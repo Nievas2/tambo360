@@ -1,20 +1,20 @@
-import { useAuth as useAuthContext } from '../context/AuthContext';
-import { User } from '../types';
+import { useAuth as useAuthContext } from '../context/AuthContext'
+import { User } from '../types'
 
 export const useAuth = () => {
-  const { authState, login, logout, setLoading, setError } = useAuthContext();
+  const { authState, login, logout, setLoading, setError } = useAuthContext()
 
   const loginUser = (user: User) => {
-    login(user);
-  };
+    login(user)
+  }
 
   const logoutUser = () => {
-    logout();
-  };
+    logout()
+  }
 
   const clearError = () => {
-    setError(null);
-  };
+    setError(null)
+  }
 
   return {
     user: authState.user,
@@ -26,5 +26,5 @@ export const useAuth = () => {
     setLoading,
     setError,
     clearError,
-  };
-};
+  }
+}

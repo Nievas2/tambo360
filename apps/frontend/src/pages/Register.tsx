@@ -1,64 +1,63 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Input } from "../components/common/Input";
-import { Button } from "../components/common/Button";
-import { User } from "../types";
-import { getSecurityTip } from "../services/service";
-import { api } from "../services/api";
-import { useAuth } from "../hooks/useAuth";
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Input } from '../components/common/Input'
+import { Button } from '../components/common/Button'
+import { getSecurityTip } from '../services/service'
+import { api } from '../services/api'
+import { useAuth } from '../hooks/useAuth'
 
 const Register: React.FC = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const navigate = useNavigate()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [securityTip, setSecurityTip] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [serverError, setServerError] = useState<string | null>(null);
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [securityTip, setSecurityTip] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchTip = async () => {
-      const tip = await getSecurityTip();
-      setSecurityTip(tip);
-    };
-    fetchTip();
-  }, []);
+      const tip = await getSecurityTip()
+      setSecurityTip(tip)
+    }
+    fetchTip()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setServerError(null);
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    setServerError(null)
     if (errors[name]) {
       setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setServerError(null);
+    e.preventDefault()
+    setIsLoading(true)
+    setServerError(null)
 
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match";
+      newErrors.confirmPassword = "Passwords don't match"
     }
     if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = 'Password must be at least 8 characters'
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setIsLoading(false);
-      return;
+      setErrors(newErrors)
+      setIsLoading(false)
+      return
     }
 
     try {
@@ -66,15 +65,15 @@ const Register: React.FC = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-      });
-      login(response.user);
-      navigate("/dashboard");
-    } catch (err: any) {
-      setServerError(err.message || "Registration failed");
+      })
+      login(response.user)
+      navigate('/dashboard')
+    } catch (err) {
+      setServerError(err.message || 'Registration failed')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
@@ -189,7 +188,7 @@ const Register: React.FC = () => {
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link
                 to="/login"
                 className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
@@ -201,7 +200,7 @@ const Register: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register
