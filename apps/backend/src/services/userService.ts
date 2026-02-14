@@ -1,19 +1,20 @@
-const User = require('../models/User');
+import User from "../models/User";
 
 class UserService {
+  private users: User[] = [];
   constructor() {
     this.users = [];
   }
 
-  findByEmail(email) {
+  findByEmail(email: any) {
     return this.users.find(user => user.email === email);
   }
 
-  findById(id) {
+  findById(id: any) {
     return this.users.find(user => user.id === id);
   }
 
-  async create(userData) {
+  async create(userData: any) {
     const existingUser = this.findByEmail(userData.email);
     if (existingUser) {
       throw new Error('User already exists');
@@ -24,7 +25,7 @@ class UserService {
     return newUser;
   }
 
-  async authenticate(email, password) {
+  async authenticate(email: any, password: any) {
     const user = this.findByEmail(email);
     if (!user || user.password !== password) {
       throw new Error('Invalid email or password');
@@ -37,4 +38,4 @@ class UserService {
   }
 }
 
-module.exports = new UserService();
+export default new UserService();
