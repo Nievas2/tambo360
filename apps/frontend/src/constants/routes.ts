@@ -15,6 +15,6 @@ export const API_ENDPOINTS = {
 } as const
 
 export const STORAGE_KEYS = {
-  USER: 'example_user',
-  TOKEN: 'example_token',
-} as const
+  USER: 'tambo_user_data',
+  TOKEN: 'tambo_auth_token',
+} as const;
