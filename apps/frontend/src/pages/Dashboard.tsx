@@ -35,7 +35,6 @@ const Dashboard: React.FC = () => {
           </p>
         </header>
 
-        
         {/* Grid de indicadores optimizado para Tablet */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
