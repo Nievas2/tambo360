@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Login from "../pages/Login";
@@ -10,7 +11,7 @@ export const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route
-        path="/login"
+        path={ROUTES.LOGIN}
         element={
           <PublicRoute>
             <Login />
@@ -18,7 +19,7 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/register"
+        path={ROUTES.REGISTER}
         element={
           <PublicRoute>
             <Register />
@@ -26,14 +27,14 @@ export const AppRoutes: React.FC = () => {
         }
       />
       <Route
-        path="/dashboard"
+        path={ROUTES.DASHBOARD}
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
     </Routes>
   );
 };
