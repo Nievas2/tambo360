@@ -1,34 +1,33 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Input } from "../components/common/Input";
-import { Button } from "../components/common/Button";
-import { User } from "../types";
-import { api } from "../services/api";
-import { useAuth } from "../hooks/useAuth";
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Input } from '../components/common/Input'
+import { Button } from '../components/common/Button'
+import { api } from '../services/api'
+import { useAuth } from '../hooks/useAuth'
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
 
     try {
-      const response = await api.login({ email, password });
-      login(response.user);
-      navigate("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      const response = await api.login({ email, password })
+      login(response.user)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
@@ -153,7 +152,7 @@ const Login: React.FC = () => {
 
           <div className="mt-8 pt-6 border-t border-slate-800 text-center">
             <p className="text-slate-400 text-sm">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{' '}
               <Link
                 to="/register"
                 className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
@@ -165,7 +164,7 @@ const Login: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
