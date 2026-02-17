@@ -3,7 +3,7 @@ export const ROUTES = {
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   HOME: '/',
-} as const;
+} as const
 
 export const API_ENDPOINTS = {
   BASE: 'http://localhost:3000/api',
@@ -12,9 +12,9 @@ export const API_ENDPOINTS = {
     REGISTER: '/auth/register',
   },
   HEALTH: '/health',
-} as const;
+} as const
 
 export const STORAGE_KEYS = {
   USER: 'example_user',
   TOKEN: 'example_token',
-} as const;
+} as const
