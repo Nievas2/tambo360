@@ -1,5 +1,5 @@
 import { Button } from '@/src/components/common/Button'
-import { useAuth } from '@/src/hooks/useAuth'
+import { useAuth } from '@/src/context/AuthContext'
 import React from 'react'
 
 const Navbar: React.FC = () => {
