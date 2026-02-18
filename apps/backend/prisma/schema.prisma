@@ -1,10 +1,11 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Usuario {
@@ -15,6 +16,7 @@ model Usuario {
   fechaCreacion    DateTime          @default(now())
   establecimientos Establecimiento[]
 }
+
 
 model Establecimiento {
   idEstablecimiento String           @id @default(uuid())
@@ -40,13 +42,13 @@ enum Moneda {
 
 enum Categoria {
   quesos
-  leches 
+  leches
 }
 
 model Producto {
-  idProducto String @id @default(uuid())
-  nombre     String
-  categoria   Categoria
+  idProducto       String           @id @default(uuid())
+  nombre           String
+  categoria        Categoria
   loteProducciones LoteProduccion[]
 }
 
@@ -55,7 +57,7 @@ model LoteProduccion {
   fechaProduccion   DateTime        @default(now())
   idProducto        String
   producto          Producto        @relation(fields: [idProducto], references: [idProducto])
-  cantidad          Float
+  cantidad          Decimal
   unidad            Unidad
   idEstablecimiento String
   establecimiento   Establecimiento @relation(fields: [idEstablecimiento], references: [idEstablecimiento])
@@ -66,7 +68,7 @@ model LoteProduccion {
 model Merma {
   idMerma       String         @id @default(uuid())
   descripcion   String
-  cantidad      Float
+  cantidad      Decimal
   unidad        Unidad
   fechaCreacion DateTime       @default(now())
   idLote        String
@@ -76,7 +78,7 @@ model Merma {
 model CostosDirecto {
   idCostoDirecto String         @id @default(uuid())
   concepto       String
-  monto          Decimal
+  monto          Decimal        @db.Decimal(10, 2)
   moneda         Moneda
   fechaCreacion  DateTime       @default(now())
   idLote         String
