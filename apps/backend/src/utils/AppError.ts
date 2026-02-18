@@ -18,6 +18,6 @@ export class AppError extends Error {
         this.statusCode = statusCode;
         this.isOperational = true;
 
-        Error.captureStackTrace(this, this.constructor);
+        (Error as any).captureStackTrace(this, this.constructor);
     }
 }
