@@ -1,51 +1,53 @@
 import { Request, Response } from "express";
 import userService from "../services/userService";
 
-export const register = async (req: Request,res: Response): Promise<void> => {
+export const registrarUsuario = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const { nombre, correo, contraseña } = req.body;
 
-    if (!name || !email || !password) {
+    if (!nombre || !correo || !contraseña) {
       res.status(400).json({
-        error: "All fields are required",
+        error: "Todos los campos son obligatorios",
       });
       return;
     }
 
-    const newUser = await userService.create({ name, email, password });
+    const nuevoUsuario = await userService.create({ nombre, correo, contraseña });
 
     res.status(201).json({
-      user: newUser.toJSON(),
-      message: "User registered successfully",
+      usuario: nuevoUsuario.toJSON(),
+      mensaje: "Usuario registrado correctamente",
     });
+
   } catch (error: unknown) {
     if (error instanceof Error && error.message === "User already exists") {
       res.status(409).json({ error: error.message });
       return;
     }
 
-    res.status(500).json({ error: "Registration failed" });
+    res.status(500).json({ error: "Error al registrar el usuario" });
   }
 };
 
-export const login = async (req: Request,res: Response): Promise<void> => {
+export const iniciarSesion = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { correo, contraseña } = req.body;
 
-    if (!email || !password) {
+    if (!correo || !contraseña) {
       res.status(400).json({
-        error: "Email and password are required",
+        error: "Correo y contraseña son obligatorios",
       });
       return;
     }
 
-    const user = await userService.authenticate(email, password);
+    const usuario = await userService.authenticate(correo, contraseña);
 
     res.json({
-      user: user.toJSON(),
-      token: "mock-jwt-token-" + user.id,
-      message: "Login successful",
+      usuario: usuario.toJSON(),
+      token: "mock-jwt-token-" + usuario.id,
+      mensaje: "Inicio de sesión exitoso",
     });
+
   } catch (error: unknown) {
     if (
       error instanceof Error &&
@@ -55,6 +57,6 @@ export const login = async (req: Request,res: Response): Promise<void> => {
       return;
     }
 
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({ error: "Error al iniciar sesión" });
   }
 };
