@@ -1,10 +1,12 @@
 import User from "../models/User";
+import { prisma } from "../lib/prisma";
 
 class UserService {
   private users: User[] = [];
   constructor() {
     this.users = [];
   }
+  
 
   findByEmail(email: any) {
     return this.users.find(user => user.email === email);
