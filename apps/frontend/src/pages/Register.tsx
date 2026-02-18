@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Input } from '../components/common/Input'
 import { Button } from '../components/common/Button'
 import { getSecurityTip } from '../services/service'
-import { api } from '../services/api'
-import { useAuth } from '../hooks/useAuth'
+import { useLogin } from '@/src/hooks/auth/useLogin'
+import { useRegister } from '@/src/hooks/auth/useRegister'
 
 const Register: React.FC = () => {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { mutateAsync } = useLogin()
+  const { mutateAsync: registerUser } = useRegister()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -61,12 +62,12 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await api.register({
+      const response = await registerUser({
         name: formData.name,
         email: formData.email,
         password: formData.password,
       })
-      login(response.user)
+      mutateAsync(response.data.user)
       navigate('/dashboard')
     } catch (err) {
       setServerError(err.message || 'Registration failed')
