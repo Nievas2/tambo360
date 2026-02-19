@@ -1,10 +1,20 @@
 import express from "express";
-import AuthRoutes from "./auth";
+
+import RutasAutenticacion from "./auth";
 import HealthRoutes from "./health";
+import RutasEstablecimientos from "./establishment";
+import RutasLotes from "./batch";
+import RutasMermas from "./decrease";
+import RutasCostos from "./cost";
 
 const router = express.Router();
 
-router.use('/auth', AuthRoutes);
+// Rutas de la API
+router.use('/auth', RutasAutenticacion);
 router.use('/health', HealthRoutes);
+router.use('/establecimiento', RutasEstablecimientos);
+router.use('/lote', RutasLotes);
+router.use('/mermas', RutasMermas);
+router.use('/costos', RutasCostos);
 
 export default router;
