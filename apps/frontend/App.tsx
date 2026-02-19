@@ -13,7 +13,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Layout>
+    <Layout className="font-inter">
       <AppRoutes />
     </Layout>
   )
