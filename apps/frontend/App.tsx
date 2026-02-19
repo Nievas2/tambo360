@@ -6,12 +6,10 @@ import { AppRoutes } from './src/routes/AppRoutes';
 
 const queryClient = new QueryClient();
 
-// Componente interno para manejar la lógica de carga después de los Providers
 const AppContent: React.FC = () => {
   const { loading } = useAuth();
 
   if (loading) {
-    // Aquí puedes usar el LoadingSpinner de develop si existe, o un div simple
     return <div className="flex items-center justify-center h-screen">Cargando aplicación...</div>;
   }
 
