@@ -1,34 +1,18 @@
-import { useAuth } from '@/src/context/AuthContext'
-import React from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 interface PublicRouteProps {
-  children: React.ReactNode
-  redirectTo?: string
+  children: React.ReactNode;
 }
 
-export const PublicRoute: React.FC<PublicRouteProps> = ({
-  children,
-  redirectTo = '/dashboard',
-}) => {
-  const { isAuthenticated, loading } = useAuth()
+const PublicRoute = ({ children }: PublicRouteProps) => {
+  const { user } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 bg-indigo-600 rounded-full mb-4"></div>
-          <p className="text-slate-400 font-medium">Loading...</p>
-        </div>
-      </div>
-    )
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
   }
 
-  return !isAuthenticated ? (
-    <>{children}</>
-  ) : (
-    <Navigate to={redirectTo} replace />
-  )
-}
+  return <>{children}</>;
+};
 
-export default PublicRoute
+export default PublicRoute;

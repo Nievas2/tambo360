@@ -1,14 +1,19 @@
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AppRoutes } from './src/routes/AppRoutes'; // Agregamos ./src/
-import { AuthProvider } from './src/context/AuthContext'; // Agregamos ./src/
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './src/context/AuthContext';
+import { AppRoutes } from './src/routes/AppRoutes';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AppRoutes /> 
+        <Router>
+          <AppRoutes />
+        </Router>
       </AuthProvider>
-    </Router>
+    </QueryClientProvider>
   );
 }
 

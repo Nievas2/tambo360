@@ -1,23 +1,22 @@
-import React from 'react'
-import Navbar from '@/src/components/Navbar'
-import DailyProductionLog from '@/src/components/shared/dashboard/DailyProductionLog'
+import React from 'react';
 
 const Dashboard: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#252525]">Dashboard</h1>
+        <p className="text-[#959595]">Bienvenido al panel de control de Tambo360.</p>
+      </div>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6 lg:p-10">
-        <header className="mb-10">
-          <h2 className="text-3xl font-bold text-white mb-2">hello word</h2>
-        </header>
-      </main>
-
-      <section>
-        <DailyProductionLog />
-      </section>
+      {/* Aquí puedes agregar tus tarjetas o estadísticas después */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 bg-white border border-[#EAEAEA] rounded-xl shadow-sm">
+          <h3 className="font-semibold text-[#252525]">Estado General</h3>
+          <p className="text-2xl font-bold text-[#252525] mt-2">Activo</p>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

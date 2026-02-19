@@ -1,41 +1,42 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { Layout } from '../components/layout/Layout';
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 import Login from '../pages/Login';
+import Dashboard from '../pages/Dashboard';
+import Produccion from '../pages/Produccion';
+import TamboEngine from '../pages/TamboEngine';
+import Perfil from '../pages/Perfil';
 
 export function AppRoutes() {
-  // --- MODO DESARROLLO (CAMBI0 ESTO) ---
-  const isAuthenticated = true; // Ponerlo en 'false' para ver el Login
-  // -------------------------------------
+const { loading } = useAuth();
+
+  if (loading) return null;
 
   return (
     <Routes>
-      {/* 1. Ruta de Login (Siempre fuera del Layout) */}
-      <Route 
-        path="/login" 
-        element={!isAuthenticated ? <Login /> : <Navigate to="/" />} 
-      />
+      <Route element={<PublicRoute><Outlet /></PublicRoute>}>
+        <Route path="/login" element={<Login />} />
+      </Route>
 
-      {/* 2. Grupo de Rutas Privadas con Layout y Outlet */}
       <Route
         element={
-          isAuthenticated ? (
+          <ProtectedRoute>
             <Layout>
               <Outlet />
             </Layout>
-          ) : (
-            <Navigate to="/login" />
-          )
+          </ProtectedRoute>
         }
       >
-        {/* Aquí van todas las páginas que llevan Sidebar */}
-        <Route path="/" element={<div>Dashboard Page</div>} />
-        <Route path="/produccion" element={<div>Producción Page</div>} />
-        <Route path="/alertas" element={<div>TamboEngine Page</div>} />
-        <Route path="/perfil" element={<div>Perfil Page</div>} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/produccion" element={<Produccion />} />
+        <Route path="/alertas" element={<TamboEngine />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Route>
 
-      {/* 3. Redirección por defecto */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
