@@ -1,6 +1,6 @@
-import { Button } from '@/src/components/common/Button'
+import { Button } from '@/src/components/common/button'
 import { Card, CardContent, CardHeader } from '@/src/components/common/card'
-import { Plus } from 'lucide-react'
+import { AlertCircle, ArrowRight, Plus } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -11,6 +11,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/components/common/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/src/components/common/dialog'
+import { Label } from '@/src/components/common/label'
+import { Input } from '@/src/components/common/Input'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/common/select'
 
 const DailyProductionLog = () => {
   return (
@@ -22,10 +41,73 @@ const DailyProductionLog = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button variant="outline" size="sm">
-            Crear lote
-            <Plus className="ml-2 size-4" />
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                Crear lote
+                <Plus className="ml-2 size-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader className="border-b p-2">
+                <DialogTitle className="text-[32px] font-bold text-black">
+                  Crear nuevo lote
+                </DialogTitle>
+
+                <DialogDescription>
+                  Ingresa los datos para iniciar el seguimiento de producción.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form className="space-y-6">
+                <div className="space-y-4">
+                  <Label className="font-bold">Fecha de producción</Label>
+                  <Input type="date" placeholder="dd/mm/aaaa" />
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="font-bold">Tipo de producción</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona producto..." />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="queso-fresco">
+                          Queso fresco
+                        </SelectItem>
+                        <SelectItem value="queso-duro">Queso duro</SelectItem>
+                        <SelectItem value="leche-cruda">Leche cruda</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="font-bold">
+                    Cantidad producida (Kg/Litros)
+                  </Label>
+                  <Input type="text" inputMode="decimal" placeholder="0.00" />
+                </div>
+
+                <span className="flex items-center gap-2 text-xs">
+                  <AlertCircle className="size-5" /> Verifica que los datos sean
+                  correctos antes de crear el lote.
+                </span>
+                <DialogFooter>
+                  <Button
+                    variant="default"
+                    className="flex items-center justify-center w-full h-16 text-xl font-bold"
+                    type="submit"
+                  >
+                    Crear lote
+                    <ArrowRight className="size-6" />
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent>
