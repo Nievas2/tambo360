@@ -7,7 +7,12 @@ const app = express();
 
 setupMiddleware(app);
 
+import { errorHandler } from "./middleware/errorMiddleware";
+
 app.use("/api", apiRoutes);
+
+// handler de errores global
+app.use(errorHandler);
 
 app.listen(config.port, () => {
   console.log(`Example Auth Backend running on port ${config.port}`);

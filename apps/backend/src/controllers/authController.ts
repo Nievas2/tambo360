@@ -1,62 +1,52 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
+import { AppError } from "../utils/AppError";
+import { ApiResponse } from "../utils/ApiResponse";
 
-export const registrarUsuario = async (req: Request, res: Response): Promise<void> => {
+export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { nombre, correo, contraseña } = req.body;
 
     if (!nombre || !correo || !contraseña) {
-      res.status(400).json({
-        error: "Todos los campos son obligatorios",
-      });
-      return;
+      throw new AppError("Todos los campos son obligatorios", 400);
     }
 
-    const nuevoUsuario = await userService.create({ nombre, correo, contraseña });
-
-    res.status(201).json({
-      usuario: nuevoUsuario.toJSON(),
-      mensaje: "Usuario registrado correctamente",
+    const newUser = await userService.create({
+      nombre,
+      correo,
+      contraseña,
     });
 
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message === "User already exists") {
-      res.status(409).json({ error: error.message });
-      return;
-    }
+    const response = ApiResponse.success(
+      newUser.toJSON(),
+      "Usuario registrado exitosamente",
+      201
+    );
 
-    res.status(500).json({ error: "Error al registrar el usuario" });
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    next(error);
   }
 };
 
-export const iniciarSesion = async (req: Request, res: Response): Promise<void> => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { correo, contraseña } = req.body;
 
     if (!correo || !contraseña) {
-      res.status(400).json({
-        error: "Correo y contraseña son obligatorios",
-      });
-      return;
+      throw new AppError("Email y contraseña son obligatorios", 400);
     }
 
-    const usuario = await userService.authenticate(correo, contraseña);
+    const user = await userService.authenticate(correo, contraseña);
 
-    res.json({
-      usuario: usuario.toJSON(),
-      token: "mock-jwt-token-" + usuario.id,
-      mensaje: "Inicio de sesión exitoso",
-    });
+    const data = {
+      user: user.toJSON(),
+      token: "mock-jwt-token-" + user.id,
+    };
 
-  } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      error.message === "Invalid email or password"
-    ) {
-      res.status(401).json({ error: error.message });
-      return;
-    }
-
-    res.status(500).json({ error: "Error al iniciar sesión" });
+    const response = ApiResponse.success(data, "Inicio de sesión exitoso");
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    next(error);
   }
 };

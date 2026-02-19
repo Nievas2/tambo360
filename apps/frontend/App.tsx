@@ -1,33 +1,30 @@
-import React from "react";
-import { HashRouter } from "react-router-dom";
-import { AuthProvider } from "./src/context/AuthContext";
-import { Layout } from "./src/components/layout/Layout";
-import { LoadingSpinner } from "./src/components/layout/LoadingSpinner";
-import { AppRoutes } from "./src/routes/AppRoutes";
-import { useAuth } from "./src/hooks/useAuth";
+import React from 'react'
+import { Layout } from './src/components/layout/Layout'
+import { LoadingSpinner } from './src/components/layout/LoadingSpinner'
+import { AppRoutes } from './src/routes/AppRoutes'
+import Providers from '@/src/utils/Providers'
+import { useAuth } from '@/src/context/AuthContext'
 
 const AppContent: React.FC = () => {
-  const { loading } = useAuth();
+  const { loading } = useAuth()
 
   if (loading) {
-    return <LoadingSpinner message="Initializing Example App..." />;
+    return <LoadingSpinner message="Initializing Example App..." />
   }
 
   return (
     <Layout>
       <AppRoutes />
     </Layout>
-  );
-};
+  )
+}
 
 export const App: React.FC = () => {
   return (
-    <HashRouter>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </HashRouter>
-  );
-};
+    <Providers>
+      <AppContent />
+    </Providers>
+  )
+}
 
-export default App;
+export default App

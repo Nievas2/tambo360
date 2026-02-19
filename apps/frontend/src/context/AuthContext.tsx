@@ -1,93 +1,52 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { AuthState, User } from "../types";
-import { storage } from "../utils/storage";
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { AuthState, User } from '../types'
+import { storage } from '../utils/storage'
 
-interface AuthContextType {
-  authState: AuthState;
-  login: (user: User) => void;
-  logout: () => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
+interface AuthContextType extends AuthState {
+  login: (user: User) => void
+  logout: () => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
 }
 
-type AuthAction =
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_USER"; payload: User }
-  | { type: "SET_ERROR"; payload: string | null }
-  | { type: "LOGOUT" };
-
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case "SET_LOADING":
-      return { ...state, loading: action.payload };
-    case "SET_USER":
-      return {
-        user: action.payload,
-        isAuthenticated: true,
-        loading: false,
-        error: null,
-      };
-    case "SET_ERROR":
-      return {
-        ...state,
-        error: action.payload,
-        loading: false,
-      };
-    case "LOGOUT":
-      return {
-        user: null,
-        isAuthenticated: false,
-        loading: false,
-        error: null,
-      };
-    default:
-      return state;
-  }
-};
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [authState, dispatch] = useReducer(authReducer, {
-    user: null,
-    isAuthenticated: false,
-    loading: true,
-    error: null,
-  });
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const isAuthenticated = !!user
 
   useEffect(() => {
-    const savedUser = storage.getUser();
+    const savedUser = storage.getUser()
     if (savedUser) {
-      dispatch({ type: "SET_USER", payload: savedUser });
-    } else {
-      dispatch({ type: "SET_LOADING", payload: false });
+      setUser(savedUser)
     }
-  }, []);
+    setLoading(false)
+  }, [])
 
   const login = (user: User) => {
-    storage.setUser(user);
-    dispatch({ type: "SET_USER", payload: user });
-  };
+    storage.setUser(user)
+    setUser(user)
+    setError(null)
+  }
 
   const logout = () => {
-    storage.clear();
-    dispatch({ type: "LOGOUT" });
-  };
-
-  const setLoading = (loading: boolean) => {
-    dispatch({ type: "SET_LOADING", payload: loading });
-  };
-
-  const setError = (error: string | null) => {
-    dispatch({ type: "SET_ERROR", payload: error });
-  };
+    storage.clear()
+    setUser(null)
+    setError(null)
+  }
 
   return (
     <AuthContext.Provider
       value={{
-        authState,
+        user,
+        isAuthenticated,
+        loading,
+        error,
         login,
         logout,
         setLoading,
@@ -96,13 +55,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     >
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
-};
+  return context
+}
