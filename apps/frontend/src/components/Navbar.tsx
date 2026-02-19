@@ -1,4 +1,4 @@
-import { Button } from '@/src/components/common/Button'
+import { Button } from '@/src/components/common/button'
 import { useAuth } from '@/src/context/AuthContext'
 import React from 'react'
 
