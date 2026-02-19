@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Input } from '../components/common/Input'
 import { Button } from '../components/common/Button'
-import { api } from '../services/api'
-import { useAuth } from '../hooks/useAuth'
+import { useLogin } from '@/src/hooks/auth/useLogin'
+import { useAuth } from '@/src/context/AuthContext'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
+  const { mutateAsync } = useLogin()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,8 +20,8 @@ const Login: React.FC = () => {
     setError(null)
 
     try {
-      const response = await api.login({ email, password })
-      login(response.user)
+      const response = await mutateAsync({ email, password })
+      login(response.data.user)
       navigate('/dashboard')
     } catch (err) {
       setError(err.message || 'An unexpected error occurred')
