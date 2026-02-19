@@ -1,5 +1,6 @@
 import React from 'react'
 import Navbar from '@/src/components/Navbar'
+import DailyProductionLog from '@/src/components/shared/dashboard/DailyProductionLog'
 
 const Dashboard: React.FC = () => {
   return (
@@ -11,6 +12,10 @@ const Dashboard: React.FC = () => {
           <h2 className="text-3xl font-bold text-white mb-2">hello word</h2>
         </header>
       </main>
+
+      <section>
+        <DailyProductionLog />
+      </section>
     </div>
   )
 }
