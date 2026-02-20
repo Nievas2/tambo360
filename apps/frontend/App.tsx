@@ -1,30 +1,38 @@
-import React from 'react'
-import { Layout } from './src/components/layout/Layout'
-import { LoadingSpinner } from './src/components/layout/LoadingSpinner'
-import { AppRoutes } from './src/routes/AppRoutes'
-import Providers from '@/src/utils/Providers'
-import { useAuth } from '@/src/context/AuthContext'
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { AppRoutes } from './src/routes/AppRoutes';
 
+const queryClient = new QueryClient();
+
+// Componente para manejar el estado de carga inicial
 const AppContent: React.FC = () => {
-  const { loading } = useAuth()
+  const { loading } = useAuth();
 
   if (loading) {
-    return <LoadingSpinner message="Initializing Example App..." />
+    return (
+      <div className="flex items-center justify-center h-screen font-inter">
+        Cargando Tambo360...
+      </div>
+    );
   }
 
   return (
-    <Layout className="font-inter">
+    <Router>
       <AppRoutes />
-    </Layout>
-  )
-}
+    </Router>
+  );
+};
 
 export const App: React.FC = () => {
   return (
-    <Providers>
-      <AppContent />
-    </Providers>
-  )
-}
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
-export default App
+export default App;
