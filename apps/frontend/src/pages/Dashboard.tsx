@@ -1,4 +1,6 @@
 import React from 'react';
+// Asegúrate de que la ruta al componente sea la correcta en tu proyecto
+import DailyProductionLog from '../components/shared/dashboard/DailyProductionLog'; 
 
 const Dashboard: React.FC = () => {
   return (
@@ -8,7 +10,10 @@ const Dashboard: React.FC = () => {
         <p className="text-[#959595]">Bienvenido al panel de control de Tambo360.</p>
       </div>
 
-      {/* Aquí puedes agregar tus tarjetas o estadísticas después */}
+      <section>
+        <DailyProductionLog />
+      </section>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 bg-white border border-[#EAEAEA] rounded-xl shadow-sm">
           <h3 className="font-semibold text-[#252525]">Estado General</h3>
