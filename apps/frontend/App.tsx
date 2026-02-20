@@ -6,11 +6,16 @@ import { AppRoutes } from './src/routes/AppRoutes';
 
 const queryClient = new QueryClient();
 
+// Componente para manejar el estado de carga inicial
 const AppContent: React.FC = () => {
   const { loading } = useAuth();
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Cargando aplicación...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen font-inter">
+        Cargando Tambo360...
+      </div>
+    );
   }
 
   return (
