@@ -10,7 +10,7 @@ import TamboEngine from '../pages/TamboEngine';
 import Perfil from '../pages/Perfil';
 
 export function AppRoutes() {
-const { loading } = useAuth();
+const loading = false;
 
   if (loading) return null;
 
