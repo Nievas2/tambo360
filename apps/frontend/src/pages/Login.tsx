@@ -1,168 +1,168 @@
-import React, { useState } from 'react'
+import { Card, CardContent } from '@/src/components/common/card'
+import { Button } from '@/src/components/common/button'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Label } from '@/src/components/common/label'
+import { Input } from '@/src/components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
-import { Input } from '../components/common/Input'
-import { Button } from '../components/common/button'
 import { useLogin } from '@/src/hooks/auth/useLogin'
 import { useAuth } from '@/src/context/AuthContext'
+import { EyeIcon, ArrowRight } from 'lucide-react'
+import { LoginSchema } from '@/src/types/login'
+import { useForm } from 'react-hook-form'
+import React, { useState } from 'react'
+import { AxiosError } from 'axios'
 
 const Login: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false)
+  const { mutateAsync, isPending, error } = useLogin()
   const navigate = useNavigate()
-  const { mutateAsync } = useLogin()
   const { login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      correo: '',
+      contraseña: '',
+    },
+    resolver: zodResolver(LoginSchema),
+  })
 
+  const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await mutateAsync({ email, password })
-      login(response.data.user)
+      const response = await mutateAsync(data)
+      login({ token: response.data.token, user: response.data.user })
       navigate('/dashboard')
-    } catch (err) {
-      setError(err.message || 'An unexpected error occurred')
-    } finally {
-      setIsLoading(false)
+    } catch (err: any) {
+      console.error('Error al iniciar sesión:', err)
     }
-  }
+  })
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950">
-      <div className="w-full max-w-md">
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-8 rounded-2xl shadow-2xl">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-600/20">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-7 h-7 text-white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-1">Welcome Back</h1>
-            <p className="text-slate-400">
-              Enter your credentials to access ExampleAuth
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                  />
-                </svg>
-                {error}
-              </div>
-            )}
-
-            <Input
-              label="Email Address"
-              placeholder="name@company.com"
-              type="email"
-              required
-              disabled={isLoading}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                  />
-                </svg>
-              }
-            />
-
-            <Input
-              label="Password"
-              placeholder="••••••••"
-              type="password"
-              required
-              disabled={isLoading}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
-                  />
-                </svg>
-              }
-            />
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
-                />
-                <span className="text-sm text-slate-400">Remember me</span>
-              </label>
-              <button
-                type="button"
-                className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            <Button type="submit" className="w-full mt-4" isLoading={isLoading}>
-              Sign In
-            </Button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-slate-800 text-center">
-            <p className="text-slate-400 text-sm">
-              Don&apos;t have an account?{' '}
-              <Link
-                to="/register"
-                className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
-              >
-                Create Account
-              </Link>
-            </p>
+    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5]">
+      <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
+        <div className="w-full h-full max-w-lg flex items-center justify-center">
+          <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
+            <img src="/logo.svg" alt="Logo" className="w-3/4 h-auto" />
+            <img src="/tambo.svg" alt="Tambo" className="w-1/2 h-auto mt-4" />
           </div>
         </div>
+      </div>
+
+      <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-end p-4 md:p-8">
+        <Card className="w-full max-w-125 border-none shadow-none md:shadow-sm py-8 px-2 md:px-4 bg-white rounded-xl">
+          <CardContent className="space-y-8">
+            <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
+              <div className="h-12 lg:h-28 w-auto flex items-start gap-2">
+                <img src="/logo.svg" alt="logo" className="h-12" />
+
+                <img src="/tambo.svg" alt="tambo" className="h-6" />
+              </div>
+
+              <div className="space-y-2">
+                <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
+                  Bienvenido
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Ingresa tus credenciales para empezar a usar la plataforma.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-6">
+              <div className="space-y-4">
+                {/* Email */}
+                <div className="space-y-2">
+                  <Label className="font-bold text-[#1a1c1e]">
+                    Correo electrónico
+                  </Label>
+                  <Input
+                    placeholder="Ingresa tu correo electrónico"
+                    {...register('correo')}
+                    disabled={isPending}
+                  />
+
+                  {errors.correo && (
+                    <small className="text-red-500">
+                      {errors.correo.message}
+                    </small>
+                  )}
+                </div>
+
+                {/* Password */}
+                <div className="space-y-2">
+                  <Label
+                    title="Contraseña"
+                    className="font-bold text-[#1a1c1e]"
+                  >
+                    Contraseña
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••••••"
+                      {...register('contraseña')}
+                      disabled={isPending}
+                    />
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                    >
+                      <EyeIcon className="w-5 h-5" />
+                    </Button>
+                  </div>
+
+                  {errors.contraseña && (
+                    <small className="text-red-500">
+                      {errors.contraseña.message}
+                    </small>
+                  )}
+
+                  <div className="flex justify-end">
+                    <Link
+                      to="/reset-password"
+                      className="text-xs text-slate-500 hover:underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+
+                  {error && (
+                    <small className="text-red-700">
+                      {error.response.data.message || 'Error al iniciar sesión'}
+                    </small>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-14 rounded-lg text-lg font-medium transition-all"
+                disabled={isPending}
+              >
+                {isPending ? 'Cargando...' : 'Iniciar sesión'}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </form>
+
+            <div className="text-center pt-4">
+              <p className="text-sm text-slate-600">
+                ¿No tienes una cuenta?{' '}
+                <Link
+                  to="/register"
+                  className="font-bold text-[#1a1c1e] hover:underline"
+                >
+                  Regístrate
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
