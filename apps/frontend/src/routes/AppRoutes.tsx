@@ -1,42 +1,51 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layout } from '../components/layout/Layout';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
-import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
-import Produccion from '../pages/Produccion';
-import TamboEngine from '../pages/TamboEngine';
-import Perfil from '../pages/Perfil';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
+import { ROUTES } from '../constants/routes';
+import LoadingSpinner from '../components/layout/LoadingSpinner';
 
-export function AppRoutes() {
-const loading = false;
+export const AppRoutes = () => {
+  const { loading } = useAuth();
 
-  if (loading) return null;
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Routes>
-      <Route element={<PublicRoute><Outlet /></PublicRoute>}>
-        <Route path="/login" element={<Login />} />
-      </Route>
+      <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      
+      <Route 
+        path={ROUTES.LOGIN} 
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } 
+      />
+      <Route 
+        path={ROUTES.REGISTER} 
+        element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        } 
+      />
 
-      <Route
+      <Route 
+        path={ROUTES.DASHBOARD} 
         element={
           <ProtectedRoute>
-            <Layout>
-              <Outlet />
-            </Layout>
+            <Dashboard />
           </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/produccion" element={<Produccion />} />
-        <Route path="/alertas" element={<TamboEngine />} />
-        <Route path="/perfil" element={<Perfil />} />
-      </Route>
+        } 
+      />
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
-}
+};
