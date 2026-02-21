@@ -54,6 +54,13 @@ class UserService {
           correo: userData.correo,
           contrasena: hashedPassword
 
+        },
+        select: {
+          idUsuario: true,
+          nombre: true,
+          correo: true,
+          verificado: true,
+          fechaCreacion: true
         }
       })
 
