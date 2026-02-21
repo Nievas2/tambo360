@@ -27,7 +27,7 @@ export const AppRoutes = () => {
       </Route>
 
       {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
-      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+      <Route element={<Layout />}>
         {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
         <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 

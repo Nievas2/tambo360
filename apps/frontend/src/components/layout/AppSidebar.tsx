@@ -8,14 +8,15 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarTrigger,
-    useSidebar,
 } from "../common/sidebar";
 
-export function AppSidebar() {
+interface AppSidebarProps {
+    forcedCollapsed?: boolean;
+}
+
+export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
     const location = useLocation();
-    const { state } = useSidebar();
-    const isCollapsed = state === "collapsed";
+    const isCollapsed = forcedCollapsed;
 
     const mainMenuItems = [
         { title: "Dashboard", icon: LayoutDashboard, url: ROUTES.DASHBOARD },
@@ -23,36 +24,19 @@ export function AppSidebar() {
         { title: "TamboEngine", icon: Cpu, url: "/tambo-engine" },
     ];
 
-    const triggerHoverStyles = "[&_button]:hover:!bg-[#4A4A4A] [&_button]:hover:!text-white [&_button]:transition-colors";
-
     return (
-        <Sidebar
-            collapsible="icon"
-            className="border-r border-gray-200 bg-white h-full"
-        >
-            <SidebarHeader className={isCollapsed ? "p-4" : "p-8"}>
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-                            <img src="/isotipo_tambo 1.svg" alt="Isotipo" className="h-full w-full object-contain" />
-                        </div>
-                        {!isCollapsed && (
-                            <div className="flex items-center animate-in fade-in duration-300">
-                                <img src="/logotipo 1.svg" alt="Tambo360" className="h-6 w-auto" />
-                            </div>
-                        )}
+        <Sidebar className="w-full border-none h-full bg-white">
+            <SidebarHeader className={`transition-all duration-300 ${isCollapsed ? "p-4" : "p-8"}`}>
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center">
+                        <img src="/isotipo_tambo 1.svg" alt="Isotipo" className="h-full w-full object-contain" />
                     </div>
                     {!isCollapsed && (
-                        <div className={`ml-2 ${triggerHoverStyles}`}>
-                            <SidebarTrigger />
+                        <div className="flex items-center animate-in fade-in duration-300">
+                            <img src="/logotipo 1.svg" alt="Tambo360" className="h-6 w-auto" />
                         </div>
                     )}
                 </div>
-                {isCollapsed && (
-                    <div className={`flex justify-center mt-4 ${triggerHoverStyles}`}>
-                        <SidebarTrigger />
-                    </div>
-                )}
             </SidebarHeader>
 
             <SidebarContent className="px-4 flex flex-col justify-between h-full pb-8">
@@ -63,22 +47,13 @@ export function AppSidebar() {
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton
                                     asChild
-                                    tooltip={item.title}
-                                    className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none outline-none flex items-center ${
+                                    className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
                                         isCollapsed ? "justify-center" : "justify-start"
-                                    } ${
-                                        isActive 
-                                            ? "bg-[#4A4A4A] !text-white" 
-                                            : "bg-transparent text-gray-400 hover:bg-gray-50"
-                                    }`}
+                                    } ${isActive ? "bg-[#4A4A4A] !text-white" : "bg-transparent text-gray-400 hover:bg-gray-50"}`}
                                 >
                                     <Link to={item.url} className={`flex items-center gap-3 w-full ${isCollapsed ? "justify-center" : ""}`}>
                                         <item.icon className={`h-5 w-5 shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
-                                        {!isCollapsed && (
-                                            <span className={`font-semibold ${isActive ? "text-white" : "text-gray-600"}`}>
-                                                {item.title}
-                                            </span>
-                                        )}
+                                        {!isCollapsed && <span className="font-semibold">{item.title}</span>}
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -90,22 +65,13 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             asChild
-                            tooltip="Mi Perfil"
-                            className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none outline-none flex items-center ${
+                            className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
                                 isCollapsed ? "justify-center" : "justify-start"
-                            } ${
-                                location.pathname === "/perfil" 
-                                    ? "bg-[#4A4A4A] !text-white" 
-                                    : "bg-transparent text-gray-400 hover:bg-gray-50"
-                            }`}
+                            } ${location.pathname === "/perfil" ? "bg-[#4A4A4A] !text-white" : "bg-transparent text-gray-400 hover:bg-gray-50"}`}
                         >
                             <Link to="/perfil" className={`flex items-center gap-3 w-full ${isCollapsed ? "justify-center" : ""}`}>
                                 <User className={`h-5 w-5 shrink-0 ${location.pathname === "/perfil" ? "text-white" : "text-gray-400"}`} />
-                                {!isCollapsed && (
-                                    <span className={`font-semibold ${location.pathname === "/perfil" ? "text-white" : "text-gray-600"}`}>
-                                        Mi Perfil
-                                    </span>
-                                )}
+                                {!isCollapsed && <span className="font-semibold">Mi Perfil</span>}
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

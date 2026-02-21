@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-// Usamos export const para evitar problemas de exportación
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onMenuClick: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -15,45 +18,34 @@ export const Navbar: React.FC = () => {
   const formatDateTime = (date: Date) => {
     const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-    const dayName = days[date.getDay()];
-    const monthName = months[date.getMonth()];
-    const dayNumber = date.getDate();
-    const year = date.getFullYear();
-
-    // Formatear hora AM/PM
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // la hora '0' debería ser '12'
-
-    return `${dayName}, ${monthName} ${dayNumber}, ${year} | ${hours}:${minutes} ${ampm}`;
+    return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} | ${date.getHours() % 12 || 12}:${date.getMinutes().toString().padStart(2, '0')} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
   };
 
   return (
-    <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-8 shadow-sm">
-      <div className="flex flex-col">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate max-w-[150px] sm:max-w-none">
-          ¡Hola, {user?.name?.split(' ')[0] || 'Raul Maidana'}!
+    <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-8">
+      <div className="flex items-center gap-4">
+        {/* Botón unificado con hover #4A4A4A */}
+        <button 
+          onClick={onMenuClick}
+          className="p-2 rounded-lg transition-colors duration-200 hover:bg-[#4A4A4A] hover:text-white text-[#4A4A4A]"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <h1 className="text-lg sm:text-xl font-bold text-black truncate">
+          ¡Hola, {user?.name?.split(' ')[0] || 'Raul'}!
         </h1>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden md:flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm">
-          <MapPin className="h-4 w-4 text-gray-400" />
-          <div className="flex flex-col leading-none">
-            <span className="text-sm font-semibold text-gray-700">Córdoba, AR</span>
-          </div>
+        <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+          <MapPin className="h-4 w-4 text-black" />
+          <span className="text-xs font-semibold text-gray-700">Córdoba, AR</span>
         </div>
-
-        <div className="flex items-center gap-2 sm:gap-3 rounded-xl border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm">
-          <Clock className="h-4 w-4 text-gray-400" />
-          <div className="flex flex-col leading-none">
-            <span className="text-xs sm:text-sm font-semibold text-gray-700">
-              {formatDateTime(currentTime)}
-            </span>
-          </div>
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+          <Clock className="h-4 w-4 text-black" />
+          <span className="text-[10px] sm:text-xs font-semibold text-gray-700">
+            {formatDateTime(currentTime)}
+          </span>
         </div>
       </div>
     </nav>
