@@ -1,42 +1,28 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import ProtectedRoute from './ProtectedRoute';
-import PublicRoute from './PublicRoute';
-import Dashboard from '../pages/Dashboard';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import Produccion from '../pages/Produccion'; 
-import TamboEngine from '../pages/TamboEngine';
-import Perfil from '../pages/Perfil';
-
-import { ROUTES } from '../constants/routes';
-import LoadingSpinner from '../components/layout/LoadingSpinner';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import Dashboard from '../pages/Dashboard';
+import Produccion from '../pages/Produccion';
+import TamboEngine from '../pages/TamboEngine';
+import Login from '../pages/Login';
+import ProtectedRoute from './ProtectedRoute'; // Importamos tu protector
 
-export const AppRoutes = () => {
-  const { loading } = useAuth();
-
-  if (loading) return <LoadingSpinner />;
-
+const AppRoutes = () => {
   return (
     <Routes>
-      {/* RUTAS PÚBLICAS: Envolvemos el Outlet con PublicRoute para satisfacer el requerimiento de children */}
-      <Route element={<PublicRoute><Outlet /></PublicRoute>}>
-        <Route path={ROUTES.LOGIN} element={<Login />} />
-        <Route path={ROUTES.REGISTER} element={<Register />} />
-      </Route>
+      {/* Ruta pública de Login */}
+      <Route path="/login" element={<Login />} />
 
-      {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
+      {/* Rutas Protegidas */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
-        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-        <Route path="/produccion" element={<Produccion />} />
-        <Route path="/alertas" element={<TamboEngine />} />
-        <Route path="/perfil" element={<Perfil />} />
+        <Route index element={<Dashboard />} />
+        <Route path="produccion" element={<Produccion />} />
+        <Route path="tambo-engine" element={<TamboEngine />} />
       </Route>
 
-      {/* Catch-all para errores */}
+      {/* Redirección por defecto */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
+
+export default AppRoutes;

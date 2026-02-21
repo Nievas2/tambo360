@@ -18,7 +18,7 @@ export function AppSidebar() {
     const mainItems = [
         { title: "Dashboard", url: ROUTES.DASHBOARD, icon: LayoutDashboard },
         { title: "Producción", url: ROUTES.PRODUCCION || "/produccion", icon: Milk },
-        { title: "TamboEngine", url: ROUTES.ALERTAS || "/alertas", icon: Cpu },
+        { title: "TamboEngine", url: "/tambo-engine", icon: Cpu }, // Corregido para que dirija correctamente
     ];
 
     return (
