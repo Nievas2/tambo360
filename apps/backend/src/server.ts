@@ -2,10 +2,12 @@ import express from "express";
 import { setupMiddleware } from "./middleware";
 import apiRoutes from "./routes";
 import config from "./config";
+import { setupSwagger } from "./swagger";
 
 const app = express();
 
 setupMiddleware(app);
+setupSwagger(app);
 
 import { errorHandler } from "./middleware/errorMiddleware";
 
