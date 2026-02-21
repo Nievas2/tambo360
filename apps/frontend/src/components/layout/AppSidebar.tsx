@@ -25,12 +25,20 @@ export function AppSidebar() {
         <Sidebar className="bg-[#F1F1F1] border-r border-[#E3E3E3] text-[#252525] w-72">
             <SidebarHeader className="p-8">
                 <div className="flex items-center gap-3">
-                    {/* Logo en Negro #000000 */}
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#000000] text-[#FFFFFF] font-bold text-xl">
-                        T
+                    <div className="flex h-10 w-10 items-center justify-center">
+                        <img
+                            src="/isotipo_tambo 1.svg"
+                            alt="Isotipo Tambo360"
+                            className="h-full w-full object-contain"
+                        />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-lg text-[#000000] tracking-tight leading-none uppercase">Tambo360</span>
+
+                    <div className="flex items-center">
+                        <img
+                            src="/logotipo 1.svg"
+                            alt="Tambo360"
+                            className="h-6 w-auto object-contain"
+                        />
                     </div>
                 </div>
             </SidebarHeader>
@@ -47,8 +55,8 @@ export function AppSidebar() {
                                         <SidebarMenuButton
                                             asChild
                                             className={`h-12 rounded-lg transition-all duration-200 group ${isActive
-                                                    ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
-                                                    : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
+                                                ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
+                                                : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
                                                 }`}
                                         >
                                             <Link to={item.url} className="flex items-center gap-4 px-4">
@@ -73,8 +81,8 @@ export function AppSidebar() {
                                 <SidebarMenuButton
                                     asChild
                                     className={`h-12 rounded-lg transition-all duration-200 group ${location.pathname === '/perfil'
-                                            ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
-                                            : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
+                                        ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
+                                        : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
                                         }`}
                                 >
                                     <Link to="/perfil" className="flex items-center gap-4 px-4">
