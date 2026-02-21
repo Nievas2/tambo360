@@ -1,25 +1,43 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from '../components/layout/Layout';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
 import Dashboard from '../pages/Dashboard';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
 import Produccion from '../pages/Produccion';
 import TamboEngine from '../pages/TamboEngine';
-import Login from '../pages/Login';
-import ProtectedRoute from './ProtectedRoute'; // Importamos tu protector
+import Perfil from '../pages/Perfil';
 
-const AppRoutes = () => {
+import { ROUTES } from '../constants/routes';
+import LoadingSpinner from '../components/layout/LoadingSpinner';
+import Layout from '../components/layout/Layout';
+
+export const AppRoutes = () => {
+  const { loading } = useAuth();
+
+  if (loading) return <LoadingSpinner />;
+
   return (
     <Routes>
-      {/* Ruta pública de Login */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Rutas Protegidas */}
-      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<Dashboard />} />
-        <Route path="produccion" element={<Produccion />} />
-        <Route path="tambo-engine" element={<TamboEngine />} />
+      {/* RUTAS PÚBLICAS: Envolvemos el Outlet con PublicRoute */}
+      <Route element={<PublicRoute><Outlet /></PublicRoute>}>
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route path={ROUTES.REGISTER} element={<Register />} />
       </Route>
 
-      {/* Redirección por defecto */}
+      {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
+        <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+
+        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+        <Route path="/produccion" element={<Produccion />} />
+        <Route path="/tambo-engine" element={<TamboEngine />} />
+        <Route path="/perfil" element={<Perfil />} />
+      </Route>
+
+      {/* Catch-all para redirigir cualquier ruta no encontrada */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
