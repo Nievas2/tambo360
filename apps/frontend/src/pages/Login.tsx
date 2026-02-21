@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Input } from '../components/common/Input'
-import { Button } from '../components/common/Button'
+import { Button } from '../components/common/button'
 import { useLogin } from '@/src/hooks/auth/useLogin'
 import { useAuth } from '@/src/context/AuthContext'
 

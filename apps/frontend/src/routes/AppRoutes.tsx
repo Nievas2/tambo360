@@ -1,115 +1,46 @@
-// apps/frontend/src/routes/AppRoutes.tsx
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import ProtectedRoute from './ProtectedRoute';
+import PublicRoute from './PublicRoute';
+import Dashboard from '../pages/Dashboard';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
+import Produccion from '../pages/Produccion';
+import TamboEngine from '../pages/TamboEngine';
+import Perfil from '../pages/Perfil';
 
-import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { ROUTES } from '../constants/routes'
-import ProtectedRoute from './ProtectedRoute'
-import PublicRoute from './PublicRoute'
-import Login from '../pages/Login'
-import Register from '../pages/Register'
-import Dashboard from '../pages/Dashboard'
+import { ROUTES } from '../constants/routes';
+import LoadingSpinner from '../components/layout/LoadingSpinner';
+import Layout from '../components/layout/Layout';
 
-// Placeholder para vistas pendientes de implementación de UX
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white p-6">
-    <div className="text-center border-2 border-dashed border-slate-800 rounded-lg p-12">
-      <h1 className="text-2xl font-bold mb-2">{title}</h1>
-      <p className="text-slate-400 italic">
-        Vista en desarrollo - Optimizado para Tablet
-      </p>
-    </div>
-  </div>
-)
+export const AppRoutes = () => {
+  const { loading } = useAuth();
 
-export const AppRoutes: React.FC = () => {
+  if (loading) return <LoadingSpinner />;
+
   return (
     <Routes>
-      {/* Rutas Públicas */}
-      <Route
-        path={ROUTES.LOGIN}
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path={ROUTES.REGISTER}
-        element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        }
-      />
+      {/* RUTAS PÚBLICAS: Envolvemos el Outlet con PublicRoute */}
+      <Route element={<PublicRoute><Outlet /></PublicRoute>}>
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route path={ROUTES.REGISTER} element={<Register />} />
+      </Route>
 
-      {/* Rutas Protegidas (Aislamiento por establecimiento) */}
-      <Route
-        path={ROUTES.DASHBOARD}
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
+      {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
+        <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
-      {/* HU1: Registro de producción */}
-      <Route
-        path={ROUTES.PRODUCCION}
-        element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Registro de Producción por Lotes" />
-          </ProtectedRoute>
-        }
-      />
+        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+        <Route path="/produccion" element={<Produccion />} />
+        <Route path="/tambo-engine" element={<TamboEngine />} />
+        <Route path="/perfil" element={<Perfil />} />
+      </Route>
 
-      {/* HU2: Registro de mermas */}
-      <Route
-        path={ROUTES.MERMAS}
-        element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Registro de Mermas de Producción" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Registro de costos directos */}
-      <Route
-        path={ROUTES.COSTOS}
-        element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Registro de Costos Operativos" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Visualización de indicadores operativos */}
-      <Route
-        path={ROUTES.REPORTES}
-        element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Indicadores Operativos Básicos" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* HU4: Alertas y explicaciones de IA */}
-      <Route
-        path={ROUTES.ALERTAS}
-        element={
-          <ProtectedRoute>
-            <PlaceholderPage title="Alertas TamboEngine (IA)" />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Navegación y Fallback */}
-      <Route
-        path={ROUTES.HOME}
-        element={<Navigate to={ROUTES.LOGIN} replace />}
-      />
-      <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      {/* Catch-all para redirigir cualquier ruta no encontrada */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default AppRoutes
+export default AppRoutes;
