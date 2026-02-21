@@ -1,17 +1,15 @@
 import express from "express";
-import { register, login } from "../controllers/authController";
-import { prisma } from "../lib/prisma";
+import { register, login, verifyEmail, resendVerificationEmail, forgotPassword, verifyResetPasswordToken, resetPassword, getMe } from "../controllers/authController";
 
 const router = express.Router();
 
-router.post("/register", register);
-
-router.get("/test", async (req, res) => {
-    const usuarios = await prisma.usuario.findMany();
-    console.log(usuarios);
-    res.json(usuarios);
-});
-
-router.post("/login", login);
+router.post("/crear-cuenta", register);
+router.post("/verificar-email", verifyEmail);
+router.post("/reenviar-verificacion", resendVerificationEmail);
+router.post("/iniciar-sesion", login);
+router.post("/contrasena-olvidada", forgotPassword);
+router.post("/verificar-restablecer-contrasena", verifyResetPasswordToken);
+router.post("/restablecer-contrasena", resetPassword)
+router.get("/me", getMe);
 
 export default router;

@@ -7,27 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  idUsuario        String            @id @default(uuid())
-  correo           String            @unique
-  contrasena       String
-  nombre           String
-  fechaCreacion    DateTime          @default(now())
-  establecimientos Establecimiento[]
-}
-
-
-model Establecimiento {
-  idEstablecimiento String           @id @default(uuid())
-  nombre            String
-  localidad         String
-  provincia         String
-  fechaCreacion     DateTime         @default(now())
-  idUsuario         String
-  usuario           Usuario          @relation(fields: [idUsuario], references: [idUsuario])
-  loteProducciones  LoteProduccion[]
-}
-
 enum Unidad {
   kg
   litros
@@ -42,6 +21,34 @@ enum Moneda {
 enum Categoria {
   quesos
   leches
+}
+
+enum TipoToken {
+  verificacion
+  recuperacion
+}
+
+model Usuario {
+  idUsuario        String            @id @default(uuid())
+  correo           String            @unique
+  contrasena       String
+  nombre           String        @db.VarChar(50)
+  verificado       Boolean           @default(false)
+  fechaCreacion    DateTime          @default(now())
+  establecimientos Establecimiento[]
+  tokens           VerificarToken[]
+}
+
+
+model Establecimiento {
+  idEstablecimiento String           @id @default(uuid())
+  nombre            String
+  localidad         String
+  provincia         String
+  fechaCreacion     DateTime         @default(now())
+  idUsuario         String
+  usuario           Usuario          @relation(fields: [idUsuario], references: [idUsuario])
+  loteProducciones  LoteProduccion[]
 }
 
 model Producto {
@@ -82,4 +89,17 @@ model CostosDirecto {
   fechaCreacion  DateTime       @default(now())
   idLote         String
   lote           LoteProduccion @relation(fields: [idLote], references: [idLote])
+}
+
+
+model VerificarToken {
+  tokenid String @id @default(uuid())
+  idUsuario String
+  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
+  tipo TipoToken
+  tokenHash String
+  expiraEn DateTime
+  usadoEn DateTime?
+  creadoEn DateTime @default(now())
+  @@index([idUsuario, tipo])
 }
