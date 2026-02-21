@@ -23,13 +23,12 @@ export function AppSidebar() {
         { title: "TamboEngine", icon: Cpu, url: "/tambo-engine" },
     ];
 
-    // Esta clase busca el botón real dentro del componente SidebarTrigger y le aplica el hover
     const triggerHoverStyles = "[&_button]:hover:!bg-[#4A4A4A] [&_button]:hover:!text-white [&_button]:transition-colors";
 
     return (
         <Sidebar
             collapsible="icon"
-            className="border-r border-gray-200 bg-white sticky top-0 h-screen z-50"
+            className="border-r border-gray-200 bg-white h-full z-50"
         >
             <SidebarHeader className={isCollapsed ? "p-4" : "p-8"}>
                 <div className="flex items-center justify-between w-full">
