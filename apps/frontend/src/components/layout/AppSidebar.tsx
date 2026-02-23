@@ -8,84 +8,74 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarGroup,
-    SidebarGroupContent,
 } from "../common/sidebar";
 
-export function AppSidebar() {
-    const location = useLocation();
+interface AppSidebarProps {
+    forcedCollapsed?: boolean;
+}
 
-    const mainItems = [
-        { title: "Dashboard", url: ROUTES.DASHBOARD, icon: LayoutDashboard },
-        { title: "Producción", url: ROUTES.PRODUCCION || "/produccion", icon: Milk },
-        { title: "TamboEngine", url: ROUTES.ALERTAS || "/alertas", icon: Cpu },
+export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
+    const location = useLocation();
+    const isCollapsed = forcedCollapsed;
+
+    const mainMenuItems = [
+        { title: "Dashboard", icon: LayoutDashboard, url: ROUTES.DASHBOARD },
+        { title: "Producción", icon: Milk, url: "/produccion" },
+        { title: "TamboEngine", icon: Cpu, url: "/tambo-engine" },
     ];
 
     return (
-        <Sidebar className="bg-[#F1F1F1] border-r border-[#E3E3E3] text-[#252525] w-72">
-            <SidebarHeader className="p-8">
+        <Sidebar className="w-full border-none h-full bg-white">
+            <SidebarHeader className={`transition-all duration-300 ${isCollapsed ? "p-4" : "p-8"}`}>
                 <div className="flex items-center gap-3">
-                    {/* Logo en Negro #000000 */}
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#000000] text-[#FFFFFF] font-bold text-xl">
-                        T
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center">
+                        <img src="/isotipo_tambo 1.svg" alt="Isotipo" className="h-full w-full object-contain" />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-lg text-[#000000] tracking-tight leading-none uppercase">Tambo360</span>
-                    </div>
+                    {!isCollapsed && (
+                        <div className="flex items-center animate-in fade-in duration-300">
+                            <img src="/logotipo 1.svg" alt="Tambo360" className="h-6 w-auto" />
+                        </div>
+                    )}
                 </div>
             </SidebarHeader>
 
             <SidebarContent className="px-4 flex flex-col justify-between h-full pb-8">
-                {/* Grupo Superior: Dashboard, Producción, TamboEngine */}
-                <SidebarGroup>
-                    <SidebarGroupContent>
-                        <SidebarMenu className="gap-2">
-                            {mainItems.map((item) => {
-                                const isActive = location.pathname === item.url;
-                                return (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            className={`h-12 rounded-lg transition-all duration-200 group ${isActive
-                                                    ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
-                                                    : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
-                                                }`}
-                                        >
-                                            <Link to={item.url} className="flex items-center gap-4 px-4">
-                                                <item.icon className={`h-5 w-5 ${isActive ? 'text-[#000000]' : 'text-[#959595] group-hover:text-[#252525]'}`} />
-                                                <span className={`font-bold text-[15px] ${isActive ? 'text-[#000000]' : ''}`}>
-                                                    {item.title}
-                                                </span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                );
-                            })}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-                {/* Grupo Inferior: Solo Perfil */}
-                <SidebarGroup>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
+                <SidebarMenu>
+                    {mainMenuItems.map((item) => {
+                        const isActive = location.pathname === item.url;
+                        return (
+                            <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton
                                     asChild
-                                    className={`h-12 rounded-lg transition-all duration-200 group ${location.pathname === '/perfil'
-                                            ? "bg-[#FFFFFF] text-[#000000] shadow-sm border border-[#D6D6D6]"
-                                            : "hover:bg-[#EAEAEA] text-[#4A4A4A]"
-                                        }`}
+                                    className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+                                        isCollapsed ? "justify-center" : "justify-start"
+                                    } ${isActive ? "bg-[#4A4A4A] !text-white" : "bg-transparent text-gray-400 hover:bg-gray-50"}`}
                                 >
-                                    <Link to="/perfil" className="flex items-center gap-4 px-4">
-                                        <User className={`h-5 w-5 ${location.pathname === '/perfil' ? 'text-[#000000]' : 'text-[#959595] group-hover:text-[#252525]'}`} />
-                                        <span className="font-bold text-[15px]">Perfil</span>
+                                    <Link to={item.url} className={`flex items-center gap-3 w-full ${isCollapsed ? "justify-center" : ""}`}>
+                                        <item.icon className={`h-5 w-5 shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
+                                        {!isCollapsed && <span className="font-semibold">{item.title}</span>}
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
+                        );
+                    })}
+                </SidebarMenu>
+
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+                                isCollapsed ? "justify-center" : "justify-start"
+                            } ${location.pathname === "/perfil" ? "bg-[#4A4A4A] !text-white" : "bg-transparent text-gray-400 hover:bg-gray-50"}`}
+                        >
+                            <Link to="/perfil" className={`flex items-center gap-3 w-full ${isCollapsed ? "justify-center" : ""}`}>
+                                <User className={`h-5 w-5 shrink-0 ${location.pathname === "/perfil" ? "text-white" : "text-gray-400"}`} />
+                                {!isCollapsed && <span className="font-semibold">Mi Perfil</span>}
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarContent>
         </Sidebar>
     );

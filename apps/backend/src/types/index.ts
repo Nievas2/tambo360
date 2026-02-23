@@ -1,3 +1,10 @@
+
+declare module 'express' {
+  interface Request {
+    user?: { id: string };
+  }
+}
+
 interface RegistrationData {
   name: string;
   email: string;
