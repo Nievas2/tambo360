@@ -46,7 +46,20 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
     const user = await userService.authenticate(correo, contraseña);
 
-    const token = jwt.sign({id: user.idUsuario,}, process.env.JWT_SECRET!, { expiresIn: "1d" });
+    const userData = {
+      user: {
+        nombre: user.nombre,
+        correo: user.correo,
+        idUsuario: user.idUsuario,
+        verificado: user.verificado,
+        fechaCreacion: user.fechaCreacion,
+        establecimientos: user.establecimientos
+      }
+    }
+
+    const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" });
+
+
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -55,7 +68,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       maxAge: 24 * 60 * 60 * 1000 // 1 día
     });
 
-    const response = ApiResponse.success({idUsuario: user.idUsuario, verificado: user.verificado}, "Inicio de sesión exitoso");
+    const response = ApiResponse.success({...userData, token: token}, "Inicio de sesión exitoso");
     res.status(response.statusCode).json(response);
   } catch (error) {
     next(error);
@@ -89,7 +102,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
 // Funcion para reenviar el email de verificación
 export const resendVerificationEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    
+
     const { correo } = req.body;
 
     if (!correo) {
@@ -151,7 +164,7 @@ export const verifyResetPasswordToken = async (req: Request, res: Response, next
 // Funcion para restablecer la contraseña
 export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    
+
     const { token, nuevaContraseña } = req.body;
 
     if (!token || typeof token !== "string") {
@@ -181,11 +194,11 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 // Funcion para obtener los datos del usuario autenticado
 export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    if(!req.user) {
+    if (!req.user) {
       throw new AppError("No autenticado", 401);
     }
 
-    const {id} = req.user;
+    const { id } = req.user;
     const user = await userService.findById(id);
 
     if (!user) {
