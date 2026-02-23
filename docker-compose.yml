@@ -24,8 +24,8 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:tambo360@db:5432/tambo
-      - EMAIL_USER=facuuflv@gmail.com
-      - EMAIL_PASS=zreaiujjfisxhqao
+      - EMAIL_USER=t360.arg@gmail.com
+      - EMAIL_PASS=ylmghgmkqeirqvjo
       - FRONTEND_URL=http://localhost:5173
       - JWT_SECRET=jwt_secret_key_tambo360
     volumes:
