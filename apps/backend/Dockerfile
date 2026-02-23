@@ -1,7 +1,6 @@
 # -------- BASE --------
 FROM node:20-slim AS base
 
-# Instalar openssl
 RUN apt-get update -y \
   && apt-get install -y openssl \
   && rm -rf /var/lib/apt/lists/*
@@ -19,7 +18,6 @@ EXPOSE 3000
 
 CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm run dev"]
 
-
 # -------- BUILD --------
 FROM base AS build
 
@@ -29,9 +27,12 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-
 # -------- PRODUCTION --------
 FROM node:20-slim AS production
+
+RUN apt-get update -y \
+  && apt-get install -y openssl \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -40,9 +41,10 @@ RUN npm install --omit=dev
 
 COPY prisma ./prisma
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
 ENV NODE_ENV=production
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]

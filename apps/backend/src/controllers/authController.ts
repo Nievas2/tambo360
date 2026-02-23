@@ -52,8 +52,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         correo: user.correo,
         idUsuario: user.idUsuario,
         verificado: user.verificado,
-        fechaCreacion: user.fechaCreacion,
-        establecimientos: user.establecimientos
+        fechaCreacion: user.fechaCreacion
       }
     }
 
@@ -64,11 +63,11 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000 // 1 día
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000 // un dia
     });
 
-    const response = ApiResponse.success({...userData, token: token}, "Inicio de sesión exitoso");
+    const response = ApiResponse.success({ ...userData, token: token }, "Inicio de sesión exitoso");
     res.status(response.statusCode).json(response);
   } catch (error) {
     next(error);
