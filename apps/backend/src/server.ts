@@ -5,6 +5,8 @@ import config from "./config";
 import { setupSwagger } from "./swagger";
 
 const app = express();
+console.log("ENV DATABASE_URL:", process.env.DATABASE_URL);
+console.log("ENV DIRECT_URL:", process.env.DIRECT_URL);
 
 setupMiddleware(app);
 setupSwagger(app);

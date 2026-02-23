@@ -31,7 +31,8 @@ RUN npm run build
 FROM node:20-slim AS production
 
 RUN apt-get update -y \
-  && apt-get install -y openssl \
+  && apt-get install -y openssl ca-certificates \
+  && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -48,3 +49,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 CMD ["node", "dist/server.js"]
+
