@@ -3,7 +3,9 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError";
 
 interface JwtPayload {
-  id: string;
+  user: {
+    idUsuario: string;
+  };
 }
 
 export const authenticate = (
@@ -23,7 +25,8 @@ export const authenticate = (
       process.env.JWT_SECRET!
     ) as JwtPayload;
 
-    req.user = { id: decoded.id };
+    
+    req.user = { id: decoded.user.idUsuario }; //Se setea  el id del usuario
 
     next();
   } catch (error) {
