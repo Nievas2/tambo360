@@ -34,7 +34,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [])
 
   const login = ({ user, token }: { user: User; token: string }) => {
-    Cookies.set('user', JSON.stringify(user.idUsuario))
     setUser(user)
     setToken(token)
     setError(null)
