@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-end p-4 md:p-8">
+      <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-center md:justify-end p-4 md:p-8">
         <Card className="w-full max-w-125 border-none shadow-none md:shadow-sm py-8 px-2 md:px-4 bg-white rounded-xl">
           <CardContent className="space-y-8">
             <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
