@@ -1,9 +1,9 @@
 import express from "express";
-import { registrarEstablecimiento, listarEstablecimientos } from "../controllers/establishmentsController";
+import { registrarEstablecimiento, listarEstablecimientos } from "../controllers/establishmentController";
 
 const router = express.Router();
 
-router.post('/registrar', registrarEstablecimiento);
-router.get('/listar', listarEstablecimientos);
+router.post('/crear-establecimiento', registrarEstablecimiento);
+router.get('/obtener-establecimiento', listarEstablecimientos);
 
 export default router;
