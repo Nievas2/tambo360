@@ -81,6 +81,7 @@ const Login: React.FC = () => {
                   <Input
                     placeholder="Ingresa tu correo electrónico"
                     {...register('correo')}
+                    data-test-id="email-login"
                     disabled={isPending}
                   />
 
@@ -104,6 +105,7 @@ const Login: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••••••"
                       {...register('contraseña')}
+                      data-test-id="password-login"
                       disabled={isPending}
                     />
 
@@ -143,6 +145,7 @@ const Login: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full h-14 rounded-lg text-lg font-medium transition-all"
+                data-test-id="iniciar-sesion"
                 disabled={isPending}
               >
                 {isPending ? 'Cargando...' : 'Iniciar sesión'}
@@ -156,6 +159,7 @@ const Login: React.FC = () => {
                 <Link
                   to="/register"
                   className="font-bold text-[#1a1c1e] hover:underline"
+                  data-test-id="crear-cuenta"
                 >
                   Regístrate
                 </Link>
