@@ -1,15 +1,16 @@
-import nodemailer from "nodemailer";
+import nodemailer, { Transporter } from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
+const transporter: Transporter<SMTPTransport.SentMessageInfo> = nodemailer.createTransport({
+  host: "smtp.gmail.com", // explicit host
+  port: 465,              // SSL
+  secure: true,           // true for 465
   auth: {
-    user:
-
-      process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  family: 4, // ⚠️ fuerza IPv4, evita ENETUNREACH en Render
+} as SMTPTransport.Options);
 
 export async function sendVerificationEmail(to: string, link: string) {
   const info = await transporter.sendMail({
