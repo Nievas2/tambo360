@@ -45,8 +45,16 @@ const Login: React.FC = () => {
       <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
         <div className="w-full h-full max-w-lg flex items-center justify-center">
           <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
-            <img src="/logo.svg" alt="Logo" className="w-3/4 h-auto" />
-            <img src="/tambo.svg" alt="Tambo" className="w-1/2 h-auto mt-4" />
+            <img
+              src="/isotipo_tambo 1.svg"
+              alt="Logo"
+              className="w-3/4 h-auto"
+            />
+            <img
+              src="/logotipo 1.svg"
+              alt="Tambo"
+              className="w-1/2 h-auto mt-4"
+            />
           </div>
         </div>
       </div>
@@ -56,9 +64,9 @@ const Login: React.FC = () => {
           <CardContent className="space-y-8">
             <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
               <div className="h-12 lg:h-28 w-auto flex items-start gap-2">
-                <img src="/logo.svg" alt="logo" className="h-12" />
+                <img src="/isotipo_tambo 1.svg" alt="logo" className="h-12" />
 
-                <img src="/tambo.svg" alt="tambo" className="h-6" />
+                <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
               </div>
 
               <div className="space-y-2">
