@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/src/components/common/card'
-import { Button } from '@/src/components/common/button'
+import { Button } from '@/src/components/common/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/src/components/common/label'
 import { Input } from '@/src/components/common/Input'
