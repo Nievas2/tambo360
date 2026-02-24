@@ -10,12 +10,16 @@ export const registrarEstablecimiento = async (req: Request, res: Response, next
         const parsed = createEstablishmentSchema.safeParse(req.body);
 
         if (!parsed.success) {
-            const errors = parsed.error.issues.map(i => i.message).join(", ");
-            throw new AppError(errors, 400);
+            throw new AppError("Todos los campos son obligatorios y deben ser válidos", 400);
         }
 
-        const idUsuario = (req as any).user.idUsuario;
-        const nuevoEstablecimiento = await establishmentsService.crear({ ...parsed.data, userId: idUsuario, });
+        const user = (req as any).user;
+
+        if (!user) {
+            throw new AppError("Usuario no autenticado", 401);
+        }
+
+        const nuevoEstablecimiento = await establishmentsService.crear({ ...parsed.data, userId: user.id, });
 
         const response = ApiResponse.success(
             nuevoEstablecimiento,
@@ -32,7 +36,7 @@ export const registrarEstablecimiento = async (req: Request, res: Response, next
 
 export const listarEstablecimientos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const idUsuario = (req as any).user.idUsuario;
+        const idUsuario = (req as any).user.id;
 
         const establecimientos = await establishmentsService.listarPorUsuario(idUsuario);
 

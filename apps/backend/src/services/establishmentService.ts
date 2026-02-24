@@ -7,6 +7,7 @@ type CreateEstablishmentServiceData = CreateEstablishmentData & {
 };
 
 class EstablishmentsService {
+
     async crear(data: CreateEstablishmentServiceData) {
 
         const usuario = await prisma.usuario.findUnique({
