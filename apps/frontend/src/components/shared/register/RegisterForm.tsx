@@ -10,8 +10,12 @@ import { useForm } from 'react-hook-form'
 
 interface RegisterFormProps {
   handleNextStep: () => void
+  handleAddEmail: (email: string) => void
 }
-const RegisterForm = ({ handleNextStep }: RegisterFormProps) => {
+const RegisterForm = ({
+  handleNextStep,
+  handleAddEmail,
+}: RegisterFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { mutateAsync, isPending, error } = useRegister()
@@ -33,6 +37,7 @@ const RegisterForm = ({ handleNextStep }: RegisterFormProps) => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const response = await mutateAsync(data)
+      handleAddEmail(data.correo)
       handleNextStep()
     } catch (err: any) {
       console.error('Error al iniciar sesión:', err)
@@ -47,13 +52,13 @@ const RegisterForm = ({ handleNextStep }: RegisterFormProps) => {
           <Label className="font-bold text-[#1a1c1e]">Nombre*</Label>
           <Input
             placeholder="Ingresa tu nombre y apellido"
-            {...register('correo')}
+            {...register('nombre')}
             data-test-id="nombre-registro"
             disabled={isPending}
           />
 
-          {errors.correo && (
-            <small className="text-red-500">{errors.correo.message}</small>
+          {errors.nombre && (
+            <small className="text-red-500">{errors.nombre.message}</small>
           )}
         </div>
 
@@ -145,8 +150,10 @@ const RegisterForm = ({ handleNextStep }: RegisterFormProps) => {
             </Button>
           </div>
 
-          {errors.contraseña && (
-            <small className="text-red-500">{errors.contraseña.message}</small>
+          {errors.confirmarContraseña && (
+            <small className="text-red-500">
+              {errors.confirmarContraseña.message}
+            </small>
           )}
 
           {error && (

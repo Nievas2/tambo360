@@ -1,16 +1,56 @@
 import RegisterForm from '@/src/components/shared/register/RegisterForm'
 import { Card, CardContent } from '@/src/components/common/card'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Mail, Section } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
+import { useResendEmail } from '@/src/hooks/auth/useResendEmail'
 
 const Register: React.FC = () => {
-  const [step, setStep] = useState(2)
+  const [isResending, setIsResending] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [email, setEmail] = useState('')
+  const [step, setStep] = useState(1)
+  const { mutateAsync, error, isPending } = useResendEmail()
+
+  useEffect(() => {
+    let interval: any | null = null
+    if (step === 2) {
+      setSecondsLeft(180)
+    }
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [step])
+
+  useEffect(() => {
+    if (secondsLeft <= 0) return
+    const timer = setInterval(() => {
+      setSecondsLeft((s) => Math.max(0, s - 1))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [secondsLeft])
 
   function handleNextStep() {
     setStep((prev) => prev + 1)
   }
+
+  function handleAddEmail(email: string) {
+    setEmail(email)
+  }
+
+  async function handleResend() {
+    try {
+      setIsResending(true)
+      await mutateAsync(email)
+      setSecondsLeft(180)
+    } catch (e) {
+      console.error('Error al reenviar email', e)
+    } finally {
+      setIsResending(false)
+    }
+  }
+
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5]">
       <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
@@ -34,7 +74,7 @@ const Register: React.FC = () => {
         <Card className="w-full max-w-125 border-none shadow-none md:shadow-sm py-8 bg-white rounded-xl">
           <CardContent className="space-y-8">
             <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
-              <div className="h-12 lg:h-28 w-auto flex items-start gap-2">
+              <div className="w-auto flex items-start gap-2">
                 <img src="/isotipo_tambo 1.svg" alt="logo" className="h-12" />
 
                 <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
@@ -54,34 +94,61 @@ const Register: React.FC = () => {
             </div>
 
             {step === 1 ? (
-              <RegisterForm handleNextStep={handleNextStep} />
+              <RegisterForm
+                handleNextStep={handleNextStep}
+                handleAddEmail={handleAddEmail}
+              />
             ) : (
               <section className="h-full min-h-[50vh] flex flex-col items-center justify-center gap-6">
                 <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                  Crear cuenta
+                  Revisa tu email
                 </h2>
-                <p className="text-sm text-muted-foreground">
-                  Selecciona el método que prefieras para recibir la
-                  verificación
+                <p className="text-sm text-center text-muted-foreground">
+                  Haz clic en el enlace del email para activar <br /> tu cuenta
+                  y comenzar a usar Tambo360.
                 </p>
-                <Button variant="outline" className="w-full h-14">
-                  <Mail className="size-5" /> Via correo electrónico
-                </Button>
+
+                <div className="w-full max-w-sm">
+                  <Button
+                    variant="outline"
+                    className="w-full h-14"
+                    onClick={handleResend}
+                    disabled={secondsLeft > 0 || isResending || isPending}
+                    data-test-id="resend-email"
+                  >
+                    {isResending
+                      ? 'Enviando...'
+                      : secondsLeft > 0
+                        ? `Reenviar email (${Math.floor(secondsLeft / 60)
+                            .toString()
+                            .padStart(2, '0')}:${(secondsLeft % 60)
+                            .toString()
+                            .padStart(2, '0')})`
+                        : 'Reenviar email'}
+                  </Button>
+                  {error && (
+                    <small className="text-red-700 mt-2">
+                      {error.response.data.message || 'Error al reenviar email'}
+                    </small>
+                  )}
+                </div>
               </section>
             )}
 
-            <div className="text-center pt-4">
-              <p className="text-sm text-slate-600">
-                ¿Ya tienes una cuenta?{' '}
-                <Link
-                  to="/register"
-                  className="font-bold text-[#1a1c1e] hover:underline"
-                  data-test-id="iniciar-sesion"
-                >
-                  Inicia sesion
-                </Link>
-              </p>
-            </div>
+            {step === 1 && (
+              <div className="text-center pt-4">
+                <p className="text-sm text-slate-600">
+                  ¿Ya tienes una cuenta?{' '}
+                  <Link
+                    to="/register"
+                    className="font-bold text-[#1a1c1e] hover:underline"
+                    data-test-id="iniciar-sesion"
+                  >
+                    Inicia sesion
+                  </Link>
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

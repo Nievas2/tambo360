@@ -39,6 +39,7 @@ export const RegisterSchema = z
   })
   .refine((data) => data.contraseña === data.confirmarContraseña, {
     message: 'Las contraseñas no coinciden',
+    path: ['confirmarContraseña'],
   })
 
 export type RegisterData = z.infer<typeof RegisterSchema>
