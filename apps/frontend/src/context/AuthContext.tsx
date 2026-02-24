@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { AuthState, User } from '../types'
 import Cookies from 'js-cookie'
+import { api } from '@/src/services/api'
 
 interface AuthContextType extends AuthState {
   login: ({ user, token }: { user: User; token: string }) => void
@@ -22,15 +23,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isAuthenticated = !!user
 
   useEffect(() => {
-    const savedUser = Cookies.get('user')
-      ? JSON.parse(Cookies.get('user') as string)
-      : null
-    const savedToken = Cookies.get('token')
-    if (savedUser) {
-      setUser(savedUser)
-      setToken(savedToken || null)
+    const fetchSession = async () => {
+      try {
+        const res = await api.get('/auth/me')
+        if (res?.data) {
+          setUser(res.data)
+        } else {
+          setUser(null)
+          setToken(null)
+        }
+      } catch (err) {
+        setUser(null)
+        setToken(null)
+      } finally {
+        setLoading(false)
+      }
     }
-    setLoading(false)
+
+    fetchSession()
   }, [])
 
   const login = ({ user, token }: { user: User; token: string }) => {
