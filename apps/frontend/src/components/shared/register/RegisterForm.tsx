@@ -171,7 +171,7 @@ const RegisterForm = ({
         disabled={isPending}
       >
         {isPending ? 'Cargando...' : 'Siguiente'}
-        <ArrowRight className="ml-2 w-5 h-5" />
+        <ArrowRight className="ml-2 size-5" />
       </Button>
     </form>
   )

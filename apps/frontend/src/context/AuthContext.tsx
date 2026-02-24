@@ -3,6 +3,7 @@ import { AuthState, User } from '../types'
 import Cookies from 'js-cookie'
 
 interface AuthContextType extends AuthState {
+  setToken: (token: string | null) => void
   login: ({ user, token }: { user: User; token: string }) => void
   logout: () => void
   setLoading: (loading: boolean) => void
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         token,
+        setToken,
         isAuthenticated,
         loading,
         error,
