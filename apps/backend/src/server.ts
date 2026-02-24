@@ -6,6 +6,8 @@ import { setupSwagger } from "./swagger";
 import cookieParser from "cookie-parser";//para que no se rompa el volumen
 
 const app = express();
+console.log("ENV DATABASE_URL:", process.env.DATABASE_URL);
+console.log("ENV DIRECT_URL:", process.env.DIRECT_URL);
 
 setupMiddleware(app);
 setupSwagger(app);
