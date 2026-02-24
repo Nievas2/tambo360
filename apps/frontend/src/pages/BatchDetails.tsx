@@ -10,7 +10,19 @@ import {
 } from '@/src/components/common/empty'
 import { Input } from '@/src/components/common/Input'
 import { StatCard } from '@/src/components/shared/StatCard'
-import { ArrowRight, Search } from 'lucide-react'
+import {
+  ArrowRight,
+  CircleCheck,
+  CircleDollarSign,
+  Droplet,
+  Factory,
+  ListFilter,
+  Percent,
+  Search,
+  StickyNote,
+  Tag,
+  TrendingDown,
+} from 'lucide-react'
 import { useState } from 'react'
 
 const MOCK_DATA = {
@@ -61,20 +73,46 @@ export default function LoteDetalle() {
       <div className="flex flex-col gap-4">
         {/* Stats grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <StatCard title="Cantidad Producida" value={lote.cantidadProducida} />
-          <StatCard title="Merma Registrada" value={lote.mermaRegistrada} />
-          <StatCard title="Cantidad Vendible" value={lote.cantidadVendible} />
-          <StatCard title="% de Merma" value={lote.porcentajeMerma} />
+          <StatCard
+            icon={<Droplet />}
+            title="Cantidad Producida"
+            value={lote.cantidadProducida}
+          />
+          <StatCard
+            icon={<TrendingDown />}
+            title="Merma Registrada"
+            value={lote.mermaRegistrada}
+          />
+          <StatCard
+            icon={<CircleCheck />}
+            title="Cantidad Vendible"
+            value={lote.cantidadVendible}
+          />
+          <StatCard
+            icon={<Percent />}
+            title="% de Merma"
+            value={lote.porcentajeMerma}
+          />
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard
+            icon={<Factory />}
             title="Costo Unitario Real"
             value={lote.costoUnitarioReal}
           />
-          <StatCard title="Costo Total de Lote" value={lote.costoTotalLote} />
-          <StatCard title="Costo de Merma" value={lote.costoMerma} />
           <StatCard
+            icon={<StickyNote />}
+            title="Costo Total de Lote"
+            value={lote.costoTotalLote}
+          />
+          <StatCard
+            icon={<CircleDollarSign />}
+            title="Costo de Merma"
+            value={lote.costoMerma}
+          />
+          <StatCard
+            icon={<Tag />}
             title="Costo Unitario Base"
             value={lote.costoUnitarioBase}
           />
@@ -121,7 +159,7 @@ export default function LoteDetalle() {
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="size-4 text-gray-400 absolute" />
+                <Search className="size-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
                   type="text"
                   placeholder="Buscar lote..."
@@ -130,34 +168,27 @@ export default function LoteDetalle() {
                   className="h-10 pl-10"
                 />
               </div>
+
+              <Button variant="outline" className="h-10">
+                <ListFilter className="size-4" />
+              </Button>
             </div>
           </div>
 
           <CardContent className="p-0">
             {tab === 'detalles' && lote.mermas.length === 0 && (
-              <Empty>
+              <Empty className="w-full gap-4">
                 <EmptyHeader>
-                  <EmptyTitle>Sin mermas registradas</EmptyTitle>
+                  <EmptyTitle className="font-bold">
+                    Sin mermas registradas
+                  </EmptyTitle>
                 </EmptyHeader>
-                <EmptyContent>
-                  <EmptyDescription>
+                <EmptyContent className="w-full max-w-xl">
+                  <EmptyDescription className="w-full">
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
                   <Button>Registrar Merma</Button>
-                </EmptyContent>
-              </Empty>
-            )}
-            {tab === 'historial' && lote.historialCostos.length === 0 && (
-              <Empty>
-                <EmptyHeader>
-                  <EmptyTitle>Sin historial de costos</EmptyTitle>
-                </EmptyHeader>
-                <EmptyContent>
-                  <EmptyDescription>
-                    No hay registros de costos asociados a este lote todavía.
-                  </EmptyDescription>
-                  <Button>Agregar Registro de Costo</Button>
                 </EmptyContent>
               </Empty>
             )}
