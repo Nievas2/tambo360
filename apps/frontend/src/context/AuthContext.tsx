@@ -26,9 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchSession = async () => {
       try {
         const res = await api.get('/auth/me')
-        if (res?.data?.user) {
-          setUser(res.data.user)
-          // No se puede leer token httpOnly desde cliente; si el backend devuelve token en body, puedes setToken(res.data.token)
+        if (res?.data) {
+          setUser(res.data)
         } else {
           setUser(null)
           setToken(null)
