@@ -12,6 +12,7 @@ import Perfil from '../pages/Perfil'
 import { ROUTES } from '../constants/routes'
 import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
+import VerifyUser from '@/src/pages/VerifyUser'
 import BatchDetails from '@/src/pages/BatchDetails'
 
 export const AppRoutes = () => {
@@ -32,6 +33,8 @@ export const AppRoutes = () => {
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
       </Route>
+
+      <Route path={'/auth/verify'} element={<VerifyUser />} />
 
       {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
       <Route
