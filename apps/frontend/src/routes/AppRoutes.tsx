@@ -13,6 +13,7 @@ import { ROUTES } from '../constants/routes'
 import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
 import VerifyUser from '@/src/pages/VerifyUser'
+import BatchDetails from '@/src/pages/BatchDetails'
 
 export const AppRoutes = () => {
   const { loading } = useAuth()
@@ -48,6 +49,7 @@ export const AppRoutes = () => {
 
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
         <Route path="/produccion" element={<Produccion />} />
+        <Route path="/produccion/lote/:loteId" element={<BatchDetails />} />
         <Route path="/tambo-engine" element={<TamboEngine />} />
         <Route path="/perfil" element={<Perfil />} />
       </Route>

@@ -3,6 +3,7 @@ import { setupMiddleware } from "./middleware";
 import apiRoutes from "./routes";
 import config from "./config";
 import { setupSwagger } from "./swagger";
+import cookieParser from "cookie-parser";//para que no se rompa el volumen
 
 const app = express();
 console.log("ENV DATABASE_URL:", process.env.DATABASE_URL);
