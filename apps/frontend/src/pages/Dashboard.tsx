@@ -1,3 +1,4 @@
+import AlertsSection from '@/src/components/shared/dashboard/AlertsSection'
 import { StatCard } from '../components/shared/StatCard'
 import DailyProductionLog from '../components/shared/dashboard/DailyProductionLog'
 
@@ -46,8 +47,11 @@ const Dashboard = () => {
       </div>
 
       {/* Contenedor para el log de producción - Manejo de ancho total */}
-      <div className="mt-8 w-full overflow-x-auto">
-        <DailyProductionLog />
+      <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full overflow-x-auto">
+        <div className="w-full sm:w-2/3 lg:w-3/4">
+          <DailyProductionLog />
+        </div>
+        <AlertsSection />
       </div>
     </div>
   )
