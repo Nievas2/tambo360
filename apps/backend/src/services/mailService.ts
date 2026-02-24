@@ -1,23 +1,17 @@
-import nodemailer, { Transporter } from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import sgMail from "@sendgrid/mail";
 
-const transporter: Transporter<SMTPTransport.SentMessageInfo> = nodemailer.createTransport({
-  host: "smtp.gmail.com", // explicit host
-  port: 465,              // SSL
-  secure: true,           // true for 465
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  family: 4, // ⚠️ fuerza IPv4, evita ENETUNREACH en Render
-} as SMTPTransport.Options);
+// Setea la API Key de tu .env
+const apiKey = process.env.SENDGRID_API_KEY;
+if (!apiKey) throw new Error("SENDGRID_API_KEY no está definida en .env");
+
+
+sgMail.setApiKey(apiKey);
 
 export async function sendVerificationEmail(to: string, link: string) {
-  const info = await transporter.sendMail({
-    from: `"Tambo360" <${process.env.EMAIL_USER}>`,
-    to: to,
+  const msg = {
+    to,
+    from: process.env.EMAIL_FROM!, // el remitente verificado en SendGrid (no personal)
     subject: "Verificá tu cuenta en Tambo360",
-
     text: `
 Hola,
 
@@ -35,7 +29,6 @@ Si no solicitaste esta cuenta, podés ignorar este mensaje.
 
 Equipo Tambo360
 `,
-
     html: `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
@@ -83,10 +76,10 @@ Equipo Tambo360
       </a>
     </div>
     <p style="font-size:12px; word-break:break-all; color:#6b7280;">
-Si el botón no funciona, copiá y pegá este enlace en tu navegador:
-<br/>
-${link}
-</p>
+      Si el botón no funciona, copiá y pegá este enlace en tu navegador:
+      <br/>
+      ${link}
+    </p>
 
     <p style="color:#374151; line-height:1.6;">
       Este enlace estará disponible por las próximas 24 horas.
@@ -106,15 +99,21 @@ ${link}
   </div>
 </div>
 `
-  });
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log("Correo de verificación enviado a", to);
+  } catch (error) {
+    console.error("Error enviando correo de verificación:", error);
+  }
 }
 
 export async function sendPasswordResetEmail(to: string, link: string) {
-  const info = await transporter.sendMail({
-    from: `"Tambo360" <${process.env.EMAIL_USER}>`,
-    to: to,
+  const msg = {
+    to,
+    from: process.env.EMAIL_FROM!, // el remitente verificado en SendGrid
     subject: "Recuperá tu contraseña en Tambo360",
-
     text: `
 Hola,
 
@@ -131,7 +130,6 @@ Tu contraseña actual seguirá siendo válida.
 
 Equipo Tambo360
 `,
-
     html: `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
@@ -180,7 +178,7 @@ Equipo Tambo360
     </div>
 
     <p style="color:#374151; line-height:1.6;">
-      Este enlace estará disponible por 15 minutos.
+      Este enlace estará disponible por 1 hora.
     </p>
 
     <p style="color:#6b7280; font-size:12px; line-height:1.5;">
@@ -203,5 +201,12 @@ Equipo Tambo360
   </div>
 </div>
 `
-  });
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log("Correo de recuperación enviado a", to);
+  } catch (error) {
+    console.error("Error enviando correo de recuperación:", error);
+  }
 }
