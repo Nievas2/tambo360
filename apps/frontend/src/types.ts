@@ -14,7 +14,6 @@ export interface User {
   nombre: string
   fechaCreacion: string
   establecimientos: string | Establecimiento[] 
-  token?: string 
 }
 
 export interface AuthState {
