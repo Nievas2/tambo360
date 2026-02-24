@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+// Importamos la interfaz para mantener el tipado correcto
+import { Establecimiento } from '../types';
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -14,6 +16,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Lógica para obtener el establecimiento:
+  // Si establecimientos es un array, tomamos el primero.
+  const establecimientoActivo = Array.isArray(user?.establecimientos) 
+    ? (user?.establecimientos[0] as Establecimiento)
+    : null;
 
   const formatDateTime = (date: Date) => {
     const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -31,7 +39,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
           <Menu className="h-6 w-6" />
         </button>
         <h1 className="text-lg sm:text-xl font-bold text-black truncate">
-          {/* Usamos 'nombre' que es como está definido en tu archivo types */}
           ¡Hola, {user?.nombre?.split(' ')[0] || 'Raul'}!
         </h1>
       </div>
@@ -40,8 +47,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <MapPin className="h-4 w-4 text-black" />
           <span className="text-xs font-semibold text-gray-700">
-            {/* Acceso seguro a la ubicación del usuario */}
-            {user?.location?.city || user?.city || 'Córdoba'}, {user?.location?.province || user?.province || 'AR'}
+            {/* Levantamos los datos desde el establecimiento del usuario */}
+            {establecimientoActivo 
+              ? `${establecimientoActivo.localidad}, ${establecimientoActivo.provincia}`
+              : 'Córdoba, AR'}
           </span>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
