@@ -30,14 +30,14 @@ const MOCK_DATA = {
   nombre: 'Leche entera',
   estado: 'Óptimo',
   inicio: '14/01/2026',
-  cantidadProducida: '12,500 L',
-  mermaRegistrada: '380 L',
-  cantidadVendible: '12,120 L',
-  porcentajeMerma: '3.04%',
-  costoUnitarioReal: '$0.42',
-  costoTotalLote: '$5,250',
-  costoMerma: '$159',
-  costoUnitarioBase: '$0.38 / L',
+  cantidadProducida: 'XXX L',
+  mermaRegistrada: 'XXX L',
+  cantidadVendible: 'XXXX L',
+  porcentajeMerma: 'X.X%',
+  costoUnitarioReal: '$XXX',
+  costoTotalLote: '$XXX',
+  costoMerma: '$XXXX',
+  costoUnitarioBase: '$XXX',
   observaciones: 'Sin observaciones relevantes.',
   mermas: [],
   historialCostos: [],
@@ -57,7 +57,7 @@ export default function LoteDetalle() {
             <h1 className="text-[32px] font-bold">
               Lote {lote.id} – {lote.nombre}
             </h1>
-            <Badge color="green">{lote.estado}</Badge>
+            <Badge variant="secondary">{lote.estado}</Badge>
           </div>
           <p className="text-[#959595]">Inicio: {lote.inicio}</p>
         </div>
@@ -90,7 +90,7 @@ export default function LoteDetalle() {
           />
           <StatCard
             icon={<Percent />}
-            title="% de Merma"
+            title="Porcentaje de Merma"
             value={lote.porcentajeMerma}
           />
         </div>
@@ -98,22 +98,22 @@ export default function LoteDetalle() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <StatCard
             icon={<Factory />}
-            title="Costo Unitario Real"
+            title="Costo de producción"
             value={lote.costoUnitarioReal}
           />
           <StatCard
             icon={<StickyNote />}
-            title="Costo Total de Lote"
+            title="Costo merma"
             value={lote.costoTotalLote}
           />
           <StatCard
             icon={<CircleDollarSign />}
-            title="Costo de Merma"
+            title="Costo Total del lote"
             value={lote.costoMerma}
           />
           <StatCard
             icon={<Tag />}
-            title="Costo Unitario Base"
+            title="Costo Unitario Real"
             value={lote.costoUnitarioBase}
           />
         </div>
