@@ -4,6 +4,8 @@ import { AppError } from "../utils/AppError";
 import { ApiResponse } from "../utils/ApiResponse";
 import { passwordValidationSchema, registerSchema } from "../schemas/authSchema";
 import jwt from "jsonwebtoken";
+import { config } from "node:process";
+
 
 // FUncion para registrar un nuevo usuario
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -56,8 +58,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         establecimientos: user.establecimientos
       }
     }
-
-    const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" });
+   const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" }); //
 
 
 

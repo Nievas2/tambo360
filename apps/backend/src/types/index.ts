@@ -1,10 +1,7 @@
-import {Establecimiento} from "@prisma/client";
-
-
 declare module 'express' {
   interface Request {
     user?: { id: string };
-    establecimiento?: Establecimiento;
+     
   }
 }
 
