@@ -21,13 +21,18 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - DATABASE_URL=postgresql://postgres:tambo360@db:5432/tambo
-      - EMAIL_USER=t360.arg@gmail.com
-      - EMAIL_PASS=ylmghgmkqeirqvjo
-      - FRONTEND_URL=http://localhost:5173
-      - JWT_SECRET=jwt_secret_key_tambo360
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     volumes:
       - ./apps/backend:/app
       - /app/node_modules
