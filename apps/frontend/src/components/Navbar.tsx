@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -10,36 +9,10 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [location, setLocation] = useState<string>("Córdoba, AR");
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
-          );
-          const data = await response.json();
-          const addr = data.address;
-          
-          // Ajuste de lógica para "Ciudad, Provincia/Estado"
-          // Buscamos el nombre de la ciudad o municipio
-          const ciudad = addr.city || addr.town || addr.municipality || addr.village || "Córdoba";
-          // Buscamos la provincia o el estado
-          const provincia = addr.state || addr.region || "AR";
-          
-          setLocation(`${ciudad}, ${provincia}`);
-        } catch (error) {
-          console.error("Error obteniendo ubicación", error);
-        }
-      });
-    }
   }, []);
 
   const formatDateTime = (date: Date) => {
@@ -58,15 +31,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
           <Menu className="h-6 w-6" />
         </button>
         <h1 className="text-lg sm:text-xl font-bold text-black truncate">
-          {/* Usamos user.name si existe, sino 'Raul' por defecto como tenías */}
-          ¡Hola, {user?.name?.split(' ')[0] || 'Raul'}!
+          {/* Usamos 'nombre' que es como está definido en tu archivo types */}
+          ¡Hola, {user?.nombre?.split(' ')[0] || 'Raul'}!
         </h1>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
         <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <MapPin className="h-4 w-4 text-black" />
-          <span className="text-xs font-semibold text-gray-700">{location}</span>
+          <span className="text-xs font-semibold text-gray-700">
+            {/* Acceso seguro a la ubicación del usuario */}
+            {user?.location?.city || user?.city || 'Córdoba'}, {user?.location?.province || user?.province || 'AR'}
+          </span>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <Clock className="h-4 w-4 text-black" />
