@@ -4,6 +4,8 @@ import { AppError } from "../utils/AppError";
 import { ApiResponse } from "../utils/ApiResponse";
 import { passwordValidationSchema, registerSchema } from "../schemas/authSchema";
 import jwt from "jsonwebtoken";
+import { config } from "node:process";
+
 
 // FUncion para registrar un nuevo usuario
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -52,23 +54,21 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         correo: user.correo,
         idUsuario: user.idUsuario,
         verificado: user.verificado,
-        fechaCreacion: user.fechaCreacion,
-        establecimientos: user.establecimientos
+        fechaCreacion: user.fechaCreacion
       }
     }
-
-    const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" });
+   const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" }); //
 
 
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000 // 1 día
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000 // un dia
     });
 
-    const response = ApiResponse.success({...userData, token: token}, "Inicio de sesión exitoso");
+    const response = ApiResponse.success({ ...userData, token: token }, "Inicio de sesión exitoso");
     res.status(response.statusCode).json(response);
   } catch (error) {
     next(error);

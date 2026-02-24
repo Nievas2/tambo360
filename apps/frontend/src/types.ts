@@ -1,13 +1,15 @@
 export interface User {
-  id: string
-  email: string
-  username: string
-  name: string
-  avatar?: string
+  idUsuario: string
+  correo: string
+  contrasena: string
+  nombre: string
+  fechaCreacion: string
+  establecimientos: string
 }
 
 export interface AuthState {
   user: User | null
+  token: string | null
   isAuthenticated: boolean
   loading: boolean
   error: string | null

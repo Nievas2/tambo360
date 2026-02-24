@@ -1,4 +1,4 @@
-import { Button } from '@/src/components/common/button'
+import { Button } from '@/src/components/common/Button'
 import { Card, CardContent, CardHeader } from '@/src/components/common/card'
 import { AlertCircle, ArrowRight, Grid, Plus } from 'lucide-react'
 import {
