@@ -27,8 +27,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchSession = async () => {
       try {
         const res = await api.get('/auth/me')
-        if (res?.data) {
-          setUser(res.data)
+        if (res?.data.data) {
+          setUser(res.data.data)
         } else {
           setUser(null)
           setToken(null)
