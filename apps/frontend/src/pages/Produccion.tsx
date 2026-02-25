@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
-import { Plus, Search, Filter, Milk, Cpu } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  Milk,
+  Cpu,
+  Eye,
+  Pencil,
+  DropletOff,
+  BanknoteArrowUp,
+  Copy,
+  Trash,
+  Ellipsis,
+} from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
 import {
@@ -8,17 +21,30 @@ import {
   CardTitle,
   CardContent,
 } from '@/src/components/common/card'
-// Importamos los componentes de la tabla de Shadcn
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
+  TableCell,
 } from '@/src/components/common/table'
+import { Badge } from '@/src/components/common/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/common/dropdown-menu'
+import { Link } from 'react-router-dom'
+import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
+  const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500 p-4 sm:p-8">
@@ -92,7 +118,58 @@ const Produccion: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* Se deja vacío para el futuro Back-end como pidió Nievas2 */}
+              <TableRow>
+                <TableCell>#001</TableCell>
+                <TableCell>16/06/2026</TableCell>
+                <TableCell>Leche entera</TableCell>
+                <TableCell>5.000 L</TableCell>
+                <TableCell>200 L</TableCell>
+                <TableCell>
+                  <Badge>Desvio</Badge>
+                </TableCell>
+                <TableCell>$2.450.000</TableCell>
+                <TableCell className="text-right mr-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="xs">
+                        <Ellipsis />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Link
+                            to="/produccion/lote/001"
+                            className="flex items-center gap-2"
+                          >
+                            <Eye /> Ver Detalles
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() => setIsChangeDecreaseOpen(true)}
+                        >
+                          <DropletOff /> Registrar merma
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <BanknoteArrowUp /> Registrar costo
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Copy /> Copiar
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Trash /> Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
 
@@ -133,6 +210,7 @@ const Produccion: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      <ChangeDecrease open={isChangeDecreaseOpen} onClose={()=>setIsChangeDecreaseOpen(false)} />
     </div>
   )
 }
