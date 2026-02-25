@@ -1,5 +1,5 @@
 import { LayoutDashboard, Milk, Cpu, User } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { data, Link, useLocation } from 'react-router-dom'
 import { ROUTES } from '../../constants/routes'
 import {
   Sidebar,
@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../common/sidebar'
+import { useAuth } from '@/src/context/AuthContext'
+import { Button } from '@/src/components/common/Button'
 
 interface AppSidebarProps {
   forcedCollapsed?: boolean
@@ -16,12 +18,28 @@ interface AppSidebarProps {
 
 export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
   const location = useLocation()
+  const { logout } = useAuth()
   const isCollapsed = forcedCollapsed
 
   const mainMenuItems = [
-    { title: 'Dashboard', icon: LayoutDashboard, url: ROUTES.DASHBOARD },
-    { title: 'Producción', icon: Milk, url: '/produccion' },
-    { title: 'TamboEngine', icon: Cpu, url: '/tambo-engine' },
+    {
+      title: 'Dashboard',
+      icon: LayoutDashboard,
+      url: ROUTES.DASHBOARD,
+      data: "data-test-id='dashboard'",
+    },
+    {
+      title: 'Producción',
+      icon: Milk,
+      url: '/produccion',
+      data: "data-test-id='produccion'",
+    },
+    {
+      title: 'TamboEngine',
+      icon: Cpu,
+      url: '/tambo-engine',
+      data: "data-test-id='tambo-engine'",
+    },
   ]
 
   return (
@@ -86,8 +104,8 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                 isCollapsed ? 'justify-center' : 'justify-start'
               } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] !text-white' : 'bg-transparent text-gray-400 hover:bg-gray-50'}`}
             >
-              <Link
-                to="/perfil"
+              <Button
+                onClick={() => logout()}
                 className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <User
@@ -96,7 +114,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                 {!isCollapsed && (
                   <span className="font-semibold">Mi Perfil</span>
                 )}
-              </Link>
+              </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
