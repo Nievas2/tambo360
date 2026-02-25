@@ -7,6 +7,7 @@ interface AuthContextType extends AuthState {
   logout: () => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  setToken: (token: string | null) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         token,
+        setToken,
         isAuthenticated,
         loading,
         error,
