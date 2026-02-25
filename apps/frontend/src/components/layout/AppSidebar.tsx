@@ -82,6 +82,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                   <Link
                     to={item.url}
                     className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
+                    data-test-id={item.data}
                   >
                     <item.icon
                       className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`}
