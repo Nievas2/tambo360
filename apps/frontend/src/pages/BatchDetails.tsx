@@ -43,7 +43,7 @@ const MOCK_DATA = {
   historialCostos: [],
 }
 
-export default function LoteDetalle() {
+export default function BatchDetails() {
   const [tab, setTab] = useState('detalles')
   const [search, setSearch] = useState('')
   const lote = MOCK_DATA

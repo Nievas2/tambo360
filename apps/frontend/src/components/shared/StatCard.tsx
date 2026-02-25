@@ -5,6 +5,7 @@ interface StatCardProps {
   value: string
   trend?: { value: number; isPositive: boolean }
   description?: string
+  icon?: React.ReactNode
 }
 
 export const StatCard = ({
@@ -12,11 +13,14 @@ export const StatCard = ({
   value,
   trend,
   description,
+  icon,
 }: StatCardProps) => {
   return (
     <Card className="border-slate-200 shadow-sm bg-white rounded-xl">
       <CardContent className="p-5">
         <div className="flex flex-col gap-4">
+          {icon}
+
           {/* Título en gris suave y negrita pequeña */}
           <span className="text-[12px] font-bold text-slate-500 uppercase tracking-wider font-inter">
             {title}
