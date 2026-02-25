@@ -41,10 +41,12 @@ import {
 } from '@/src/components/common/dropdown-menu'
 import { Link } from 'react-router-dom'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
+import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
+  const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500 p-4 sm:p-8">
@@ -107,9 +109,6 @@ const Produccion: React.FC = () => {
                   Merma
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
-                  Estado
-                </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Costo
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider text-right">
@@ -124,9 +123,6 @@ const Produccion: React.FC = () => {
                 <TableCell>Leche entera</TableCell>
                 <TableCell>5.000 L</TableCell>
                 <TableCell>200 L</TableCell>
-                <TableCell>
-                  <Badge>Desvio</Badge>
-                </TableCell>
                 <TableCell>$2.450.000</TableCell>
                 <TableCell className="text-right mr-2">
                   <DropdownMenu>
@@ -153,7 +149,9 @@ const Produccion: React.FC = () => {
                         >
                           <DropletOff /> Registrar merma
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setIsChangeCostOpen(true)}
+                        >
                           <BanknoteArrowUp /> Registrar costo
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -210,7 +208,15 @@ const Produccion: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      <ChangeDecrease open={isChangeDecreaseOpen} onClose={()=>setIsChangeDecreaseOpen(false)} />
+      <ChangeDecrease
+        open={isChangeDecreaseOpen}
+        onClose={() => setIsChangeDecreaseOpen(false)}
+      />
+
+      <ChangeCost
+        open={isChangeCostOpen}
+        onClose={() => setIsChangeCostOpen(false)}
+      />
     </div>
   )
 }
