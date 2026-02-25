@@ -51,6 +51,7 @@ CREATE TABLE "LoteProduccion" (
     "cantidad" DECIMAL(65,30) NOT NULL,
     "unidad" "Unidad" NOT NULL,
     "idEstablecimiento" TEXT NOT NULL,
+    "observaciones" VARCHAR(255),
 
     CONSTRAINT "LoteProduccion_pkey" PRIMARY KEY ("idLote")
 );
