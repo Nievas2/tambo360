@@ -140,7 +140,7 @@ const Register: React.FC = () => {
                 <p className="text-sm text-slate-600">
                   ¿Ya tienes una cuenta?{' '}
                   <Link
-                    to="/register"
+                    to="/login"
                     className="font-bold text-[#1a1c1e] hover:underline"
                     data-test-id="iniciar-sesion"
                   >
