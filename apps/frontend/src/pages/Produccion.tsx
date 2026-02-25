@@ -12,6 +12,7 @@ import {
   Copy,
   Trash,
   Ellipsis,
+  Files,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
@@ -49,7 +50,7 @@ const Produccion: React.FC = () => {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500 p-4 sm:p-8">
+    <div className="flex flex-col gap-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -71,7 +72,7 @@ const Produccion: React.FC = () => {
               <div className="relative group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-black transition-colors" />
                 <Input
-                  className="pl-10 w-full md:w-[240px] bg-gray-50 border-gray-200 rounded-lg"
+                  className="pl-10 w-full md:w-60 bg-gray-50 border-gray-200 rounded-lg"
                   placeholder="Buscar lote..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
@@ -127,7 +128,7 @@ const Produccion: React.FC = () => {
                 <TableCell className="text-right mr-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="xs">
+                      <Button variant="ghost" size="sm">
                         <Ellipsis />
                       </Button>
                     </DropdownMenuTrigger>
@@ -155,7 +156,7 @@ const Produccion: React.FC = () => {
                           <BanknoteArrowUp /> Registrar costo
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Copy /> Copiar
+                          <Files /> Duplicar
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
