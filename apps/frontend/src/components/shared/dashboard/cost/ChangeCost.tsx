@@ -59,11 +59,6 @@ const ChangeCost = ({ open, onClose, cost }: ChangeCostProps) => {
             <Input placeholder="0" inputMode="numeric" />
           </div>
 
-          <div className="space-y-2">
-            <Label>Observaciones</Label>
-            <Input placeholder="Anota la información que consideres importante" />
-          </div>
-
           <span className="flex items-center gap-2 text-xs">
             <AlertCircle className="size-5" /> Verifica que los datos sean
             correctos antes de {cost ? 'actualizar' : 'registrar'} los costo
