@@ -1,16 +1,15 @@
-import { getBatch } from '@/src/utils/api/batch.api'
+import { getProducts } from '@/src/utils/api/products.api'
 import { queryKeys } from '@/src/utils/queryKeys'
 import { useQuery } from '@tanstack/react-query'
 
-export function useBatch({ id }: { id: string }) {
+export function useProducts() {
   return useQuery({
-    queryKey: queryKeys.batch.detail(id),
+    queryKey: queryKeys.product.lists(),
     queryFn: async () => {
-      const { data } = await getBatch(id)
+      const { data } = await getProducts()
       return data
     },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: !!id,
   })
 }

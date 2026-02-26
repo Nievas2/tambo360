@@ -1,42 +1,22 @@
 import { Button } from '@/src/components/common/Button'
 import { Card, CardContent, CardHeader } from '@/src/components/common/card'
-import { AlertCircle, ArrowRight, Grid, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/src/components/common/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/src/components/common/dialog'
-import { Label } from '@/src/components/common/label'
-import { Input } from '@/src/components/common/Input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/src/components/common/select'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
+import { useBatches } from '@/src/hooks/batch/useBatches'
 
 const DailyProductionLog = () => {
   const [open, setOpen] = useState(false)
-  const [finished, setFinished] = useState(false)
+  const { data } = useBatches()
+  console.log(data)
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
@@ -94,7 +74,7 @@ const DailyProductionLog = () => {
           </TableBody>
         </Table>
       </CardContent>
-      <ChangeBatch open={open} setOpen={setOpen} />
+      <ChangeBatch open={open} setOpen={() => setOpen(false)} />
     </Card>
   )
 }

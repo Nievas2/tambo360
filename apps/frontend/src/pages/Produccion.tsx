@@ -6,10 +6,8 @@ import {
   Milk,
   Cpu,
   Eye,
-  Pencil,
   DropletOff,
   BanknoteArrowUp,
-  Copy,
   Trash,
   Ellipsis,
   Files,
@@ -31,13 +29,11 @@ import {
   TableRow,
   TableCell,
 } from '@/src/components/common/table'
-import { Badge } from '@/src/components/common/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/common/dropdown-menu'
@@ -45,12 +41,16 @@ import { Link } from 'react-router-dom'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
+import { useBatches } from '@/src/hooks/batch/useBatches'
+import { Badge } from '@/src/components/common/badge'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
+
+  const { data, isPending } = useBatches()
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -120,6 +120,9 @@ const Produccion: React.FC = () => {
                   Merma
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                  Estado
+                </TableHead>
+                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Costo
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider text-right">
@@ -134,6 +137,9 @@ const Produccion: React.FC = () => {
                 <TableCell>Leche entera</TableCell>
                 <TableCell>5.000 L</TableCell>
                 <TableCell>200 L</TableCell>
+                <TableCell>
+                  <Badge>Terminado</Badge>
+                </TableCell>
                 <TableCell>$2.450.000</TableCell>
                 <TableCell className="text-right mr-2">
                   <DropdownMenu>
