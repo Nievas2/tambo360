@@ -65,7 +65,7 @@ model LoteProduccion {
   cantidad          Decimal
   unidad            Unidad
   idEstablecimiento String
-  estado            Boolean
+  estado            Boolean         @default(false)
   establecimiento   Establecimiento @relation(fields: [idEstablecimiento], references: [idEstablecimiento])
   mermas            Merma[]
   costosDirectos    CostosDirecto[]
