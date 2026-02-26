@@ -21,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  CardDescription,
 } from '@/src/components/common/card'
 import {
   Table,
@@ -43,11 +44,13 @@ import {
 import { Link } from 'react-router-dom'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
+import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
+  const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -57,7 +60,10 @@ const Produccion: React.FC = () => {
             Lotes de producción
           </h1>
         </div>
-        <Button className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-6 rounded-xl transition-all shadow-sm">
+        <Button
+          className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-6 rounded-xl transition-all shadow-sm"
+          onClick={() => setIsChangeBatchOpen(true)}
+        >
           Registrar lote <Plus className="w-5 h-5" />
         </Button>
       </div>
@@ -65,9 +71,13 @@ const Produccion: React.FC = () => {
       <Card className="border-gray-200 shadow-sm overflow-hidden rounded-2xl bg-white">
         <CardHeader className="border-b border-gray-100 bg-white p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <CardTitle className="text-lg font-bold">
-              Listado de lotes
-            </CardTitle>
+            <div className="flex flex-col gap-3">
+              <CardTitle className="text-lg font-bold">
+                Listado de lotes
+              </CardTitle>
+              <CardDescription>Febrero 2026</CardDescription>
+            </div>
+
             <div className="flex items-center gap-3">
               <div className="relative group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-black transition-colors" />
@@ -209,6 +219,10 @@ const Produccion: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modales para registrar merma, costo y lote */}
+      <ChangeBatch open={isChangeBatchOpen} setOpen={setIsChangeBatchOpen} />
+
       <ChangeDecrease
         open={isChangeDecreaseOpen}
         onClose={() => setIsChangeDecreaseOpen(false)}
