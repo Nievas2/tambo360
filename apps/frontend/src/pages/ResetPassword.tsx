@@ -12,7 +12,6 @@ import * as z from "zod";
 import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword"; 
 import { useResetPassword } from "@/src/hooks/auth/useResetPassword";
 
-// Esquema alineado con las reglas del BACKEND
 const resetSchema = z.object({
   contraseña: z.string()
     .min(8, "Mínimo 8 caracteres")
@@ -60,13 +59,18 @@ const ResetPassword = () => {
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
-  const handleRequestReset = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
+  const handleRequestReset = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!email) {
+      toast.error("Por favor, ingresa tu correo electrónico");
+      return;
+    }
 
     forgotPassword(email, {
       onSuccess: () => {
         setStep(2);
+        setSecondsLeft(180);
+        toast.success("Instrucciones enviadas nuevamente");
       },
       onError: (error: any) => {
         const msg = error.response?.data?.message || "Error al enviar el correo";
@@ -81,7 +85,6 @@ const ResetPassword = () => {
       return;
     }
 
-    // Corregido: Se pasa un solo objeto con las propiedades que espera el hook
     resetPassword(
       { 
         token: tokenFromUrl, 
@@ -154,8 +157,13 @@ const ResetPassword = () => {
               <section className="flex flex-col items-center justify-center gap-6 py-4 text-center">
                 <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Revisa tu email</h2>
                 <p className="text-sm text-muted-foreground">Hemos enviado un enlace a <b>{email}</b> para restablecer tu contraseña.</p>
-                <Button variant="outline" className="w-full h-14 border-slate-200 font-bold rounded-xl" disabled={secondsLeft > 0}>
-                  {secondsLeft > 0 ? `Reenviar en ${secondsLeft}s` : 'Reenviar email'}
+                <Button 
+                  variant="outline" 
+                  className="w-full h-14 border-slate-200 font-bold rounded-xl" 
+                  disabled={secondsLeft > 0 || isSendingEmail}
+                  onClick={() => handleRequestReset()}
+                >
+                  {isSendingEmail ? "Enviando..." : secondsLeft > 0 ? `Reenviar en ${secondsLeft}s` : 'Reenviar email'}
                 </Button>
               </section>
             )}
