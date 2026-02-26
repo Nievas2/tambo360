@@ -1,5 +1,19 @@
 import React, { useState } from 'react'
-import { Plus, Search, Filter, Milk, Cpu } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  Milk,
+  Cpu,
+  Eye,
+  Pencil,
+  DropletOff,
+  BanknoteArrowUp,
+  Copy,
+  Trash,
+  Ellipsis,
+  Files,
+} from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
 import {
@@ -8,20 +22,35 @@ import {
   CardTitle,
   CardContent,
 } from '@/src/components/common/card'
-// Importamos los componentes de la tabla de Shadcn
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
+  TableCell,
 } from '@/src/components/common/table'
+import { Badge } from '@/src/components/common/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/common/dropdown-menu'
+import { Link } from 'react-router-dom'
+import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
+import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
+  const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
+  const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500 p-4 sm:p-8">
+    <div className="flex flex-col gap-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -43,7 +72,7 @@ const Produccion: React.FC = () => {
               <div className="relative group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-black transition-colors" />
                 <Input
-                  className="pl-10 w-full md:w-[240px] bg-gray-50 border-gray-200 rounded-lg"
+                  className="pl-10 w-full md:w-60 bg-gray-50 border-gray-200 rounded-lg"
                   placeholder="Buscar lote..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
@@ -81,9 +110,6 @@ const Produccion: React.FC = () => {
                   Merma
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
-                  Estado
-                </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Costo
                 </TableHead>
                 <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider text-right">
@@ -92,7 +118,57 @@ const Produccion: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* Se deja vacío para el futuro Back-end como pidió Nievas2 */}
+              <TableRow>
+                <TableCell>#001</TableCell>
+                <TableCell>16/06/2026</TableCell>
+                <TableCell>Leche entera</TableCell>
+                <TableCell>5.000 L</TableCell>
+                <TableCell>200 L</TableCell>
+                <TableCell>$2.450.000</TableCell>
+                <TableCell className="text-right mr-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Ellipsis />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Link
+                            to="/produccion/lote/001"
+                            className="flex items-center gap-2"
+                          >
+                            <Eye /> Ver Detalles
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() => setIsChangeDecreaseOpen(true)}
+                        >
+                          <DropletOff /> Registrar merma
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setIsChangeCostOpen(true)}
+                        >
+                          <BanknoteArrowUp /> Registrar costo
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Files /> Duplicar
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <Trash /> Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
 
@@ -133,6 +209,15 @@ const Produccion: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      <ChangeDecrease
+        open={isChangeDecreaseOpen}
+        onClose={() => setIsChangeDecreaseOpen(false)}
+      />
+
+      <ChangeCost
+        open={isChangeCostOpen}
+        onClose={() => setIsChangeCostOpen(false)}
+      />
     </div>
   )
 }
