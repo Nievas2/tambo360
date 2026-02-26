@@ -30,4 +30,3 @@ jobs:
           ORG_NAME: IgrowkerTraining
         run: node .github/scripts/sync-project.js
         working-directory: .
-        
