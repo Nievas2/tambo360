@@ -221,7 +221,10 @@ const Produccion: React.FC = () => {
       </Card>
 
       {/* Modales para registrar merma, costo y lote */}
-      <ChangeBatch open={isChangeBatchOpen} setOpen={setIsChangeBatchOpen} />
+      <ChangeBatch
+        open={isChangeBatchOpen}
+        setOpen={() => setIsChangeBatchOpen(false)}
+      />
 
       <ChangeDecrease
         open={isChangeDecreaseOpen}

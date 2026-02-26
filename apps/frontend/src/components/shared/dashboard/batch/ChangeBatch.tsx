@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/common/select'
-import { AlertCircle, ArrowRight, Grid, Plus } from 'lucide-react'
+import { AlertCircle, ArrowRight, Grid } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -28,7 +28,7 @@ import { useUpdateBatch } from '@/src/hooks/batch/useUpdateBatch'
 
 interface ChangeBatchProps {
   open: boolean
-  setOpen: (open: boolean) => void
+  setOpen: () => void
   batch?: BatchDto
 }
 const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
@@ -52,14 +52,14 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       if (!batch) {
-        const response = await mutateAsync(data)
+        await mutateAsync(data)
       } else {
-        const response = await mutateAsyncUpdate({
+        await mutateAsyncUpdate({
           id: batch.id,
           values: data,
         })
       }
-    } catch (err: any) {
+    } catch (err) {
       if (batch) {
         console.error('Error al actualizar el lote:', err)
       } else {
@@ -110,7 +110,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           </div>
 
           <DialogFooter className="flex flex-row justify-center sm:justify-center items-center text-center">
-            <Button variant="ghost" onClick={() => setOpen(false)}>
+            <Button variant="ghost" onClick={() => setOpen()}>
               <Grid className="size-5" />
               <span className="underline">Volver al dashboard</span>
             </Button>
@@ -130,7 +130,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
             </DialogDescription>
           </DialogHeader>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={onSubmit}>
             <div className="space-y-4">
               <Label className="font-bold">Fecha de producción</Label>
               <Input
@@ -138,6 +138,12 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
                 placeholder="dd/mm/aaaa"
                 {...register('fechaProduccion')}
               />
+
+              {errors.fechaProduccion && (
+                <span className="text-xs text-red-600">
+                  {errors.fechaProduccion.message}
+                </span>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -155,6 +161,12 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+
+              {errors.idProducto && (
+                <span className="text-xs text-red-600">
+                  {errors.idProducto.message}
+                </span>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -167,6 +179,12 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
                 placeholder="0.00"
                 {...register('cantidad')}
               />
+
+              {errors.cantidad && (
+                <span className="text-xs text-red-600">
+                  {errors.cantidad.message}
+                </span>
+              )}
             </div>
 
             <span className="flex items-center gap-2 text-xs">
