@@ -13,7 +13,7 @@ export const setupSwagger = (app: Express) => {
       },
       servers: [
         {
-          url: "http://localhost:3000", // Cambiar al deploy final
+          url: process.env.BACKEND_URL ? process.env.BACKEND_URL : "http://localhost:3000",
         },
       ],
     },
