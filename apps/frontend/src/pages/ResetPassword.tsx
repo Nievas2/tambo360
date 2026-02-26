@@ -12,7 +12,7 @@ import * as z from "zod";
 import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword"; 
 import { useResetPassword } from "@/src/hooks/auth/useResetPassword";
 
-// Esquema alineado con las reglas del BACKEND (authSchema.ts)
+// Esquema alineado con las reglas del BACKEND
 const resetSchema = z.object({
   contraseña: z.string()
     .min(8, "Mínimo 8 caracteres")
@@ -62,35 +62,43 @@ const ResetPassword = () => {
 
   const handleRequestReset = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
+
     forgotPassword(email, {
       onSuccess: () => {
-        toast.success("Instrucciones enviadas al correo");
         setStep(2);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Error al enviar el correo");
+        const msg = error.response?.data?.message || "Error al enviar el correo";
+        toast.error(msg);
       }
     });
   };
 
-  const onResetSubmit = (data: ResetFormData) => {
+  const onResetSubmit = (formData: ResetFormData) => {
     if (!tokenFromUrl) {
       toast.error("Token no válido o expirado");
       return;
     }
 
-    resetPassword({ token: tokenFromUrl, password: data.contraseña }, {
-      onSuccess: () => {
-        setStep(4);
-      },
-      onError: (error: any) => {
-        // Muestra el primer error de validación del backend si existe
-        const msg = Array.isArray(error.response?.data) 
-          ? error.response.data[0] 
-          : error.response?.data?.message || "Error al actualizar contraseña";
-        toast.error(msg);
+    // Corregido: Se pasa un solo objeto con las propiedades que espera el hook
+    resetPassword(
+      { 
+        token: tokenFromUrl, 
+        password: formData.contraseña 
+      }, 
+      {
+        onSuccess: () => {
+          setStep(4);
+        },
+        onError: (error: any) => {
+          const msg = Array.isArray(error.response?.data) 
+            ? error.response.data[0] 
+            : error.response?.data?.message || "Error al actualizar contraseña";
+          toast.error(msg);
+        }
       }
-    });
+    );
   };
 
   return (
