@@ -87,34 +87,49 @@ class UserService {
   }
 
   async verifyEmail(token: string) {
-    const hashedToken = hashToken(token)
-    const tokenRecord = await prisma.verificarToken.findFirst({
+  const hashedToken = hashToken(token);
+
+  const response = await prisma.$transaction(async (tx) => {
+    const tokenRecord = await tx.verificarToken.findFirst({
       where: {
         tokenHash: hashedToken,
         tipo: TipoToken.verificacion
       },
       include: { usuario: true }
-    })
+    });
 
-    if (!tokenRecord || tokenRecord.tipo !== TipoToken.verificacion) {
-      throw new Error('Token de verificación inválido');
+    if (!tokenRecord) {
+      throw new Error("Token de verificación inválido");
+    }
+
+    // Si ya fue usado, no rompemos (idempotencia)
+    if (tokenRecord.usadoEn) {
+      return tokenRecord.usuario;
     }
 
     if (tokenRecord.expiraEn < new Date()) {
-      throw new Error('Token de verificación expirado');
+      throw new Error("Token de verificación expirado");
     }
 
-
-    await prisma.usuario.update({
+    //  Actualizamos usuario
+    await tx.usuario.update({
       where: { idUsuario: tokenRecord.idUsuario },
       data: { verificado: true }
-    })
+    });
 
-    await prisma.verificarToken.delete({ where: { tokenid: tokenRecord.tokenid } })
+    //  Marcamos token como usado (NO lo borramos)
+    await tx.verificarToken.update({
+      where: { tokenid: tokenRecord.tokenid },
+      data: { usadoEn: new Date() }
+    });
 
-    return true;
 
-  }
+
+    return tokenRecord.usuario;
+  });
+
+  return response
+}
 
   async resendVerificationEmail(email: string) {
     const user = await this.findByEmail(email);
