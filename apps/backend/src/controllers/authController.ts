@@ -113,7 +113,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    const response = ApiResponse.success(null, "Email verificado exitosamente");
+    const response = ApiResponse.success({...userData}, "Email verificado exitosamente");
     res.status(response.statusCode).json(response);
 
   } catch (error) {
