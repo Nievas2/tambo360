@@ -1,5 +1,5 @@
-import swaggerJsdoc from "swagger-jsdoc"; 
-import swaggerUi from "swagger-ui-express"; 
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
 
 export const setupSwagger = (app: Express) => {
@@ -17,7 +17,11 @@ export const setupSwagger = (app: Express) => {
         },
       ],
     },
-    apis: ["./src/docs/*.ts"], 
+    apis: [
+      process.env.NODE_ENV === "production"
+        ? "./dist/docs/*.js"
+        : "./src/docs/*.ts",
+    ],
   };
 
   const specs = swaggerJsdoc(options);
