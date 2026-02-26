@@ -3,7 +3,9 @@ name: Sync GitHub Project to Google Sheets
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'  # Cada 6 horas
+    - cron: '*/5 * * * *'  # Cada 5 minutos
+  push:
+    branches: [main]
 
 jobs:
   sync-project:
@@ -19,7 +21,6 @@ jobs:
       
       - name: Install dependencies
         run: npm install axios google-auth-library google-sheets-api
-        working-directory: .
       
       - name: Sync Project to Sheets
         env:
@@ -29,4 +30,3 @@ jobs:
           PROJECT_NUMBER: 42
           ORG_NAME: IgrowkerTraining
         run: node .github/scripts/sync-project.js
-        working-directory: .
