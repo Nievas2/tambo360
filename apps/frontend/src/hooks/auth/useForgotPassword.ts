@@ -1,11 +1,17 @@
+// apps/frontend/src/hooks/auth/useForgotPassword.ts
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@/src/services/api'; // Corregido con llaves
+import { forgotPassword } from '../../utils/api/auth.api';
+import { toast } from 'sonner';
 
 export const useForgotPassword = () => {
     return useMutation({
-        mutationFn: async (email: string) => {
-            const { data } = await api.post('/auth/forgot-password', { email });
-            return data;
+        mutationFn: (email: string) => forgotPassword(email),
+        onSuccess: () => {
+            toast.success('Si el correo está registrado, recibirás un enlace de recuperación pronto.');
+        },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || 'Error al solicitar el restablecimiento';
+            toast.error(message);
         },
     });
 };

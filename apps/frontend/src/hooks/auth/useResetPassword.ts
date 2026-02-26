@@ -1,11 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@/src/services/api'; // Corregido con llaves
+import { resetPassword } from '../../utils/api/auth.api';
 
 export const useResetPassword = () => {
     return useMutation({
-        mutationFn: async ({ token, password }: any) => {
-            const { data } = await api.post(`/auth/reset-password/${token}`, { password });
-            return data;
-        },
+        mutationFn: ({ password, token }: { password: string; token: string }) =>
+            resetPassword(password, token),
     });
 };

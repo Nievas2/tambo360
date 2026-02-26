@@ -6,15 +6,19 @@ import { Input } from '@/src/components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLogin } from '@/src/hooks/auth/useLogin'
 import { useAuth } from '@/src/context/AuthContext'
-import { EyeIcon, ArrowRight } from 'lucide-react'
+import { EyeIcon, ArrowRight, X } from 'lucide-react'
 import { LoginSchema } from '@/src/types/login'
 import { useForm } from 'react-hook-form'
 import React, { useState } from 'react'
-import { AxiosError } from 'axios'
+import { useForgotPassword } from '@/src/hooks/auth/useForgotPassword' // Importamos el hook que envía el mail
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [showForgotModal, setShowForgotModal] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  
   const { mutateAsync, isPending, error } = useLogin()
+  const { mutate: sendForgotEmail, isPending: isForgotPending } = useForgotPassword()
   const navigate = useNavigate()
   const { login } = useAuth()
 
@@ -40,21 +44,24 @@ const Login: React.FC = () => {
     }
   })
 
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!forgotEmail) return
+    sendForgotEmail(forgotEmail, {
+      onSuccess: () => {
+        setShowForgotModal(false)
+        setForgotEmail('')
+      }
+    })
+  }
+
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5]">
       <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
-        <div className="w-full h-full max-w-lg flex items-center justify-center">
+        <div className="w-full h-full max-lg flex items-center justify-center">
           <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
-            <img
-              src="/isotipo_tambo 1.svg"
-              alt="Logo"
-              className="w-3/4 h-auto"
-            />
-            <img
-              src="/logotipo 1.svg"
-              alt="Tambo"
-              className="w-1/2 h-auto mt-4"
-            />
+            <img src="/isotipo_tambo 1.svg" alt="Logo" className="w-3/4 h-auto" />
+            <img src="/logotipo 1.svg" alt="Tambo" className="w-1/2 h-auto mt-4" />
           </div>
         </div>
       </div>
@@ -65,58 +72,35 @@ const Login: React.FC = () => {
             <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
               <div className="h-12 lg:h-28 w-auto flex items-start gap-2">
                 <img src="/isotipo_tambo 1.svg" alt="logo" className="h-12" />
-
                 <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
               </div>
-
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                  Bienvenido
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Ingresa tus credenciales para empezar a usar la plataforma.
-                </p>
+                <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Bienvenido</h1>
+                <p className="text-sm text-muted-foreground">Ingresa tus credenciales para empezar a usar la plataforma.</p>
               </div>
             </div>
 
             <form onSubmit={onSubmit} className="space-y-6">
               <div className="space-y-4">
-                {/* Email */}
                 <div className="space-y-2">
-                  <Label className="font-bold text-[#1a1c1e]">
-                    Correo electrónico
-                  </Label>
+                  <Label className="font-bold text-[#1a1c1e]">Correo electrónico</Label>
                   <Input
                     placeholder="Ingresa tu correo electrónico"
                     {...register('correo')}
-                    data-test-id="email-login"
                     disabled={isPending}
                   />
-
-                  {errors.correo && (
-                    <small className="text-red-500">
-                      {errors.correo.message}
-                    </small>
-                  )}
+                  {errors.correo && <small className="text-red-500">{errors.correo.message}</small>}
                 </div>
 
-                {/* Password */}
                 <div className="space-y-2">
-                  <Label
-                    title="Contraseña"
-                    className="font-bold text-[#1a1c1e]"
-                  >
-                    Contraseña
-                  </Label>
+                  <Label className="font-bold text-[#1a1c1e]">Contraseña</Label>
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••••••"
                       {...register('contraseña')}
-                      data-test-id="password-login"
                       disabled={isPending}
                     />
-
                     <Button
                       type="button"
                       variant="ghost"
@@ -126,25 +110,21 @@ const Login: React.FC = () => {
                       <EyeIcon className="w-5 h-5" />
                     </Button>
                   </div>
-
-                  {errors.contraseña && (
-                    <small className="text-red-500">
-                      {errors.contraseña.message}
-                    </small>
-                  )}
+                  {errors.contraseña && <small className="text-red-500">{errors.contraseña.message}</small>}
 
                   <div className="flex justify-end">
-                    <Link
-                      to="/reset-password"
-                      className="text-xs text-slate-500 hover:underline"
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotModal(true)}
+                      className="text-xs text-slate-500 hover:underline bg-transparent border-none p-0 cursor-pointer"
                     >
                       ¿Olvidaste tu contraseña?
-                    </Link>
+                    </button>
                   </div>
 
                   {error && (
                     <small className="text-red-700">
-                      {error.response.data.message || 'Error al iniciar sesión'}
+                      {(error as any).response?.data?.message || 'Error al iniciar sesión'}
                     </small>
                   )}
                 </div>
@@ -153,7 +133,6 @@ const Login: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full h-14 rounded-lg text-lg font-medium transition-all"
-                data-test-id="iniciar-sesion"
                 disabled={isPending}
               >
                 {isPending ? 'Cargando...' : 'Iniciar sesión'}
@@ -164,18 +143,53 @@ const Login: React.FC = () => {
             <div className="text-center pt-4">
               <p className="text-sm text-slate-600">
                 ¿No tienes una cuenta?{' '}
-                <Link
-                  to="/register"
-                  className="font-bold text-[#1a1c1e] hover:underline"
-                  data-test-id="crear-cuenta"
-                >
-                  Regístrate
-                </Link>
+                <Link to="/register" className="font-bold text-[#1a1c1e] hover:underline">Regístrate</Link>
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* MODAL PARA SOLICITAR CAMBIO DE CONTRASEÑA */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+          <Card className="w-full max-w-md relative bg-white rounded-xl shadow-xl">
+            <button 
+              onClick={() => setShowForgotModal(false)}
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <CardContent className="pt-8 space-y-4">
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-bold text-[#1a1c1e]">Recuperar acceso</h3>
+                <p className="text-sm text-slate-500">
+                  Enviaremos un enlace a tu correo para que puedas restablecer tu contraseña.
+                </p>
+              </div>
+              <form onSubmit={handleForgotSubmit} className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <Label className="font-bold text-[#1a1c1e]">Tu correo electrónico</Label>
+                  <Input
+                    type="email"
+                    placeholder="ejemplo@correo.com"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12" 
+                  disabled={isForgotPending}
+                >
+                  {isForgotPending ? 'Enviando...' : 'Enviar enlace de recuperación'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

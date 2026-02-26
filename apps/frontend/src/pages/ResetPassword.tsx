@@ -5,30 +5,50 @@ import { Card, CardContent } from "@/src/components/common/card";
 import { Button } from "@/src/components/common/Button";
 import { toast } from "sonner";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
-// Importamos los hooks necesarios que conectan con la API del .env
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
 import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword"; 
 import { useResetPassword } from "@/src/hooks/auth/useResetPassword";
+
+// Esquema alineado con las reglas del BACKEND (authSchema.ts)
+const resetSchema = z.object({
+  contraseña: z.string()
+    .min(8, "Mínimo 8 caracteres")
+    .regex(/[A-Z]/, "Debe tener una mayúscula")
+    .regex(/[a-z]/, "Debe tener una minúscula")
+    .regex(/\d/, "Debe tener un número")
+    .regex(/[@$!%*?&]/, "Debe tener un carácter especial"),
+  confirm: z.string()
+}).refine((data) => data.contraseña === data.confirm, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirm"],
+});
+
+type ResetFormData = z.infer<typeof resetSchema>;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const { search } = useLocation();
-  
-  // 1. Detectamos el token de la URL (cuando el usuario llega desde el mail)
   const tokenFromUrl = new URLSearchParams(search).get("token");
 
-  // Si hay token, empezamos en el paso 3. Si no, en el 1.
   const [step, setStep] = useState(tokenFromUrl ? 3 : 1);
-  
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(0);
 
-  // 2. Hooks que usarán la URL de tu .env automáticamente
   const { mutate: forgotPassword, isPending: isSendingEmail } = useForgotPassword();
   const { mutate: resetPassword, isPending: isResetting } = useResetPassword();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ResetFormData>({
+    resolver: zodResolver(resetSchema),
+  });
 
   useEffect(() => {
     if (step === 2) setSecondsLeft(180);
@@ -40,7 +60,6 @@ const ResetPassword = () => {
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
-  // Maneja el envío del email (Paso 1)
   const handleRequestReset = (e: React.FormEvent) => {
     e.preventDefault();
     forgotPassword(email, {
@@ -54,32 +73,28 @@ const ResetPassword = () => {
     });
   };
 
-  // Maneja el cambio de contraseña real (Paso 3)
-  const handleUpdatePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirm) {
-      toast.error("Las contraseñas no coinciden");
-      return;
-    }
-    
+  const onResetSubmit = (data: ResetFormData) => {
     if (!tokenFromUrl) {
       toast.error("Token no válido o expirado");
       return;
     }
 
-    resetPassword({ token: tokenFromUrl, password }, {
+    resetPassword({ token: tokenFromUrl, password: data.contraseña }, {
       onSuccess: () => {
-        setStep(4); // Pantalla de éxito
+        setStep(4);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Error al actualizar contraseña");
+        // Muestra el primer error de validación del backend si existe
+        const msg = Array.isArray(error.response?.data) 
+          ? error.response.data[0] 
+          : error.response?.data?.message || "Error al actualizar contraseña";
+        toast.error(msg);
       }
     });
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5] font-inter">
-      {/* PANEL IZQUIERDO */}
       <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
         <div className="w-full h-full max-w-lg flex items-center justify-center">
           <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
@@ -89,7 +104,6 @@ const ResetPassword = () => {
         </div>
       </div>
 
-      {/* PANEL DERECHO */}
       <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-center md:justify-end p-4 md:p-8">
         <Card className="w-full max-w-125 border-none shadow-none md:shadow-sm py-8 bg-white rounded-xl">
           <CardContent className="space-y-8">
@@ -100,7 +114,6 @@ const ResetPassword = () => {
               </div>
             </div>
 
-            {/* PASO 1: Pedir Email */}
             {step === 1 && (
               <form onSubmit={handleRequestReset} className="space-y-6">
                 <div className="space-y-2 text-center">
@@ -129,7 +142,6 @@ const ResetPassword = () => {
               </form>
             )}
 
-            {/* PASO 2: Confirmación de envío */}
             {step === 2 && (
               <section className="flex flex-col items-center justify-center gap-6 py-4 text-center">
                 <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Revisa tu email</h2>
@@ -140,43 +152,43 @@ const ResetPassword = () => {
               </section>
             )}
 
-            {/* PASO 3: Formulario Nueva Password (cuando hay TOKEN) */}
             {step === 3 && (
-              <form onSubmit={handleUpdatePassword} className="space-y-6">
+              <form onSubmit={handleSubmit(onResetSubmit)} className="space-y-6">
                 <div className="space-y-2 text-center">
                   <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Nueva contraseña</h1>
                   <p className="text-sm text-muted-foreground">Crea una nueva clave segura para tu cuenta.</p>
                 </div>
+                <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} />
                 <div className="space-y-4 text-left">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-[#1a1c1e]">Nueva Contraseña</label>
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
                         className="w-full h-14 px-4 bg-[#fafafa] border border-slate-200 rounded-xl outline-none"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
+                        {...register("contraseña")}
                       />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
+                    {errors.contraseña && <small className="text-red-500">{errors.contraseña.message}</small>}
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-[#1a1c1e]">Confirmar Contraseña</label>
                     <div className="relative">
                       <input
                         type={showConfirm ? "text" : "password"}
+                        autoComplete="new-password"
                         className="w-full h-14 px-4 bg-[#fafafa] border border-slate-200 rounded-xl outline-none"
-                        value={confirm}
-                        onChange={(e) => setConfirm(e.target.value)}
-                        required
+                        {...register("confirm")}
                       />
                       <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
                         {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
+                    {errors.confirm && <small className="text-red-500">{errors.confirm.message}</small>}
                   </div>
                 </div>
                 <Button disabled={isResetting} type="submit" className="w-full h-14 bg-[#1a1c1e] text-white rounded-xl font-bold flex items-center justify-center gap-2">
@@ -185,7 +197,6 @@ const ResetPassword = () => {
               </form>
             )}
 
-            {/* PASO 4: ÉXITO FINAL */}
             {step === 4 && (
               <section className="flex flex-col items-center justify-center gap-8 py-4 text-center">
                 <img src="/successIcon.svg" alt="Éxito" className="w-24 h-24" />
