@@ -1,31 +1,57 @@
-type EstablecimientoEntrada = {
-    nombre: string;
-    fechaCreacion: string;
-    localidad: string;
-    provincia: string;
+import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
+import { CreateEstablishmentData } from "../schemas/establishmentSchema";
+
+type CreateEstablishmentServiceData = CreateEstablishmentData & {
+    userId: string;
 };
 
-type Establecimiento = EstablecimientoEntrada & {
-    id: number;
-};
+class EstablishmentsService {
 
+    async crear(data: CreateEstablishmentServiceData) {
 
-class ServicioEstablecimientos {
-    private establecimientos: Establecimiento[] = [];
-    private idActual: number = 1;
+        const usuario = await prisma.usuario.findUnique({
+            where: { idUsuario: data.userId },
+        });
 
-    async crear(datos: EstablecimientoEntrada): Promise<Establecimiento> {
-        const nuevo: Establecimiento = {
-            id: this.idActual++,
-            ...datos,
-        };
-        this.establecimientos.push(nuevo);
-        return nuevo;
+        if (!usuario) {
+            throw new AppError("Usuario no encontrado", 404);
+        }
+
+        const existente = await prisma.establecimiento.findFirst({
+            where: { idUsuario: data.userId },
+        });
+
+        if (existente) {
+            throw new AppError("El usuario ya tiene un establecimiento registrado", 400);
+        }
+
+        const establecimiento = await prisma.establecimiento.create({
+            data: {
+                nombre: data.nombre,
+                localidad: data.localidad,
+                provincia: data.provincia,
+                idUsuario: data.userId,
+            },
+        });
+
+        return establecimiento;
     }
 
-    obtenerTodos(): Establecimiento[] {
-        return this.establecimientos;
+    async listarPorUsuario(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario },
+            select: {
+                idEstablecimiento: true,
+                nombre: true,
+                localidad: true,
+                provincia: true,
+                idUsuario: true,
+            },
+        });
+
+        return establecimiento;
     }
 }
 
-export default new ServicioEstablecimientos();
+export default new EstablishmentsService();

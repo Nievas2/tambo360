@@ -21,11 +21,15 @@ export const crearLoteSchema = z.object({
         message: "Unidad inválida",
     }),
 
-    fechaProduccion: z
-        .string()
+    fechaProduccion: z.string()
         .min(1, "La fecha de producción es obligatoria")
-        .refine((val) => !isNaN(Date.parse(val)), {
-            message: "Fecha inválida",
+        .refine((val) => {
+            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+            return regex.test(val);
+        }, { message: "Formato de fecha inválido, debe ser dd/mm/aaaa" })
+        .transform((val) => {
+            const [dd, mm, yyyy] = val.split("/");
+            return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
         }),
 
     merma: z.preprocess((val) => {
@@ -37,15 +41,6 @@ export const crearLoteSchema = z.object({
             .positive("La merma debe ser mayor a 0")
             .optional()
     ),
-
-    observaciones: z
-        .string()
-        .max(255, "Observaciones demasiado largas")
-        .optional()
-        .refine(
-            (val) => val === undefined || val.trim() !== "",
-            "Observaciones no puede estar vacía"
-        ),
 });
 
 export type CrearLoteDTO = z.infer<typeof crearLoteSchema>;

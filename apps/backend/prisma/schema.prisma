@@ -69,7 +69,6 @@ model LoteProduccion {
   establecimiento   Establecimiento @relation(fields: [idEstablecimiento], references: [idEstablecimiento])
   mermas            Merma[]
   costosDirectos    CostosDirecto[]
-  observaciones     String?         @db.VarChar(255)  
 }
 
 model Merma {

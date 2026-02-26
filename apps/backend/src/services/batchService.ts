@@ -15,9 +15,13 @@ export class LoteService {
             throw new AppError("El usuario no tiene un establecimiento registrado", 400);
         }
 
-        if (!data.idProducto) {
-            throw new AppError("Debe seleccionar un producto válido", 400);
+        const producto = await prisma.producto.findUnique({
+            where: { idProducto: data.idProducto },
+        });
+        if (!producto) {
+            throw new AppError("El producto seleccionado no existe", 400);
         }
+
 
         const lote = await prisma.loteProduccion.create({
             data: {
@@ -26,8 +30,15 @@ export class LoteService {
                 cantidad: data.cantidad,
                 unidad: data.unidad,
                 fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : undefined,
-                observaciones: data.observaciones,
             },
+            include: {
+                producto: {
+                    select: {
+                        nombre: true,
+                        categoria: true
+                    }
+                }
+            }
         });
 
         return lote;
@@ -49,7 +60,6 @@ export class LoteService {
                 cantidad: data.cantidad ?? lote.cantidad,
                 unidad: data.unidad ?? lote.unidad,
                 fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : lote.fechaProduccion,
-                observaciones: data.observaciones ?? lote.observaciones,
             },
         });
     }
@@ -73,11 +83,20 @@ export class LoteService {
 
 
     static async listarLotes(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario },
+        });
 
-        return prisma.loteProduccion.findMany({
-            where: { establecimiento: { idUsuario } },
+        if (!establecimiento) {
+            throw new AppError("El usuario no tiene un establecimiento registrado", 400);
+        }
+
+        const lotes = await prisma.loteProduccion.findMany({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
             include: { producto: true, mermas: true, costosDirectos: true },
         });
+
+        return lotes;
     }
 
     static async obtenerLote(idLote: string, idUsuario: string) {
