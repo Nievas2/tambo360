@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import establishmentsService from "../services/establishmentService";
+import establishmentsService from "../services/establishmentsService";
 import { createEstablishmentSchema } from "../schemas/establishmentSchema";
 import { ApiResponse } from "../utils/ApiResponse";
 import { AppError } from "../utils/AppError";
