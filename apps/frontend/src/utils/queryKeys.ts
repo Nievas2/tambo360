@@ -10,6 +10,7 @@
 // Base keys for each feature
 export const baseKeys = {
   auth: ['auth'] as const,
+  batch: ['batch'] as const,
 } as const
 
 // Auth related keys
@@ -21,7 +22,15 @@ export const authKeys = {
   changePassword: [...baseKeys.auth, 'changePassword'] as const,
 } as const
 
+// Batch related keys
+export const batchKeys = {
+  all: baseKeys.batch,
+  lists: () => [...baseKeys.batch, 'list'] as const,
+  detail: (id: string) => [...baseKeys.batch, id] as const,
+} as const
+
 // Export all keys for easy access
 export const queryKeys = {
   auth: authKeys,
+  batch: batchKeys,
 } as const
