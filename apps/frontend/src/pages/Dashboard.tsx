@@ -45,11 +45,6 @@ const Dashboard = () => {
           value="$811.000"
           description="Total acumulado"
         />
-        <StatCard
-          title="Costo Unitario (CPU)"
-          value="$2.053"
-          description="Costo por unidad"
-        />
       </div>
 
       {/* Cuerpo Principal */}
