@@ -20,22 +20,22 @@ export const crearLoteSchema = z.object({
 
     fechaProduccion: z
         .string()
-        .optional()
+        .min(1, "La fecha de producción es obligatoria")
+        .refine((val) => /^\d{2}\/\d{2}\/\d{4}$/.test(val), {
+            message: "Formato de fecha inválido, debe ser dd/mm/aaaa",
+        })
         .transform((val) => {
             const now = new Date();
-            if (!val) {
-                return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
-            }
-            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
-            if (!regex.test(val)) throw new Error("Formato de fecha inválido, debe ser dd/mm/aaaa");
             const [dd, mm, yyyy] = val.split("/");
-            const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd), now.getHours(), now.getMinutes(), now.getSeconds());
+            const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
 
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const dateToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            if (dateToCheck.getTime() !== today.getTime()) {
-                throw new Error("La fecha de producción debe ser el día de hoy");
+            const fechaMinima = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+            const fechaMaxima = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            if (date < fechaMinima || date > fechaMaxima) {
+                throw new Error("La fecha de producción debe estar entre hoy y 7 días antes");
             }
+
             return date;
         }),
 
