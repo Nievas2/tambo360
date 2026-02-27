@@ -4,6 +4,8 @@ import { AppError } from "../utils/AppError";
 import { ApiResponse } from "../utils/ApiResponse";
 import { passwordValidationSchema, registerSchema } from "../schemas/authSchema";
 import jwt from "jsonwebtoken";
+import { config } from "node:process";
+
 
 // FUncion para registrar un nuevo usuario
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -56,19 +58,20 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         establecimientos: user.establecimientos
       }
     }
+    const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" }); //
 
-    const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" });
 
 
+    const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000 // 1 día
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000
     });
 
-    const response = ApiResponse.success({...userData, token: token}, "Inicio de sesión exitoso");
+    const response = ApiResponse.success({ ...userData, token: token }, "Inicio de sesión exitoso");
     res.status(response.statusCode).json(response);
   } catch (error) {
     next(error);
@@ -91,7 +94,28 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
       throw new AppError("Token de verificación inválido o expirado", 400);
     }
 
-    const response = ApiResponse.success(null, "Email verificado exitosamente");
+    const userData = {
+      user: {
+        nombre: result.nombre,
+        correo: result.correo,
+        idUsuario: result.idUsuario,
+        verificado: result.verificado,
+        fechaCreacion: result.fechaCreacion,
+        establecimientos: result.establecimientos
+      }
+    }
+
+    const tokenCookie = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" }); //
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("token", tokenCookie, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    const response = ApiResponse.success({...userData}, "Email verificado exitosamente");
     res.status(response.statusCode).json(response);
 
   } catch (error) {

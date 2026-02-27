@@ -1,93 +1,89 @@
-import { Request, Response } from "express";
-import ServicioLotes from "../services/batchService";
+import { Request, Response, NextFunction } from "express";
+import { LoteService } from "../services/batchService";
+import { crearLoteSchema } from "../schemas/batchSchema";
+import { AppError } from "../utils/AppError";
+import { ApiResponse } from "../utils/ApiResponse";
 
-//Registrar un nuevo lote
-export const registrarLote = async (req: Request, res: Response): Promise<void> => {
+export const crearLote = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { fechaProduccion, tipoProduccion, cantidad, unidad } = req.body;
+        const parsed = crearLoteSchema.safeParse(req.body);
 
-        if (!fechaProduccion || !tipoProduccion || !cantidad || !unidad) {
-            res.status(400).json({
-                error: "Todos los campos son obligatorios",
-            });
-            return;
+        if (!parsed.success) {
+            const errores = parsed.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
         }
 
-        const nuevoLote = await ServicioLotes.crear({
-            fechaProduccion,
-            tipoProduccion,
-            cantidad,
-            unidad,
-        });
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
 
-        res.status(201).json({
-            message: "Lote registrado correctamente",
-            lote: nuevoLote,
-        });
+        const lote = await LoteService.crearLote(user.id, parsed.data);
 
-    } catch (error: unknown) {
-        if (error instanceof Error && error.message === "El lote ya existe") {
-            res.status(409).json({ error: error.message });
-            return;
-        }
-
-        res.status(500).json({ error: "Error al registrar el lote" });
+        return res.status(201).json(ApiResponse.success(lote, "Lote creado correctamente", 201));
+    } catch (error) {
+        next(error);
     }
 };
 
-
-// Actualizar un lote existente
-export const actualizarLote = async (req: Request, res: Response): Promise<void> => {
+export const editarLote = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
-        const { fechaProduccion, tipoProduccion, cantidad, unidad } = req.body;
+        const { idLote } = req.params;
+        if (!idLote) throw new AppError("Id de lote requerido", 400);
 
-        if (!fechaProduccion || !tipoProduccion || !cantidad || !unidad) {
-            res.status(400).json({
-                error: "Todos los campos son obligatorios",
-            });
-            return;
+        const parsed = crearLoteSchema.partial().safeParse(req.body);
+        if (!parsed.success) {
+            const errores = parsed.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
         }
 
-        const loteActualizado = await ServicioLotes.editar({
-            id,
-            fechaProduccion,
-            tipoProduccion,
-            cantidad,
-            unidad,
-        });
+        const lote = await LoteService.editarLote(idLote, parsed.data);
 
-        res.json({
-            message: "Lote actualizado correctamente",
-            lote: loteActualizado,
-        });
-
-    } catch (error: unknown) {
-        if (error instanceof Error && error.message === "Lote no encontrado") {
-            res.status(404).json({ error: error.message });
-            return;
-        }
-
-        res.status(500).json({ error: "Error al actualizar el lote" });
+        return res.status(200).json(ApiResponse.success(lote, "Lote actualizado correctamente"));
+    } catch (error) {
+        next(error);
     }
 };
 
-//Listar todos los lotes
-export const listarLotes = (req: Request, res: Response): void => {
-    const lotes = ServicioLotes.obtenerTodos();
-    res.json({ lotes });
+export const eliminarLote = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const { idLote } = req.params;
+        if (!idLote) throw new AppError("Id de lote requerido", 400);
+
+        await LoteService.eliminarLote(idLote);
+
+        return res.status(200).json(ApiResponse.success(null, "Lote eliminado correctamente", 200));
+    } catch (error) {
+        next(error);
+    }
 };
 
-// Obtener un lote por ID
-export const obtenerLote = (req: Request, res: Response): void => {
-    const id = Number(req.params.id);
+export const listarLotes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
 
-    const lote = ServicioLotes.obtenerPorId(id);
+        const lotes = await LoteService.listarLotes(user.id);
 
-    if (!lote) {
-        res.status(404).json({ error: "Lote no encontrado" });
-        return;
+        return res.status(200).json(ApiResponse.success(lotes, "Lotes listados correctamente"));
+    } catch (error) {
+        next(error);
     }
+};
 
-    res.json({ lote });
+export const obtenerLote = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const { idLote } = req.params;
+        if (!idLote) throw new AppError("Id de lote requerido", 400);
+
+        const lote = await LoteService.obtenerLote(idLote, user.id);
+
+        return res.status(200).json(ApiResponse.success(lote, "Lote obtenido correctamente"));
+    } catch (error) {
+        next(error);
+    }
 };

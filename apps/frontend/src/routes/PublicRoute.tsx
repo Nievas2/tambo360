@@ -1,18 +1,18 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 interface PublicRouteProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard" replace />
   }
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default PublicRoute;
+export default PublicRoute
