@@ -54,7 +54,8 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
         correo: user.correo,
         idUsuario: user.idUsuario,
         verificado: user.verificado,
-        fechaCreacion: user.fechaCreacion
+        fechaCreacion: user.fechaCreacion,
+        establecimientos: user.establecimientos
       }
     }
     const token = jwt.sign(userData, process.env.JWT_SECRET!, { expiresIn: "1d" }); //
