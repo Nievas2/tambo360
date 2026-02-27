@@ -9,7 +9,6 @@ import {
   BanknoteArrowUp,
   Trash,
   Ellipsis,
-  Files,
   Pencil,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
@@ -110,7 +109,7 @@ const Produccion: React.FC = () => {
                 <TableHead className="w-24 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Fecha
                 </TableHead>
-                <TableHead className="w-[25%] min-w-55 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[20%] lg:w-[25%] min-w-40 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Producto
                 </TableHead>
                 <TableHead className="w-36 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
