@@ -54,17 +54,33 @@ export class LoteService {
     }
 
     static async editarLote(idLote: string, data: Partial<CrearLoteDTO>) {
-        const lote = await prisma.loteProduccion.findUnique({ where: { idLote } });
-        if (!lote) {
-            throw new AppError("El lote no existe", 404);
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { mermas: true, costosDirectos: true }
+        });
+
+        if (!lote) throw new AppError("El lote no existe", 404);
+
+        const tieneAsociados = (lote.mermas.length > 0 || lote.costosDirectos.length > 0);
+
+        if (tieneAsociados) {
+            throw new AppError(
+                "El lote tiene mermas o costos directos asociados y no puede editarse",
+                400
+            );
         }
 
         let idProducto = lote.idProducto;
         let unidad = lote.unidad;
 
         if (data.idProducto && data.idProducto !== lote.idProducto) {
-            const producto = await prisma.producto.findUnique({ where: { idProducto: data.idProducto } });
-            if (!producto) throw new AppError("El producto seleccionado no existe", 400);
+            const producto = await prisma.producto.findUnique({
+                where: { idProducto: data.idProducto }
+            });
+
+            if (!producto) {
+                throw new AppError("El producto seleccionado no existe", 400);
+            }
 
             idProducto = data.idProducto;
             unidad = producto.categoria === "quesos" ? "kg" : "litros";
@@ -73,10 +89,15 @@ export class LoteService {
         return prisma.loteProduccion.update({
             where: { idLote },
             data: {
+                idProducto,
+                unidad,
                 cantidad: data.cantidad ?? lote.cantidad,
-                fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : lote.fechaProduccion,
+                fechaProduccion: data.fechaProduccion
+                    ? new Date(data.fechaProduccion)
+                    : lote.fechaProduccion,
                 estado: data.estado ?? lote.estado,
-            }, include: {
+            },
+            include: {
                 producto: true,
                 mermas: true,
                 costosDirectos: true
