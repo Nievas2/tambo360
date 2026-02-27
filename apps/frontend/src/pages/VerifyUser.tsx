@@ -3,34 +3,34 @@ import { Card, CardContent } from '@/src/components/common/card'
 import { useAuth } from '@/src/context/AuthContext'
 import { useVerifyEmail } from '@/src/hooks/auth/useVerifyEmail'
 import { ArrowRight } from 'lucide-react'
-import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import { useEffect } from 'react'
 
 const VerifyUser = () => {
-  const { mutateAsync, error } = useVerifyEmail()
-
+  const { mutateAsync, error, isPending } = useVerifyEmail()
   const { search } = useLocation()
   const { setToken, setUser } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
-    async function checkToken() {
-      try {
-        const token = new URLSearchParams(search).get('token')
-        if (token) {
-          const response = await mutateAsync(token)
-          console.log(response.data)
-          setUser(response.data.user)
-          Cookies.get('token')
-          setToken(token)
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
     checkToken()
   }, [])
+
+  async function checkToken() {
+    try {
+      const token = new URLSearchParams(search).get('token')
+      console.log('token')
+      if (token) {
+        const response = await mutateAsync(token)
+        setUser(response.data.user)
+        Cookies.get('token')
+        setToken(token)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5]">
@@ -62,47 +62,47 @@ const VerifyUser = () => {
               </div>
 
               <section className="min-h-[50vh] flex flex-col items-center justify-center gap-6">
-                finished ? ( error ? (
-                <div className="space-y-4">
-                  <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                    Verificación fallida
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Lo sentimos, tu correo no pudo ser verificado
-                  </p>
+                {isPending ? (
+                  <div className="space-y-2">
+                    <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
+                      Verificando email...
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Verificando tu correo electrónico
+                    </p>
+                  </div>
+                ) : error ? (
+                  <div className="space-y-4">
+                    <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
+                      Verificación fallida
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Lo sentimos, tu correo no pudo ser verificado
+                    </p>
 
-                  <small>{error.response.data.message}</small>
-                </div>
+                    <small>{error.response.data.message}</small>
+                  </div>
                 ) : (
-                <div className="flex flex-col items-center justify-center gap-6">
-                  <img src="/successIcon.svg" alt="success" />
-                  <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                    ¡Usuario validado con éxito!
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Ya puedes comenzar a gestionar tu <br />
-                    producción.
-                  </p>
+                  <div className="flex flex-col items-center justify-center gap-6">
+                    <img src="/successIcon.svg" alt="success" />
+                    <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
+                      ¡Usuario validado con éxito!
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Ya puedes comenzar a gestionar tu <br />
+                      producción.
+                    </p>
 
-                  <Button
-                    className="w-full h-14"
-                    onClick={() => navigate('/establecimiento')}
-                    data-test-id="registrar-establecimiento"
-                  >
-                    Crear establecimiento
-                    <ArrowRight className="ml-2 size-5" />
-                  </Button>
-                </div>
-                ) ) : (
-                <div className="space-y-2">
-                  <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                    Verificando email...
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Verificando tu correo electrónico
-                  </p>
-                </div>
-                ) )
+                    <Button
+                      className="w-full h-14"
+                      onClick={() => navigate('/establecimiento')}
+                      data-test-id="registrar-establecimiento"
+                    >
+                      Crear establecimiento
+                      <ArrowRight className="ml-2 size-5" />
+                    </Button>
+                  </div>
+                )}
               </section>
             </div>
           </CardContent>
