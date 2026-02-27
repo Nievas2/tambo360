@@ -12,6 +12,7 @@ import {
 import { useState } from 'react'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import { useBatches } from '@/src/hooks/batch/useBatches'
+import { Batch } from '@/src/types/batch'
 
 const DailyProductionLog = () => {
   const [open, setOpen] = useState(false)
@@ -23,7 +24,13 @@ const DailyProductionLog = () => {
       <CardHeader className="flex items-center justify-between">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">Producción de hoy</h2>
-          <p className="text-xs">Lunes 16 de febrero, 2026</p>
+          <p className="text-xs">
+            {new Date().toLocaleDateString('es-ES', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </p>
         </div>
 
         <div className="flex justify-end">
@@ -49,9 +56,53 @@ const DailyProductionLog = () => {
               <TableHead className="text-sm font-light text-[#707070]">
                 Cantidad
               </TableHead>
+              <TableHead className="text-sm font-light text-[#707070]">
+                Merma
+              </TableHead>
+              <TableHead className="text-sm font-light text-[#707070]">
+                Costo total
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
+            {data?.data?.map((batch: Batch) => (
+              <TableRow key={batch.idLote}>
+                <TableCell>
+                  #{String(batch.numeroLote).padStart(3, '0')}
+                </TableCell>
+
+                <TableCell suppressHydrationWarning>
+                  {batch.fechaProduccion.split('T')[1].slice(0, 5)}
+                </TableCell>
+                <TableCell>{batch.producto.nombre}</TableCell>
+                <TableCell>
+                  {batch.cantidad} {batch.unidad}
+                </TableCell>
+                {/* calcula todas las mermas y las suma */}
+                <TableCell>
+                  {batch.mermas?.reduce((total, m) => {
+                    const qty =
+                      typeof m.cantidad === 'string'
+                        ? parseFloat(m.cantidad)
+                        : (m.cantidad ?? 0)
+                    return total + qty
+                  }, 0)}
+                </TableCell>
+                <TableCell>
+                  {(batch.costosDirectos.length > 0 &&
+                    batch.costosDirectos[0].moneda) ||
+                    '$'}{' '}
+                  {batch.costosDirectos?.reduce((total, m) => {
+                    const qty =
+                      typeof m.monto === 'string'
+                        ? parseFloat(m.monto)
+                        : (m.monto ?? 0)
+                    return total + qty
+                  }, 0)}
+                </TableCell>
+              </TableRow>
+            ))}
+            {/*             
             <TableRow className="border-none">
               <TableCell>L-003</TableCell>
               <TableCell>14:30</TableCell>
@@ -71,7 +122,7 @@ const DailyProductionLog = () => {
               <TableCell>08:45</TableCell>
               <TableCell>Queso duro</TableCell>
               <TableCell>180kg</TableCell>
-            </TableRow>
+            </TableRow> */}
           </TableBody>
         </Table>
       </CardContent>
