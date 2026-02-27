@@ -26,24 +26,28 @@ const Dashboard = () => {
       {/* Seccion de Stats - 5 indicadores según requerimiento */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          title="Producción Total"
+          title="Queso Producido"
           value="395 Kg"
-          description={`Período: ${periodo}`}
+          trend={{ value: 12, isPositive: true }}
+          description="vs Enero"
         />
         <StatCard
-          title="Total de Mermas"
-          value="45 Kg"
-          description={`Período: ${periodo}`}
+          title="Leche Vendida"
+          value="810 L"
+          trend={{ value: 8, isPositive: true }}
+          description="vs Enero"
         />
         <StatCard
-          title="% Merma"
-          value="11.4%"
-          description="Basado en producción"
+          title="Mermas Totales"
+          value="45 Kg/L"
+          trend={{ value: 15, isPositive: false }}
+          description="vs Enero"
         />
         <StatCard
-          title="Costos Directos"
+          title="Costo directo total"
           value="$811.000"
-          description="Total acumulado"
+          trend={{ value: 5, isPositive: true }}
+          description="vs Enero"
         />
       </div>
 
