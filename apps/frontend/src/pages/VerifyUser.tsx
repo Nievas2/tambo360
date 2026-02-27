@@ -20,7 +20,6 @@ const VerifyUser = () => {
   async function checkToken() {
     try {
       const token = new URLSearchParams(search).get('token')
-      console.log('token')
       if (token) {
         const response = await mutateAsync(token)
         setUser(response.data.user)

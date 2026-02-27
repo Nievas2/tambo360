@@ -7,7 +7,6 @@ export function useBatches() {
     queryKey: queryKeys.batch.lists(),
     queryFn: async () => {
       const { data } = await getBatches()
-      console.log(data)
       return data
     },
     staleTime: 5 * 60 * 1000,

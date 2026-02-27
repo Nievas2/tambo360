@@ -35,7 +35,6 @@ const Establishment = () => {
         fechaCreacion: new Date().toISOString(),
       }
       const response = await createEstablishment(values)
-      console.log(response)
 
       window.location.href = '/dashboard'
     } catch (err) {
