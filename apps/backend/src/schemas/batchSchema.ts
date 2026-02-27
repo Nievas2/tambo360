@@ -41,6 +41,7 @@ export const crearLoteSchema = z.object({
             .positive("La merma debe ser mayor a 0")
             .optional()
     ),
+    estado: z.boolean().optional()
 });
 
 export type CrearLoteDTO = z.infer<typeof crearLoteSchema>;
