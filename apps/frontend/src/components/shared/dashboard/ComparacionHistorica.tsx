@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import {
     Card,
     CardContent,
@@ -21,24 +21,22 @@ interface ComparacionDataPoint {
 
 interface ComparacionProps {
     periodo: string
-    setPeriodo: (v: string) => void
+    // Usamos Dispatch para no tener que nombrar parámetros y evitar errores de ESLint
+    setPeriodo: Dispatch<SetStateAction<string>>
     metrica: string
-    setMetrica: (v: string) => void
+    setMetrica: Dispatch<SetStateAction<string>>
 }
 
-// Datos de prueba con un valor muy alto (Ene) para probar el fix
 const DEFAULT_DATA: ComparacionDataPoint[] = [
     { label: 'Ago', actual: 670, comparado: 270 },
     { label: 'Sep', actual: 250, comparado: 530 },
     { label: 'Oct', actual: 490, comparado: 370 },
     { label: 'Nov', actual: 600, comparado: 290 },
     { label: 'Dic', actual: 760, comparado: 185 },
-    { label: 'Ene', actual: 1000, comparado: 450 }, // Barra muy alta
+    { label: 'Ene', actual: 1000, comparado: 450 },
 ]
 
 const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: ComparacionProps) => {
-    const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-
     // Configuración del gráfico
     const CHART_H = 200
     const BAR_W = 40
@@ -48,16 +46,10 @@ const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: Comp
     const PAD_RIGHT = 10
     const X_LABEL_H = 30
 
-    // Dimensiones del Tooltip para cálculos de colisión
-    const TOOLTIP_W = BAR_W + 30 // 70px
-    const TOOLTIP_H = 45 // Alto del tooltip incluyendo padding
-    const TOOLTIP_OFFSET = 8 // Espacio entre la barra y el tooltip
-
     const hasData = DEFAULT_DATA && DEFAULT_DATA.length > 0
     const maxVal = hasData ? Math.max(...DEFAULT_DATA.map((d) => d.actual + d.comparado)) : 0
-    // Ajustamos yMax para dar un pequeño margen superior adicional si la barra es la más alta
     const yMax = Math.ceil((maxVal * 1.05) / 250) * 250 || 1000
-    const yTicks = [0, 250, 500, 750, 1000, 1250, 1500].filter(v => v <= yMax)
+    const yTicks = [0, 250, 500, 750, 1000, 1250, 1500].filter(tick => tick <= yMax)
     const barAreaH = CHART_H - PAD_TOP
 
     const toY = (val: number) => PAD_TOP + barAreaH - (val / yMax) * barAreaH
@@ -71,7 +63,6 @@ const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: Comp
                     <CardTitle className="text-lg font-bold">Comparación histórica</CardTitle>
                     <p className="text-muted-foreground text-xs">Visualizando {metrica} por {periodo}</p>
                 </div>
-                {/* ... Selects iguales ... */}
                 <div className="flex gap-2 w-full sm:w-auto">
                     <Select value={periodo} onValueChange={setPeriodo}>
                         <SelectTrigger size="sm" className="w-[110px]">
@@ -115,7 +106,6 @@ const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: Comp
                                 </pattern>
                             </defs>
 
-                            {/* Grid Lines */}
                             {yTicks.map((tick) => (
                                 <g key={tick}>
                                     <line x1={Y_AXIS_W} y1={toY(tick)} x2={svgW} y2={toY(tick)} className="stroke-border" strokeWidth="1" />
@@ -125,87 +115,23 @@ const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: Comp
                                 </g>
                             ))}
 
-                            {/* Bars */}
                             {DEFAULT_DATA.map((d, i) => {
                                 const x = Y_AXIS_W + i * (BAR_W + BAR_GAP)
-                                const totalValue = d.actual + d.comparado
                                 const actualH = (d.actual / yMax) * barAreaH
                                 const compH = (d.comparado / yMax) * barAreaH
                                 const yActual = CHART_H - actualH
-                                const yComp = CHART_H - (actualH + compH) // PUNTA DE LA BARRA
-
-                                // --- LÓGICA DE CORRECCIÓN DEL TOOLTIP ---
-                                // 1. Calculamos la posición Y por defecto (encima de la barra)
-                                let tooltipY = yComp - TOOLTIP_H - TOOLTIP_OFFSET
-                                let isFlipped = false
-
-                                // 2. Detectamos colisión con el borde superior del SVG (PAD_TOP)
-                                // Si tooltipY es menor que PAD_TOP, significa que se corta arriba.
-                                if (tooltipY < PAD_TOP) {
-                                    // Lo volteamos: dibujamos DEBAJO de la punta de la barra
-                                    tooltipY = yComp + TOOLTIP_OFFSET
-                                    isFlipped = true
-                                }
-
-                                // Centramos el tooltip horizontalmente respecto a la barra
-                                const tooltipX = x + BAR_W / 2 - TOOLTIP_W / 2
+                                const yComp = CHART_H - (actualH + compH)
 
                                 return (
-                                    <g key={d.label} onMouseEnter={() => setHoveredIdx(i)} onMouseLeave={() => setHoveredIdx(null)}>
-                                        {/* Barras */}
+                                    <g key={d.label}>
                                         <rect x={x} y={yActual} width={BAR_W} height={actualH} fill="#cbcbcb" rx="2" />
-                                        <rect x={x} y={yComp} width={BAR_W} height={compH} fill="url(#hatch)" stroke="#c2c2c2" rx="2" />
-
-                                        {/* Etiquetas X */}
+                                        {/* Lógica de barra única: solo se dibuja si hay valor comparado */}
+                                        {compH > 0 && (
+                                            <rect x={x} y={yComp} width={BAR_W} height={compH} fill="url(#hatch)" stroke="#c2c2c2" rx="2" />
+                                        )}
                                         <text x={x + BAR_W / 2} y={CHART_H + 20} textAnchor="middle" className="fill-muted-foreground text-[11px] font-medium">
                                             {d.label}
                                         </text>
-
-                                        {/* Tooltip Inteligente */}
-                                        {hoveredIdx === i && (
-                                            <g className="pointer-events-none transition-transform duration-150 ease-in-out">
-                                                {/* Fondo del Tooltip */}
-                                                <rect
-                                                    x={tooltipX}
-                                                    y={tooltipY}
-                                                    width={TOOLTIP_W}
-                                                    height={TOOLTIP_H}
-                                                    rx="6"
-                                                    fill="#1c1c1c"
-                                                    className="shadow-xl"
-                                                />
-
-                                                {/* Triángulo indicador (Opcional, ayuda visualmente) */}
-                                                <path
-                                                    d={isFlipped
-                                                        ? `M${x + BAR_W / 2} ${tooltipY} L${x + BAR_W / 2 - 6} ${tooltipY - 6} L${x + BAR_W / 2 + 6} ${tooltipY - 6} Z` // Triángulo hacia arriba
-                                                        : `M${x + BAR_W / 2} ${yComp - TOOLTIP_OFFSET} L${x + BAR_W / 2 - 6} ${yComp - TOOLTIP_OFFSET + 6} L${x + BAR_W / 2 + 6} ${yComp - TOOLTIP_OFFSET + 6} Z` // Triángulo hacia abajo
-                                                    }
-                                                    fill="#1c1c1c"
-                                                    transform={isFlipped ? `translate(0, 0)` : `translate(0, -6)`}
-                                                />
-
-                                                {/* Contenido del Tooltip */}
-                                                <text
-                                                    x={tooltipX + TOOLTIP_W / 2}
-                                                    y={tooltipY + 20} // Ajuste vertical del texto dentro del rect
-                                                    textAnchor="middle"
-                                                    fill="white"
-                                                    className="text-[11px] font-bold tracking-tight"
-                                                >
-                                                    {totalValue.toLocaleString('es-AR')} {/* Formato de miles */}
-                                                </text>
-                                                <text
-                                                    x={tooltipX + TOOLTIP_W / 2}
-                                                    y={tooltipY + 33}
-                                                    textAnchor="middle"
-                                                    fill="#aaaaaa"
-                                                    className="text-[9px] font-medium"
-                                                >
-                                                    Total {metrica}
-                                                </text>
-                                            </g>
-                                        )}
                                     </g>
                                 )
                             })}
@@ -213,7 +139,6 @@ const ComparacionHistorica = ({ periodo, setPeriodo, metrica, setMetrica }: Comp
                     </div>
                 )}
 
-                {/* Legend ... igual ... */}
                 <div className="flex justify-center gap-6 mt-4 border-t pt-4">
                     <div className="flex items-center gap-2">
                         <div className="size-3 rounded-sm border border-[#c2c2c2] overflow-hidden bg-white">
