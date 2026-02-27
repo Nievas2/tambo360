@@ -14,7 +14,7 @@ import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
 import VerifyUser from '@/src/pages/VerifyUser'
 import BatchDetails from '@/src/pages/BatchDetails'
-import Establishment from '@/src/pages/establishment'
+import Establishment from '@/src/pages/Establishment'
 import CheckEstablishment from '@/src/routes/CheckEstablishment'
 
 export const AppRoutes = () => {
@@ -38,6 +38,15 @@ export const AppRoutes = () => {
 
       <Route path={'/auth/verify'} element={<VerifyUser />} />
 
+      <Route
+        path={'/establecimiento'}
+        element={
+          <ProtectedRoute>
+            <Establishment />
+          </ProtectedRoute>
+        }
+      />
+
       {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
       <Route
         element={
@@ -48,7 +57,6 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path={'/establecimiento'} element={<Establishment />} />
         {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
         <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 

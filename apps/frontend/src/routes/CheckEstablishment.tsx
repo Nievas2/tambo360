@@ -6,6 +6,7 @@ interface CheckEstablishmentProps {
   children: React.ReactNode
 }
 
+// src/routes/CheckEstablishment.tsx
 const CheckEstablishment = ({ children }: CheckEstablishmentProps) => {
   const { user, loading } = useAuth()
 
@@ -13,7 +14,7 @@ const CheckEstablishment = ({ children }: CheckEstablishmentProps) => {
     return <LoadingSpinner />
   }
 
-  if (user.establecimientos.length == 0) {
+  if (user.establecimientos && user.establecimientos.length === 0) {
     return <Navigate to="/establecimiento" replace />
   }
 
