@@ -17,30 +17,28 @@ export const crearLoteSchema = z.object({
             .positive("La cantidad debe ser mayor a 0")
     ),
 
-    unidad: z.enum(["kg", "litros"], {
-        message: "Unidad inválida",
-    }),
 
-    fechaProduccion: z.string()
-        .min(1, "La fecha de producción es obligatoria")
-        .refine((val) => {
-            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
-            return regex.test(val);
-        }, { message: "Formato de fecha inválido, debe ser dd/mm/aaaa" })
+    fechaProduccion: z
+        .string()
+        .optional()
         .transform((val) => {
+            const now = new Date();
+            if (!val) {
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+            }
+            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+            if (!regex.test(val)) throw new Error("Formato de fecha inválido, debe ser dd/mm/aaaa");
             const [dd, mm, yyyy] = val.split("/");
-            return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+            const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd), now.getHours(), now.getMinutes(), now.getSeconds());
+
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const dateToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            if (dateToCheck.getTime() !== today.getTime()) {
+                throw new Error("La fecha de producción debe ser el día de hoy");
+            }
+            return date;
         }),
 
-    merma: z.preprocess((val) => {
-        if (val === "" || val === null || val === undefined) return undefined;
-        const parsed = Number(val);
-        return isNaN(parsed) ? undefined : parsed;
-    },
-        z.number()
-            .positive("La merma debe ser mayor a 0")
-            .optional()
-    ),
     estado: z.boolean().optional()
 });
 

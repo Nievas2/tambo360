@@ -132,14 +132,14 @@ const Login: React.FC = () => {
                     </small>
                   )}
 
-                  <div className="flex justify-end">
+                  {/*  <div className="flex justify-end">
                     <Link
                       to="/reset-password"
                       className="text-xs text-slate-500 hover:underline"
                     >
                       ¿Olvidaste tu contraseña?
                     </Link>
-                  </div>
+                  </div> */}
 
                   {error && (
                     <small className="text-red-700">

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { MapPin, Clock, Menu } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-// Importamos la interfaz para mantener el tipado correcto
-import { Establecimiento } from '../types';
+import React from 'react'
+import { MapPin, Clock, Menu } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { useLocation } from 'react-router-dom'
 
 interface NavbarProps {
   onMenuClick: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
-  const { user } = useAuth();
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const { user } = useAuth()
+  const { pathname } = useLocation()
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -30,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   };
 
   return (
-    <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-8">
+    <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between px-4 sm:px-8">
       <div className="flex items-center gap-4">
         <button 
           onClick={onMenuClick}
@@ -38,9 +37,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         >
           <Menu className="h-6 w-6" />
         </button>
-        <h1 className="text-lg sm:text-xl font-bold text-black truncate">
-          ¡Hola, {user?.nombre?.split(' ')[0] || 'Raul'}!
-        </h1>
+        {pathname == '/dashboard' ? (
+          <h3 className="text-lg sm:text-xl font-bold text-black truncate">
+            ¡Hola, {user?.nombre?.split(' ')[0] || 'Raul'}!
+          </h3>
+        ) : (
+          <h3 className="text-[16px] font-bold text-[#959595] truncate">
+            {user?.establecimientos[0].nombre}
+          </h3>
+        )}
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">

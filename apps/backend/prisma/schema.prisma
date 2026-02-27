@@ -59,6 +59,7 @@ model Producto {
 
 model LoteProduccion {
   idLote            String          @id @default(uuid())
+  numeroLote        Int             @default(autoincrement())
   fechaProduccion   DateTime        @default(now())
   idProducto        String
   producto          Producto        @relation(fields: [idProducto], references: [idProducto])
