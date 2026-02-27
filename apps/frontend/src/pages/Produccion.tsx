@@ -131,153 +131,154 @@ const Produccion: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isPending ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i} className="animate-pulse">
-                    <TableCell>
-                      <div className="h-4 w-10 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-20 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-32 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-16 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-12 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-6 w-20 bg-gray-200 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-16 bg-gray-200 rounded" />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="h-8 w-8 bg-gray-200 rounded mx-auto" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : data?.data.length > 0 ? (
-                data?.data?.map((batch: Batch) => (
-                  <TableRow key={batch.idLote}>
-                    <TableCell>
-                      #{String(batch.numeroLote).padStart(3, '0')}
-                    </TableCell>
-                    {/* avoid hydration mismatch: format date on the client or suppress warning */}
-                    <TableCell suppressHydrationWarning>
-                      {batch.fechaProduccion
-                        .slice(0, 10)
-                        .split('-')
-                        .reverse()
-                        .join('/')}
-                    </TableCell>
-                    <TableCell>{batch.producto.nombre}</TableCell>
-                    <TableCell>
-                      {batch.cantidad} {batch.unidad}
-                    </TableCell>
-                    {/* calcula todas las mermas y las suma */}
-                    <TableCell>
-                      {batch.mermas?.reduce((total, m) => {
-                        const qty =
-                          typeof m.cantidad === 'string'
-                            ? parseFloat(m.cantidad)
-                            : (m.cantidad ?? 0)
-                        return total + qty
-                      }, 0)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {batch.estado ? 'Completo' : 'Incompleto'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {(batch.costosDirectos.length > 0 &&
-                        batch.costosDirectos[0].moneda) ||
-                        '$'}{' '}
-                      {batch.costosDirectos?.reduce((total, m) => {
-                        const qty =
-                          typeof m.monto === 'string'
-                            ? parseFloat(m.monto)
-                            : (m.monto ?? 0)
-                        return total + qty
-                      }, 0)}
-                    </TableCell>
-                    <TableCell className="text-center mr-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Ellipsis />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                              <Link
-                                to={`/produccion/lote/${batch.idLote}`}
-                                className="flex items-center gap-2"
+              {isPending
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <TableRow key={i} className="animate-pulse">
+                      <TableCell>
+                        <div className="h-4 w-10 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-20 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-32 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-16 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-12 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-16 bg-gray-200 rounded" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="h-8 w-8 bg-gray-200 rounded mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : data?.data.length > 0 &&
+                  data?.data?.map((batch: Batch) => (
+                    <TableRow key={batch.idLote}>
+                      <TableCell>
+                        #{String(batch.numeroLote).padStart(3, '0')}
+                      </TableCell>
+                      {/* avoid hydration mismatch: format date on the client or suppress warning */}
+                      <TableCell suppressHydrationWarning>
+                        {batch.fechaProduccion
+                          .slice(0, 10)
+                          .split('-')
+                          .reverse()
+                          .join('/')}
+                      </TableCell>
+                      <TableCell>{batch.producto.nombre}</TableCell>
+                      <TableCell>
+                        {batch.cantidad} {batch.unidad}
+                      </TableCell>
+                      {/* calcula todas las mermas y las suma */}
+                      <TableCell>
+                        {batch.mermas?.reduce((total, m) => {
+                          const qty =
+                            typeof m.cantidad === 'string'
+                              ? parseFloat(m.cantidad)
+                              : (m.cantidad ?? 0)
+                          return total + qty
+                        }, 0)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {batch.estado ? 'Completo' : 'Incompleto'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {(batch.costosDirectos.length > 0 &&
+                          batch.costosDirectos[0].moneda) ||
+                          '$'}{' '}
+                        {batch.costosDirectos?.reduce((total, m) => {
+                          const qty =
+                            typeof m.monto === 'string'
+                              ? parseFloat(m.monto)
+                              : (m.monto ?? 0)
+                          return total + qty
+                        }, 0)}
+                      </TableCell>
+                      <TableCell className="text-center mr-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Ellipsis />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem>
+                                <Link
+                                  to={`/produccion/lote/${batch.idLote}`}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Eye /> Ver Detalles
+                                </Link>
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedBatch(batch)
+                                  setIsChangeBatchOpen(true)
+                                }}
                               >
-                                <Eye /> Ver Detalles
-                              </Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedBatch(batch)
-                                setIsChangeBatchOpen(true)
-                              }}
-                            >
-                              <Pencil /> Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setIsChangeDecreaseOpen(true)}
-                            >
-                              <DropletOff /> Registrar merma
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setIsChangeCostOpen(true)}
-                            >
-                              <BanknoteArrowUp /> Registrar costo
-                            </DropdownMenuItem>
-                            <DropdownMenuItem disabled={true}>
-                              <Files /> Duplicar
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
+                                <Pencil /> Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setIsChangeDecreaseOpen(true)}
+                              >
+                                <DropletOff /> Registrar merma
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => setIsChangeCostOpen(true)}
+                              >
+                                <BanknoteArrowUp /> Registrar costo
+                              </DropdownMenuItem>
+                              <DropdownMenuItem disabled={true}>
+                                <Files /> Duplicar
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
 
-                          <DropdownMenuSeparator />
+                            <DropdownMenuSeparator />
 
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem disabled={true}>
-                              <Trash /> Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white">
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center max-w-md w-full">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                      <Milk className="w-10 h-10 text-gray-300" />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
-                      Tu listado de producción está vacío
-                    </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">
-                      Comienza registrando tu primer lote para ver aquí el
-                      detalle de tu producción láctea.
-                    </p>
-                  </div>
-                </div>
-              )}
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem disabled={true}>
+                                <Trash /> Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
+
+          {data?.data.length === 0 && (
+            <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white w-full">
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center max-w-md w-full">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                  <Milk className="w-10 h-10 text-gray-300" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  Tu listado de producción está vacío
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Comienza registrando tu primer lote para ver aquí el detalle
+                  de tu producción láctea.
+                </p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
