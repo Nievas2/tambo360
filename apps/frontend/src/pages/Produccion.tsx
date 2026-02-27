@@ -161,9 +161,11 @@ const Produccion: React.FC = () => {
                   </TableRow>
                 ))
               ) : data?.data.length > 0 ? (
-                data?.data?.map((batch: Batch, index: number) => (
+                data?.data?.map((batch: Batch) => (
                   <TableRow key={batch.idLote}>
-                    <TableCell>#{String(index + 1).padStart(3, '0')}</TableCell>
+                    <TableCell>
+                      #{String(batch.numeroLote).padStart(3, '0')}
+                    </TableCell>
                     {/* avoid hydration mismatch: format date on the client or suppress warning */}
                     <TableCell suppressHydrationWarning>
                       {batch.fechaProduccion

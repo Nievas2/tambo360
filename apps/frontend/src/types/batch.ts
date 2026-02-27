@@ -43,4 +43,5 @@ export interface Batch {
   producto: Product
   mermas: Decrease[]
   costosDirectos: Cost[]
+  numeroLote: number
 }

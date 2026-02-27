@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/src/components/common/select'
 import { AlertCircle, ArrowRight, Grid } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,7 +39,8 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
   const { mutateAsync: mutateAsyncUpdate, error: errorUpdate } =
     useUpdateBatch()
   const { data } = useProducts()
-  console.log(batch)
+  const { pathname } = useLocation()
+
   const {
     register,
     handleSubmit,
@@ -62,14 +63,12 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           ? new Date(batch.fechaProduccion).toISOString().slice(0, 10)
           : ''
 
-      // Resetear todo y asegurar que el campo date reciba el valor
       reset({
         idProducto: batch.idProducto ?? '',
         cantidad: (batch.cantidad ?? '').toString(),
         fechaProduccion: fecha,
       })
 
-      // Algunos componentes Input requieren setValue explícito para type="date"
       setValue('fechaProduccion', fecha, {
         shouldValidate: false,
         shouldDirty: false,
@@ -167,16 +166,29 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           </DialogHeader>
 
           <div className="p-4 space-y-4">
-            <Button
-              variant="default"
-              className="flex items-center justify-center w-full h-14 text-xl font-bold"
-              asChild
-            >
-              <Link to={`/produccion/lote/${id}`} className="block">
-                Ir al detalle del lote
-                <ArrowRight className="ml-2 size-6" />
-              </Link>
-            </Button>
+            {pathname === '/produccion' ? (
+              <Button
+                variant="default"
+                className="flex items-center justify-center w-full h-14 text-xl font-bold"
+                asChild
+              >
+                <Link to={`/produccion/lote/${id}`} className="block">
+                  Ir al detalle del lote
+                  <ArrowRight className="ml-2 size-6" />
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                className="flex items-center justify-center w-full h-14 text-xl font-bold"
+                onClick={() => {
+                  setOpen()
+                  setFinished(false)
+                }}
+              >
+                Ver detalle del lote <ArrowRight className="ml-2 size-6" />
+              </Button>
+            )}
 
             {!batch && (
               <Button

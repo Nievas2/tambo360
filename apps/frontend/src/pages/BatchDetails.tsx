@@ -8,45 +8,93 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from '@/src/components/common/empty'
-import { Input } from '@/src/components/common/Input'
+import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
+import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
+import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import { StatCard } from '@/src/components/shared/StatCard'
 import { useBatch } from '@/src/hooks/batch/useBatch'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const MOCK_DATA = {
-  id: '004',
-  nombre: 'Leche entera',
-  estado: 'Óptimo',
-  inicio: '14/01/2026',
-  cantidadProducida: 'XXX L',
-  mermaRegistrada: 'XXX L',
-  cantidadVendible: 'XXXX L',
-  porcentajeMerma: 'X.X%',
-  costoUnitarioReal: '$XXX',
-  costoTotalLote: '$XXX',
-  costoMerma: '$XXXX',
-  costoUnitarioBase: '$XXX',
-  observaciones: 'Sin observaciones relevantes.',
-  mermas: [],
-  historialCostos: [],
-}
-
 export default function BatchDetails() {
-  const [tab, setTab] = useState('detalles')
-  const [searchInput, setSearchInput] = useState('')
   const { pathname } = useLocation()
   const id = pathname.split('/')[3]
 
   if (!id) {
     return <p>Falta el identificador del lote</p>
   }
-
+  const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
+  const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
+  const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const { data: batch, isLoading } = useBatch({ id: id })
-  const lote = MOCK_DATA
 
-  console.log(batch)
+  if (isLoading) {
+    return (
+      <div className="min-h-screen space-y-6 animate-pulse">
+        {/* Header skeleton */}
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="h-5 w-20 bg-gray-200 rounded-full" />
+            <div className="h-9 w-72 bg-gray-200 rounded-lg" />
+            <div className="h-4 w-40 bg-gray-200 rounded" />
+          </div>
+          <div className="flex items-center justify-end gap-2 w-full mt-2 sm:mt-0">
+            <div className="h-12 w-36 bg-gray-200 rounded-lg" />
+            <div className="h-12 w-36 bg-gray-200 rounded-lg" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {/* Stats grid skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="border rounded-xl p-4 flex flex-col gap-3 bg-white"
+              >
+                <div className="h-8 w-8 bg-gray-200 rounded-lg" />
+                <div className="h-4 w-28 bg-gray-200 rounded" />
+                <div className="h-7 w-20 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Mermas card skeleton */}
+          <div className="border rounded-xl bg-white py-2">
+            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
+              <div className="h-5 w-36 bg-gray-200 rounded" />
+              <div className="flex gap-2">
+                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
+                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+              </div>
+            </div>
+            <div className="p-4 flex flex-col gap-3">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
+              ))}
+            </div>
+          </div>
+
+          {/* Costos card skeleton */}
+          <div className="border rounded-xl bg-white py-2">
+            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
+              <div className="h-5 w-36 bg-gray-200 rounded" />
+              <div className="flex gap-2">
+                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
+                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+              </div>
+            </div>
+            <div className="p-4 flex flex-col gap-3">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen space-y-6">
@@ -58,15 +106,26 @@ export default function BatchDetails() {
           </Badge>
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-[32px] font-bold">
-              {/* Lote {lote.id} –  */}
-              {lote.nombre}
+              Lote #{String(batch?.data?.numeroLote).padStart(3, '0')} –
+              {batch?.data?.producto?.nombre}
             </h1>
           </div>
-          <p className="text-[#959595]">Inicio: {lote.inicio}</p>
+          <p className="text-[#959595]">
+            Inicio:{' '}
+            {batch?.data?.fechaProduccion
+              .slice(0, 10)
+              .split('-')
+              .reverse()
+              .join('/')}
+          </p>
         </div>
 
         <div className="flex items-center justify-end gap-2 w-full">
-          <Button variant="outline" className="h-12 w-full max-w-36">
+          <Button
+            variant="outline"
+            className="h-12 w-full max-w-36"
+            onClick={() => setIsChangeBatchOpen(true)}
+          >
             Editar lote
           </Button>
           <Button className="h-12 w-full max-w-36">Completar lote</Button>
@@ -146,7 +205,7 @@ export default function BatchDetails() {
           </div>
 
           <CardContent className="p-0">
-            {tab === 'detalles' && lote.mermas.length === 0 && (
+            {batch?.data?.mermas.length === 0 && (
               <Empty className="w-full gap-4">
                 <EmptyHeader>
                   <EmptyTitle className="font-bold">
@@ -180,11 +239,11 @@ export default function BatchDetails() {
           </div>
 
           <CardContent className="p-0">
-            {tab === 'detalles' && lote.mermas.length === 0 && (
+            {batch?.data?.costosDirectos.length === 0 && (
               <Empty className="w-full gap-4">
                 <EmptyHeader>
                   <EmptyTitle className="font-bold">
-                    Sin mermas registradas
+                    Sin costos registrados
                   </EmptyTitle>
                 </EmptyHeader>
                 <EmptyContent className="w-full max-w-xl">
@@ -192,13 +251,41 @@ export default function BatchDetails() {
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
-                  <Button>Registrar Merma</Button>
+                  <Button>Registrar costo</Button>
                 </EmptyContent>
               </Empty>
             )}
           </CardContent>
         </Card>
       </div>
+
+      <ChangeBatch
+        open={isChangeBatchOpen}
+        setOpen={() => setIsChangeBatchOpen(false)}
+        batch={
+          batch?.data != undefined
+            ? {
+                id: batch.data.idLote,
+                idProducto: batch.data.idProducto,
+                cantidad:
+                  typeof batch.data.cantidad === 'string'
+                    ? parseFloat(batch.data.cantidad)
+                    : Number(batch.data.cantidad ?? 0),
+                fechaProduccion: batch.data.fechaProduccion,
+              }
+            : undefined
+        }
+      />
+
+      <ChangeDecrease
+        open={isChangeDecreaseOpen}
+        onClose={() => setIsChangeDecreaseOpen(false)}
+      />
+
+      <ChangeCost
+        open={isChangeCostOpen}
+        onClose={() => setIsChangeCostOpen(false)}
+      />
     </div>
   )
 }
