@@ -55,17 +55,25 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
     resolver: zodResolver(BatchSchema),
   })
 
-  // Reset form when `batch` changes (populate inputs)
   useEffect(() => {
     if (batch) {
       const fecha =
         batch.fechaProduccion && !isNaN(Date.parse(batch.fechaProduccion))
-          ? new Date(batch.fechaProduccion).toISOString().slice(0, 10) // yyyy-mm-dd for <input type="date">
+          ? new Date(batch.fechaProduccion).toISOString().slice(0, 10)
           : ''
+
+      // Resetear todo y asegurar que el campo date reciba el valor
       reset({
         idProducto: batch.idProducto ?? '',
         cantidad: (batch.cantidad ?? '').toString(),
         fechaProduccion: fecha,
+      })
+
+      // Algunos componentes Input requieren setValue explícito para type="date"
+      setValue('fechaProduccion', fecha, {
+        shouldValidate: false,
+        shouldDirty: false,
+        shouldTouch: false,
       })
     } else {
       reset({
@@ -74,16 +82,17 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         fechaProduccion: '',
       })
     }
-  }, [batch, reset])
+  }, [batch, reset, setValue])
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       if (!batch) {
         const date = new Date(data.fechaProduccion)
-        const fechaProduccion = date.toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        })
+        const fechaProduccion = [
+          String(date.getUTCDate()).padStart(2, '0'),
+          String(date.getUTCMonth() + 1).padStart(2, '0'),
+          date.getUTCFullYear(),
+        ].join('/')
 
         const values = {
           ...data,
@@ -94,11 +103,11 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         setFinished(true)
       } else {
         const date = new Date(data.fechaProduccion)
-        const fechaProduccion = date.toLocaleDateString('es-ES', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        })
+        const fechaProduccion = [
+          String(date.getUTCDate()).padStart(2, '0'),
+          String(date.getUTCMonth() + 1).padStart(2, '0'),
+          date.getUTCFullYear(),
+        ].join('/')
 
         const values = {
           ...data,
@@ -108,6 +117,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           id: batch.id,
           values: values,
         })
+
         setId(batch.id)
         setFinished(true)
       }
@@ -121,7 +131,13 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
   })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setFinished(false)
+        setOpen()
+      }}
+    >
       {finished ? (
         <DialogContent className="space-y-6">
           <DialogHeader>
@@ -216,7 +232,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
             <div className="space-y-4">
               <Label className="font-bold">Tipo de producción</Label>
               <Select
-                defaultValue={batch.idProducto}
+                defaultValue={batch ? batch.idProducto : ''}
                 onValueChange={(e) => setValue('idProducto', e)}
               >
                 <SelectTrigger className="w-full">

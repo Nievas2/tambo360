@@ -110,7 +110,7 @@ const Produccion: React.FC = () => {
                 <TableHead className="w-24 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Fecha
                 </TableHead>
-                <TableHead className="w-[30%] min-w-55 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[25%] min-w-55 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Producto
                 </TableHead>
                 <TableHead className="w-36 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
@@ -137,9 +137,11 @@ const Produccion: React.FC = () => {
                     <TableCell>{index}</TableCell>
                     {/* avoid hydration mismatch: format date on the client or suppress warning */}
                     <TableCell suppressHydrationWarning>
-                      {new Date(batch.fechaProduccion).toLocaleDateString(
-                        'es-ES'
-                      )}
+                      {batch.fechaProduccion
+                        .slice(0, 10)
+                        .split('-')
+                        .reverse()
+                        .join('/')}
                     </TableCell>
                     <TableCell>{batch.producto.nombre}</TableCell>
                     <TableCell>
@@ -253,7 +255,10 @@ const Produccion: React.FC = () => {
       {/* Modales para registrar merma, costo y lote */}
       <ChangeBatch
         open={isChangeBatchOpen}
-        setOpen={() => setIsChangeBatchOpen(false)}
+        setOpen={() => {
+          setIsChangeBatchOpen(false)
+          setSelectedBatch(null)
+        }}
         batch={
           selectedBatch
             ? {
