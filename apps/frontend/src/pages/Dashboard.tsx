@@ -3,9 +3,13 @@ import AlertsSection from '@/src/components/shared/dashboard/AlertsSection'
 import { StatCard } from '../components/shared/StatCard'
 import DailyProductionLog from '../components/shared/dashboard/DailyProductionLog'
 import { useAuth } from '@/src/context/AuthContext'
+import ComparacionHistorica from '@/src/components/shared/dashboard/ComparacionHistorica'
 
 const Dashboard = () => {
   const { user } = useAuth()
+  const [periodo, setPeriodo] = useState<string>('Mes')
+  const [metrica, setMetrica] = useState<string>('Producción')
+
   return (
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Cabecera */}
@@ -53,11 +57,11 @@ const Dashboard = () => {
         {/* Columna Izquierda */}
         <div className="flex-1 flex flex-col gap-6 min-w-0">
           {/* 2. Pasamos las propiedades requeridas para solucionar el error de TS */}
-          <ComparacionHistorica 
-            periodo={periodo} 
-            setPeriodo={setPeriodo} 
-            metrica={metrica} 
-            setMetrica={setMetrica} 
+          <ComparacionHistorica
+            periodo={periodo}
+            setPeriodo={setPeriodo}
+            metrica={metrica}
+            setMetrica={setMetrica}
           />
           <DailyProductionLog />
         </div>
