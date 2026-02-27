@@ -52,7 +52,6 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
       idProducto: '',
       cantidad: '',
       fechaProduccion: '',
-      unidad: 'kg',
     },
     resolver: zodResolver(BatchSchema),
   })
@@ -68,7 +67,6 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         idProducto: batch.idProducto ?? '',
         cantidad: (batch.cantidad ?? '').toString(),
         fechaProduccion: fecha,
-        unidad: batch.unidad ?? 'kg',
       })
 
       setValue('fechaProduccion', fecha, {
@@ -81,7 +79,6 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         idProducto: '',
         cantidad: '',
         fechaProduccion: '',
-        unidad: 'kg',
       })
     }
   }, [batch, reset, setValue])
@@ -272,31 +269,6 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
               {errors.idProducto && (
                 <span className="text-xs text-red-600">
                   {errors.idProducto.message}
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <Label className="font-bold">Tipo de producción</Label>
-              <Select
-                defaultValue={batch ? batch.unidad : 'kg'}
-                onValueChange={(e) => setValue('unidad', e as 'kg' | 'litros')}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona producto..." />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="kg">Kg</SelectItem>
-                    <SelectItem value="litros">Litros</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              {errors.unidad && (
-                <span className="text-xs text-red-600">
-                  {errors.unidad.message}
                 </span>
               )}
             </div>

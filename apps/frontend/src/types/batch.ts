@@ -55,10 +55,6 @@ export const BatchSchema = z.object({
         message: 'La fecha no puede ser futura',
       }
     ),
-
-  unidad: z.enum(['kg', 'litros'], {
-    message: 'Unidad inválida',
-  }),
 })
 
 export type BatchData = z.infer<typeof BatchSchema>
