@@ -25,7 +25,36 @@ export const BatchSchema = z.object({
     .min(1, 'La fecha de producción es obligatoria')
     .refine((val) => !isNaN(Date.parse(val)), {
       message: 'Fecha inválida',
-    }),
+    })
+    .refine(
+      (val) => {
+        const fechaIngresada = new Date(val + 'T00:00:00')
+
+        const hoy = new Date()
+        hoy.setHours(0, 0, 0, 0)
+
+        const haceUnaSemana = new Date(hoy)
+        haceUnaSemana.setDate(hoy.getDate() - 7)
+
+        return fechaIngresada >= haceUnaSemana
+      },
+      {
+        message: 'La fecha no puede ser de hace más de una semana',
+      }
+    )
+    .refine(
+      (val) => {
+        const fechaIngresada = new Date(val + 'T00:00:00')
+
+        const hoy = new Date()
+        hoy.setHours(0, 0, 0, 0)
+
+        return fechaIngresada <= hoy
+      },
+      {
+        message: 'La fecha no puede ser futura',
+      }
+    ),
 
   unidad: z.enum(['kg', 'litros'], {
     message: 'Unidad inválida',
