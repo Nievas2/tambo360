@@ -21,6 +21,13 @@ export class LoteService {
             throw new AppError("El producto seleccionado no existe", 400);
         }
 
+        const ultimoLote = await prisma.loteProduccion.findFirst({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
+            orderBy: { numeroLote: 'desc' }
+        });
+
+        const nuevoNumeroLote = ultimoLote ? ultimoLote.numeroLote + 1 : 1;
+
         const lote = await prisma.loteProduccion.create({
             data: {
                 idProducto: data.idProducto,
@@ -29,6 +36,7 @@ export class LoteService {
                 unidad: data.unidad,
                 fechaProduccion: data.fechaProduccion ?? undefined,
                 estado: data.estado ?? false,
+                numeroLote: nuevoNumeroLote,
             },
             include: {
                 producto: {
@@ -109,5 +117,29 @@ export class LoteService {
         }
 
         return lote;
+    }
+
+    static async listarProduccionDelDia(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario },
+        });
+        if (!establecimiento) throw new AppError("El usuario no tiene un establecimiento registrado", 400);
+
+        const inicioDia = new Date();
+        inicioDia.setHours(0, 0, 0, 0);
+
+        const finDia = new Date();
+        finDia.setHours(23, 59, 59, 999);
+
+        return prisma.loteProduccion.findMany({
+            where: {
+                idEstablecimiento: establecimiento.idEstablecimiento,
+                fechaProduccion: {
+                    gte: inicioDia,
+                    lte: finDia
+                }
+            },
+            include: { producto: true, mermas: true, costosDirectos: true }
+        });
     }
 }
