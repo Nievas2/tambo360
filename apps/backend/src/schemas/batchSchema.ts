@@ -17,9 +17,6 @@ export const crearLoteSchema = z.object({
             .positive("La cantidad debe ser mayor a 0")
     ),
 
-    unidad: z.enum(["kg", "litros"], {
-        message: "Unidad inválida",
-    }),
 
     fechaProduccion: z.string()
         .min(1, "La fecha de producción es obligatoria")
@@ -40,15 +37,6 @@ export const crearLoteSchema = z.object({
             );
         }),
 
-    merma: z.preprocess((val) => {
-        if (val === "" || val === null || val === undefined) return undefined;
-        const parsed = Number(val);
-        return isNaN(parsed) ? undefined : parsed;
-    },
-        z.number()
-            .positive("La merma debe ser mayor a 0")
-            .optional()
-    ),
     estado: z.boolean().optional()
 });
 

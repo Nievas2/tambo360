@@ -28,12 +28,14 @@ export class LoteService {
 
         const nuevoNumeroLote = ultimoLote ? ultimoLote.numeroLote + 1 : 1;
 
+        const unidad: "kg" | "litros" = producto.categoria === "quesos" ? "kg" : "litros";
+
         const lote = await prisma.loteProduccion.create({
             data: {
                 idProducto: data.idProducto,
                 idEstablecimiento: establecimiento.idEstablecimiento,
                 cantidad: data.cantidad,
-                unidad: data.unidad,
+                unidad,
                 fechaProduccion: data.fechaProduccion ?? undefined,
                 estado: data.estado ?? false,
                 numeroLote: nuevoNumeroLote,
@@ -125,18 +127,20 @@ export class LoteService {
         });
         if (!establecimiento) throw new AppError("El usuario no tiene un establecimiento registrado", 400);
 
-        const inicioDia = new Date();
-        inicioDia.setHours(0, 0, 0, 0);
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = hoy.getMonth();
+        const dd = hoy.getDate();
 
-        const finDia = new Date();
-        finDia.setHours(23, 59, 59, 999);
+        const inicioDia = new Date(yyyy, mm, dd, 0, 0, 0, 0);
+        const inicioManana = new Date(yyyy, mm, dd + 1, 0, 0, 0, 0);
 
         return prisma.loteProduccion.findMany({
             where: {
                 idEstablecimiento: establecimiento.idEstablecimiento,
                 fechaProduccion: {
                     gte: inicioDia,
-                    lte: finDia
+                    lt: inicioManana
                 }
             },
             include: { producto: true, mermas: true, costosDirectos: true }
