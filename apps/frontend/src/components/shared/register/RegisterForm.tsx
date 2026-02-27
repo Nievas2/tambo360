@@ -36,10 +36,10 @@ const RegisterForm = ({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await mutateAsync(data)
+      await mutateAsync(data)
       handleAddEmail(data.correo)
       handleNextStep()
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error al iniciar sesión:', err)
     }
   })

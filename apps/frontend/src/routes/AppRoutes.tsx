@@ -14,6 +14,8 @@ import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
 import VerifyUser from '@/src/pages/VerifyUser'
 import BatchDetails from '@/src/pages/BatchDetails'
+import Establishment from '@/src/pages/establishment'
+import CheckEstablishment from '@/src/routes/CheckEstablishment'
 
 export const AppRoutes = () => {
   const { loading } = useAuth()
@@ -40,10 +42,13 @@ export const AppRoutes = () => {
       <Route
         element={
           <ProtectedRoute>
-            <Layout />
+            <CheckEstablishment>
+              <Layout />
+            </CheckEstablishment>
           </ProtectedRoute>
         }
       >
+        <Route path={'/establecimiento'} element={<Establishment />} />
         {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
         <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
