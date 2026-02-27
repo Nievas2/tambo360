@@ -200,7 +200,12 @@ export default function BatchDetails() {
                 <ListFilter className="size-4" />
               </Button>
 
-              <Button className="w-52">Agregar merma</Button>
+              <Button
+                className="w-52"
+                onClick={() => setIsChangeDecreaseOpen(true)}
+              >
+                Agregar merma
+              </Button>
             </div>
           </div>
 
@@ -217,7 +222,9 @@ export default function BatchDetails() {
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
-                  <Button>Registrar Merma</Button>
+                  <Button onClick={() => setIsChangeDecreaseOpen(true)}>
+                    Registrar Merma
+                  </Button>
                 </EmptyContent>
               </Empty>
             )}
@@ -234,7 +241,12 @@ export default function BatchDetails() {
                 <ListFilter className="size-4" />
               </Button>
 
-              <Button className="w-52">Agregar costo</Button>
+              <Button
+                className="w-52"
+                onClick={() => setIsChangeCostOpen(true)}
+              >
+                Agregar costo
+              </Button>
             </div>
           </div>
 
@@ -251,7 +263,9 @@ export default function BatchDetails() {
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
-                  <Button>Registrar costo</Button>
+                  <Button onClick={() => setIsChangeCostOpen(true)}>
+                    Registrar costo
+                  </Button>
                 </EmptyContent>
               </Empty>
             )}
