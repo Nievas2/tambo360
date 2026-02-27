@@ -16,4 +16,6 @@ export const getBatches = () => api.get('/lote/listar')
 
 export const getBatch = (id: string) => api.get(`/lote/${id}`)
 
+export const getBatchesDay = () => api.get('/lote/produccion-hoy')
+
 export const deleteBatch = (id: string) => api.delete(`/lote/eliminar/${id}`)
