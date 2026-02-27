@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { MapPin, Clock, Menu } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-// Importamos la interfaz para mantener el tipado correcto
-import { Establecimiento } from '../types'
 
 interface NavbarProps {
   onMenuClick: () => void
@@ -10,37 +8,19 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user } = useAuth()
-  const [currentTime, setCurrentTime] = useState(new Date())
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
+  const dateStr = new Intl.DateTimeFormat('es-ES', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date())
 
-  // Lógica para obtener el establecimiento:
-  // Si establecimientos es un array, tomamos el primero.
-  const establecimientoActivo = Array.isArray(user?.establecimientos)
-    ? (user?.establecimientos[0] as Establecimiento)
-    : null
-
-  const formatDateTime = (date: Date) => {
-    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-    const months = [
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ]
-    return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} | ${date.getHours() % 12 || 12}:${date.getMinutes().toString().padStart(2, '0')} ${date.getHours() >= 12 ? 'PM' : 'AM'}`
-  }
+  const timeStr = new Intl.DateTimeFormat('es-ES', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  }).format(new Date())
 
   return (
     <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-8">
@@ -57,16 +37,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <MapPin className="h-4 w-4 text-black" />
           <span className="text-xs font-semibold text-gray-700">
-            {/* Levantamos los datos desde el establecimiento del usuario */}
-            {establecimientoActivo
-              ? `${establecimientoActivo.localidad}, ${establecimientoActivo.provincia}`
-              : 'Córdoba, AR'}
+            {user.establecimientos[0].provincia +
+              ', ' +
+              user.establecimientos[0].localidad}
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5"></div>
+        <div className="items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 hidden sm:flex">
+          <Clock className="h-4 w-4 text-black" />
+          <span className="text-xs font-semibold text-gray-700">
+            {dateStr} | {timeStr}
+          </span>
+        </div>
       </div>
     </nav>
   )

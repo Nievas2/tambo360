@@ -10,7 +10,6 @@ import { EyeIcon, ArrowRight } from 'lucide-react'
 import { LoginSchema } from '@/src/types/login'
 import { useForm } from 'react-hook-form'
 import React, { useState } from 'react'
-import { AxiosError } from 'axios'
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -35,7 +34,7 @@ const Login: React.FC = () => {
       const response = await mutateAsync(data)
       login({ token: response.data.token, user: response.data.user })
       navigate('/dashboard')
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error al iniciar sesión:', err)
     }
   })
