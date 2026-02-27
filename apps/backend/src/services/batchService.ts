@@ -63,7 +63,6 @@ export class LoteService {
             where: { idLote },
             data: {
                 cantidad: data.cantidad ?? lote.cantidad,
-                unidad: data.unidad ?? lote.unidad,
                 fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : lote.fechaProduccion,
                 estado: data.estado ?? lote.estado,
             },
@@ -122,26 +121,17 @@ export class LoteService {
     }
 
     static async listarProduccionDelDia(idUsuario: string) {
-        const establecimiento = await prisma.establecimiento.findFirst({
-            where: { idUsuario },
-        });
+        const establecimiento = await prisma.establecimiento.findFirst({ where: { idUsuario } });
         if (!establecimiento) throw new AppError("El usuario no tiene un establecimiento registrado", 400);
 
         const hoy = new Date();
-        const yyyy = hoy.getFullYear();
-        const mm = hoy.getMonth();
-        const dd = hoy.getDate();
-
-        const inicioDia = new Date(yyyy, mm, dd, 0, 0, 0, 0);
-        const inicioManana = new Date(yyyy, mm, dd + 1, 0, 0, 0, 0);
+        const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0);
+        const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59, 999);
 
         return prisma.loteProduccion.findMany({
             where: {
                 idEstablecimiento: establecimiento.idEstablecimiento,
-                fechaProduccion: {
-                    gte: inicioDia,
-                    lt: inicioManana
-                }
+                fechaProduccion: { gte: inicioDia, lte: finDia }
             },
             include: { producto: true, mermas: true, costosDirectos: true }
         });
