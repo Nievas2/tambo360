@@ -95,7 +95,13 @@ class UserService {
         tokenHash: hashedToken,
         tipo: TipoToken.verificacion
       },
-      include: { usuario: true }
+      include: {
+        usuario: {
+          include: {
+            establecimientos: true
+          }
+        }
+      }
     });
 
     if (!tokenRecord) {

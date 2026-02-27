@@ -99,7 +99,8 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
         correo: result.correo,
         idUsuario: result.idUsuario,
         verificado: result.verificado,
-        fechaCreacion: result.fechaCreacion
+        fechaCreacion: result.fechaCreacion,
+        establecimientos: result.establecimientos
       }
     }
 
