@@ -29,7 +29,15 @@ export const crearLoteSchema = z.object({
         }, { message: "Formato de fecha inválido, debe ser dd/mm/aaaa" })
         .transform((val) => {
             const [dd, mm, yyyy] = val.split("/");
-            return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+            const now = new Date();
+            return new Date(
+                Number(yyyy),
+                Number(mm) - 1,
+                Number(dd),
+                now.getHours(),
+                now.getMinutes(),
+                now.getSeconds()
+            );
         }),
 
     merma: z.preprocess((val) => {
