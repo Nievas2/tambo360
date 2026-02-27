@@ -6,9 +6,11 @@ const router = express.Router();
 
 router.post('/registrar', authenticate, crearLote);
 router.put('/actualizar/:idLote', authenticate, editarLote);
+
 router.get("/listar", authenticate, listarLotes);
-router.get("/:idLote", authenticate, obtenerLote);
-router.delete("/eliminar/:idLote", authenticate, eliminarLote);
+router.get("/buscar-lote/:idLote", authenticate, obtenerLote);
 router.get("/produccion-hoy", authenticate, produccionDelDia);
+router.delete("/eliminar/:idLote", authenticate, eliminarLote);
+
 
 export default router;
