@@ -16,23 +16,6 @@ export function useUpdateBatch() {
       return data
     },
 
-    onMutate: ({ values, id }: { values: BatchData; id: string }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
-
-      const previous = queryClient.getQueryData(queryKeys.batch.lists())
-
-      queryClient.setQueryData<BatchDto[]>(
-        queryKeys.batch.lists(),
-        (old = []) => {
-          return old.map((batch) =>
-            batch.id === id ? { ...batch, ...values } : batch
-          )
-        }
-      )
-
-      return { previous }
-    },
-
     onError: (error, _, context: { previous: unknown } | undefined) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKeys.batch.lists(), context.previous)

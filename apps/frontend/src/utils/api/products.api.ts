@@ -1,3 +1,3 @@
 import { api } from '@/src/services/api'
 
-export const getProducts = () => api.get('/producto/listar')
+export const getProducts = () => api.get('/productos')

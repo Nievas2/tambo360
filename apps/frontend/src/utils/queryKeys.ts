@@ -11,6 +11,7 @@
 export const baseKeys = {
   auth: ['auth'] as const,
   batch: ['batch'] as const,
+  product: ['product'] as const,
 } as const
 
 // Auth related keys
@@ -30,9 +31,9 @@ export const batchKeys = {
 } as const
 
 export const productKeys = {
-  all: baseKeys.batch,
-  lists: () => [...baseKeys.batch, 'list'] as const,
-  detail: (id: string) => [...baseKeys.batch, id] as const,
+  all: baseKeys.product,
+  lists: () => [...baseKeys.product, 'list'] as const,
+  detail: (id: string) => [...baseKeys.product, id] as const,
 }
 
 // Export all keys for easy access

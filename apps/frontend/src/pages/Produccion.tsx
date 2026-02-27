@@ -4,13 +4,13 @@ import {
   Search,
   Filter,
   Milk,
-  Cpu,
   Eye,
   DropletOff,
   BanknoteArrowUp,
   Trash,
   Ellipsis,
   Files,
+  Pencil,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
@@ -41,16 +41,17 @@ import { Link } from 'react-router-dom'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
-import { useBatches } from '@/src/hooks/batch/useBatches'
 import { Badge } from '@/src/components/common/badge'
+import { Batch } from '@/src/types/batch'
+import { useBatches } from '@/src/hooks/batch/useBatches'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
-
-  const { data, isPending } = useBatches()
+  const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
+  const { data } = useBatches()
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -68,7 +69,7 @@ const Produccion: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="border-gray-200 shadow-sm overflow-hidden rounded-2xl bg-white">
+      <Card className="border-gray-200 shadow-sm overflow-hidden rounded-2xl bg-white gap-0">
         <CardHeader className="border-b border-gray-100 bg-white p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-3">
@@ -100,109 +101,152 @@ const Produccion: React.FC = () => {
         </CardHeader>
 
         <CardContent className="p-0">
-          {/* CAMBIO SOLICITADO: Uso de Table de Shadcn en lugar de spans */}
           <Table>
-            <TableHeader className="bg-gray-50/50">
+            <TableHeader className="bg-[#EAEAEA]">
               <TableRow>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="pr-4  min-w-20 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Lote
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-24 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Fecha
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[30%] min-w-55 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Producto
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-36 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Cantidad
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Merma
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Estado
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className=" w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Costo
                 </TableHead>
-                <TableHead className="font-bold text-gray-400 uppercase text-xs tracking-wider text-right">
+                <TableHead className="pr-6 pl-4  w-32 text-right font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Acción
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>#001</TableCell>
-                <TableCell>16/06/2026</TableCell>
-                <TableCell>Leche entera</TableCell>
-                <TableCell>5.000 L</TableCell>
-                <TableCell>200 L</TableCell>
-                <TableCell>
-                  <Badge>Terminado</Badge>
-                </TableCell>
-                <TableCell>$2.450.000</TableCell>
-                <TableCell className="text-right mr-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Ellipsis />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Link
-                            to="/produccion/lote/001"
-                            className="flex items-center gap-2"
-                          >
-                            <Eye /> Ver Detalles
-                          </Link>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={() => setIsChangeDecreaseOpen(true)}
-                        >
-                          <DropletOff /> Registrar merma
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setIsChangeCostOpen(true)}
-                        >
-                          <BanknoteArrowUp /> Registrar costo
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Files /> Duplicar
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Trash /> Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              {data?.data.length > 0 ? (
+                data?.data?.map((batch: Batch, index: number) => (
+                  <TableRow key={batch.idLote}>
+                    <TableCell>{index}</TableCell>
+                    {/* avoid hydration mismatch: format date on the client or suppress warning */}
+                    <TableCell suppressHydrationWarning>
+                      {new Date(batch.fechaProduccion).toLocaleDateString(
+                        'es-ES'
+                      )}
+                    </TableCell>
+                    <TableCell>{batch.producto.nombre}</TableCell>
+                    <TableCell>
+                      {batch.cantidad} {batch.unidad}
+                    </TableCell>
+                    {/* calcula todas las mermas y las suma */}
+                    <TableCell>
+                      <TableCell>
+                        {batch.mermas?.reduce((total, m) => {
+                          const qty =
+                            typeof m.cantidad === 'string'
+                              ? parseFloat(m.cantidad)
+                              : (m.cantidad ?? 0)
+                          return total + qty
+                        }, 0)}
+                      </TableCell>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {batch.estado ? 'Completo' : 'Incompleto'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {(batch.costosDirectos.length > 0 &&
+                        batch.costosDirectos[0].moneda) ||
+                        '$'}{' '}
+                      {batch.costosDirectos?.reduce((total, m) => {
+                        const qty =
+                          typeof m.monto === 'string'
+                            ? parseFloat(m.monto)
+                            : (m.monto ?? 0)
+                        return total + qty
+                      }, 0)}
+                    </TableCell>
+                    <TableCell className="text-center mr-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Ellipsis />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                              <Link
+                                to={`/produccion/lote/${batch.idLote}`}
+                                className="flex items-center gap-2"
+                              >
+                                <Eye /> Ver Detalles
+                              </Link>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedBatch(batch)
+                                setIsChangeBatchOpen(true)
+                              }}
+                            >
+                              <Pencil /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setIsChangeDecreaseOpen(true)}
+                            >
+                              <DropletOff /> Registrar merma
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setIsChangeCostOpen(true)}
+                            >
+                              <BanknoteArrowUp /> Registrar costo
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled={true}>
+                              <Files /> Duplicar
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem disabled={true}>
+                              <Trash /> Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white">
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center max-w-md w-full">
+                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                      <Milk className="w-10 h-10 text-gray-300" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      Tu listado de producción está vacío
+                    </h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      Comienza registrando tu primer lote para ver aquí el
+                      detalle de tu producción láctea.
+                    </p>
+                  </div>
+                </div>
+              )}
             </TableBody>
           </Table>
-
-          {/* Estado vacío y TamboEngine AI se mantienen igual */}
-          <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white">
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center max-w-md w-full">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                <Milk className="w-10 h-10 text-gray-300" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Tu listado de producción está vacío
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Comienza registrando tu primer lote para ver aquí el detalle de
-                tu producción láctea.
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -210,6 +254,19 @@ const Produccion: React.FC = () => {
       <ChangeBatch
         open={isChangeBatchOpen}
         setOpen={() => setIsChangeBatchOpen(false)}
+        batch={
+          selectedBatch
+            ? {
+                id: selectedBatch.idLote,
+                idProducto: selectedBatch.idProducto,
+                cantidad:
+                  typeof selectedBatch.cantidad === 'string'
+                    ? parseFloat(selectedBatch.cantidad)
+                    : Number(selectedBatch.cantidad ?? 0),
+                fechaProduccion: selectedBatch.fechaProduccion,
+              }
+            : undefined
+        }
       />
 
       <ChangeDecrease

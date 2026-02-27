@@ -17,6 +17,7 @@ const DailyProductionLog = () => {
   const [open, setOpen] = useState(false)
   const { data } = useBatches()
   console.log(data)
+
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">

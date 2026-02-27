@@ -1,3 +1,6 @@
+import { Cost } from '@/src/types/cost'
+import { Decrease } from '@/src/types/decrease'
+import { Product } from '@/src/types/product'
 import z from 'zod'
 
 export const BatchSchema = z.object({
@@ -28,3 +31,16 @@ export const BatchSchema = z.object({
 export type BatchData = z.infer<typeof BatchSchema>
 
 export type BatchDto = BatchData & { id: string }
+
+export interface Batch {
+  idLote: string
+  fechaProduccion: string
+  idProducto: string
+  cantidad: string
+  unidad: string
+  idEstablecimiento: string
+  estado: boolean
+  producto: Product
+  mermas: Decrease[]
+  costosDirectos: Cost[]
+}
