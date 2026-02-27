@@ -75,9 +75,9 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
-                  className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+                  className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                     isCollapsed ? 'justify-center' : 'justify-start'
-                  } ${isActive ? 'bg-[#4A4A4A] !text-white' : 'bg-transparent text-gray-400 hover:bg-gray-50'}`}
+                  } ${isActive ? 'bg-[#BABABA] text-white! border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Link
                     to={item.url}
@@ -85,10 +85,14 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                     data-test-id={item.data}
                   >
                     <item.icon
-                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`}
+                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-black' : 'text-gray-400'}`}
                     />
                     {!isCollapsed && (
-                      <span className="font-semibold">{item.title}</span>
+                      <span
+                        className={`font-semibold ${isActive ? 'text-black' : 'text-gray-400'}`}
+                      >
+                        {item.title}
+                      </span>
                     )}
                   </Link>
                 </SidebarMenuButton>
@@ -101,20 +105,16 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+              className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center group ${
                 isCollapsed ? 'justify-center' : 'justify-start'
-              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] !text-white' : 'bg-transparent text-gray-400 hover:bg-gray-50'}`}
+              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] text-white!' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
             >
               <Button
                 onClick={() => logout()}
                 className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
               >
-                <User
-                  className={`h-5 w-5 shrink-0 ${location.pathname === '/perfil' ? 'text-white' : 'text-gray-400'}`}
-                />
-                {!isCollapsed && (
-                  <span className="font-semibold">Mi Perfil</span>
-                )}
+                <User className={`h-5 w-5 shrink-0 text-gray-400 `} />
+                <span className="font-semibold text-gray-400">Mi perfil</span>
               </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>

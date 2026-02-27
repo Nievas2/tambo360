@@ -186,26 +186,6 @@ const Produccion: React.FC = () => {
                 tu producción láctea.
               </p>
             </div>
-
-            <div className="bg-[#1a1a1a] text-white p-6 rounded-2xl max-w-sm shadow-xl relative overflow-hidden group">
-              <div className="flex gap-4 relative z-10">
-                <div className="bg-gray-700/50 p-2.5 rounded-xl h-fit">
-                  <Cpu className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-base mb-2 flex items-center gap-2">
-                    TamboEngine
-                  </h4>
-                  <p className="text-sm text-gray-400 leading-relaxed">
-                    "Registrar tu primer lote te permitirá activar el{' '}
-                    <strong className="text-white font-semibold">
-                      análisis de mermas
-                    </strong>{' '}
-                    automático y optimizar tus costos de producción."
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>

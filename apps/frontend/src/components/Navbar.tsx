@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <MapPin className="h-4 w-4 text-black" />
           <span className="text-xs font-semibold text-gray-700">
             {/* Levantamos los datos desde el establecimiento del usuario */}
