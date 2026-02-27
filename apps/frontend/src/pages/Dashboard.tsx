@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import AlertsSection from '@/src/components/shared/dashboard/AlertsSection'
 import { StatCard } from '../components/shared/StatCard'
 import DailyProductionLog from '../components/shared/dashboard/DailyProductionLog'
@@ -6,9 +7,8 @@ import { useAuth } from '@/src/context/AuthContext'
 const Dashboard = () => {
   const { user } = useAuth()
   return (
-    // min-h-screen y w-full aseguran que el contenedor no se desborde
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
-      {/* Cabecera del Dashboard - Responsive */}
+      {/* Cabecera */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
         <div>
           <p className="text-muted-foreground text-xs sm:text-sm">
@@ -20,8 +20,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Seccion de Stats - Sistema de Grid Adaptativo */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Seccion de Stats - 5 indicadores según requerimiento */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           title="Queso Producido"
           value="395 Kg"
@@ -48,12 +48,24 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Contenedor para el log de producción - Manejo de ancho total */}
-      <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full overflow-x-auto">
-        <div className="w-full sm:w-2/3 lg:w-3/4">
+      {/* Cuerpo Principal */}
+      <div className="flex flex-col lg:flex-row gap-6 w-full">
+        {/* Columna Izquierda */}
+        <div className="flex-1 flex flex-col gap-6 min-w-0">
+          {/* 2. Pasamos las propiedades requeridas para solucionar el error de TS */}
+          <ComparacionHistorica 
+            periodo={periodo} 
+            setPeriodo={setPeriodo} 
+            metrica={metrica} 
+            setMetrica={setMetrica} 
+          />
           <DailyProductionLog />
         </div>
-        <AlertsSection />
+
+        {/* Columna Derecha */}
+        <aside className="w-full lg:w-80 flex-shrink-0">
+          <AlertsSection />
+        </aside>
       </div>
     </div>
   )

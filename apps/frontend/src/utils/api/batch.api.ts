@@ -8,7 +8,7 @@ export const updateBatch = (dto: BatchData, id: string) =>
 
 export const getBatches = () => api.get('/lote/listar')
 
-export const getBatch = (id: string) => api.get(`/lote/${id}`)
+export const getBatch = (id: string) => api.get(`/lote/buscar-lote/${id}`)
 
 export const getBatchesDay = () => api.get('/lote/produccion-hoy')
 
