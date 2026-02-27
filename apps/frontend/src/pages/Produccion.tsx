@@ -243,9 +243,6 @@ const Produccion: React.FC = () => {
                               >
                                 <BanknoteArrowUp /> Registrar costo
                               </DropdownMenuItem>
-                              <DropdownMenuItem disabled={true}>
-                                <Files /> Duplicar
-                              </DropdownMenuItem>
                             </DropdownMenuGroup>
 
                             <DropdownMenuSeparator />
