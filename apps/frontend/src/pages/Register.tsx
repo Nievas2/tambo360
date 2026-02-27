@@ -2,7 +2,6 @@ import RegisterForm from '@/src/components/shared/register/RegisterForm'
 import { Card, CardContent } from '@/src/components/common/card'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Mail, Section } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { useResendEmail } from '@/src/hooks/auth/useResendEmail'
 
@@ -14,7 +13,7 @@ const Register: React.FC = () => {
   const { mutateAsync, error, isPending } = useResendEmail()
 
   useEffect(() => {
-    let interval: any | null = null
+    const interval: any | null = null
     if (step === 2) {
       setSecondsLeft(180)
     }

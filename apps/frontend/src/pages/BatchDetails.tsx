@@ -10,6 +10,7 @@ import {
 } from '@/src/components/common/empty'
 import { Input } from '@/src/components/common/Input'
 import { StatCard } from '@/src/components/shared/StatCard'
+import { useBatch } from '@/src/hooks/batch/useBatch'
 import {
   ArrowRight,
   CircleCheck,
@@ -24,6 +25,7 @@ import {
   TrendingDown,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const MOCK_DATA = {
   id: '004',
@@ -45,7 +47,15 @@ const MOCK_DATA = {
 
 export default function BatchDetails() {
   const [tab, setTab] = useState('detalles')
-  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const { search } = useLocation()
+  const id = new URLSearchParams(search).get('id')
+
+  if (!id) {
+    return <p>Falta el identificador del lote</p>
+  }
+
+  const { data: batch, isLoading } = useBatch({ id: id })
   const lote = MOCK_DATA
 
   return (
@@ -163,8 +173,8 @@ export default function BatchDetails() {
                 <Input
                   type="text"
                   placeholder="Buscar lote..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="h-10 pl-10"
                 />
               </div>
