@@ -2,20 +2,17 @@ import { useState } from 'react'
 import AlertsSection from '@/src/components/shared/dashboard/AlertsSection'
 import { StatCard } from '../components/shared/StatCard'
 import DailyProductionLog from '../components/shared/dashboard/DailyProductionLog'
-import ComparacionHistorica from '../components/shared/dashboard/ComparacionHistorica'
+import { useAuth } from '@/src/context/AuthContext'
 
 const Dashboard = () => {
-  // 1. Definimos el estado centralizado que requiere el componente
-  const [periodo, setPeriodo] = useState('Mes')
-  const [metrica, setMetrica] = useState('Producción')
-
+  const { user } = useAuth()
   return (
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Cabecera */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
         <div>
           <p className="text-muted-foreground text-xs sm:text-sm">
-            Dashboard / Tambo La Esperanza
+            Dashboard / {user.establecimientos[0].nombre}
           </p>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#252525] tracking-tight">
             Reporte Mensual
