@@ -26,6 +26,10 @@ export const BatchSchema = z.object({
     .refine((val) => !isNaN(Date.parse(val)), {
       message: 'Fecha inválida',
     }),
+
+  unidad: z.enum(['kg', 'litros'], {
+    message: 'Unidad inválida',
+  }),
 })
 
 export type BatchData = z.infer<typeof BatchSchema>

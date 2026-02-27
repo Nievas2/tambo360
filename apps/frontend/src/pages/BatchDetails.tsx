@@ -286,6 +286,7 @@ export default function BatchDetails() {
                     ? parseFloat(batch.data.cantidad)
                     : Number(batch.data.cantidad ?? 0),
                 fechaProduccion: batch.data.fechaProduccion,
+                unidad: batch.data.unidad as 'kg' | 'litros',
               }
             : undefined
         }

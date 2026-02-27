@@ -180,15 +180,13 @@ const Produccion: React.FC = () => {
                     </TableCell>
                     {/* calcula todas las mermas y las suma */}
                     <TableCell>
-                      <TableCell>
-                        {batch.mermas?.reduce((total, m) => {
-                          const qty =
-                            typeof m.cantidad === 'string'
-                              ? parseFloat(m.cantidad)
-                              : (m.cantidad ?? 0)
-                          return total + qty
-                        }, 0)}
-                      </TableCell>
+                      {batch.mermas?.reduce((total, m) => {
+                        const qty =
+                          typeof m.cantidad === 'string'
+                            ? parseFloat(m.cantidad)
+                            : (m.cantidad ?? 0)
+                        return total + qty
+                      }, 0)}
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">
@@ -300,6 +298,7 @@ const Produccion: React.FC = () => {
                     ? parseFloat(selectedBatch.cantidad)
                     : Number(selectedBatch.cantidad ?? 0),
                 fechaProduccion: selectedBatch.fechaProduccion,
+                unidad: selectedBatch.unidad as 'kg' | 'litros',
               }
             : undefined
         }
