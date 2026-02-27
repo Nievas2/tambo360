@@ -51,7 +51,7 @@ const Produccion: React.FC = () => {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
-  const { data } = useBatches()
+  const { data, isPending } = useBatches()
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -131,7 +131,36 @@ const Produccion: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.data.length > 0 ? (
+              {isPending ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <TableRow key={i} className="animate-pulse">
+                    <TableCell>
+                      <div className="h-4 w-10 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 w-20 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 w-32 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 w-16 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 w-12 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-4 w-16 bg-gray-200 rounded" />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="h-8 w-8 bg-gray-200 rounded mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : data?.data.length > 0 ? (
                 data?.data?.map((batch: Batch, index: number) => (
                   <TableRow key={batch.idLote}>
                     <TableCell>{index}</TableCell>
