@@ -4,30 +4,34 @@ import { useAuth } from '../context/AuthContext'
 import { useLocation } from 'react-router-dom'
 
 interface NavbarProps {
-  onMenuClick: () => void
+  onMenuClick: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const { user } = useAuth()
   const { pathname } = useLocation()
 
-  const dateStr = new Intl.DateTimeFormat('es-ES', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date())
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  const timeStr = new Intl.DateTimeFormat('es-ES', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  }).format(new Date())
+  // Lógica para obtener el establecimiento:
+  // Si establecimientos es un array, tomamos el primero.
+  const establecimientoActivo = Array.isArray(user?.establecimientos) 
+    ? (user?.establecimientos[0] as Establecimiento)
+    : null;
+
+  const formatDateTime = (date: Date) => {
+    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} | ${date.getHours() % 12 || 12}:${date.getMinutes().toString().padStart(2, '0')} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+  };
 
   return (
     <nav className="sticky top-0 z-30 flex h-20 w-full items-center justify-between px-4 sm:px-8">
       <div className="flex items-center gap-4">
-        <button
+        <button 
           onClick={onMenuClick}
           className="p-2 rounded-lg transition-colors duration-200 hover:bg-[#4A4A4A] hover:text-white text-[#4A4A4A]"
         >
@@ -45,21 +49,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+        <div className="hidden md:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <MapPin className="h-4 w-4 text-black" />
           <span className="text-xs font-semibold text-gray-700">
-            {user.establecimientos[0].provincia +
-              ', ' +
-              user.establecimientos[0].localidad}
+            {/* Levantamos los datos desde el establecimiento del usuario */}
+            {establecimientoActivo 
+              ? `${establecimientoActivo.localidad}, ${establecimientoActivo.provincia}`
+              : 'Córdoba, AR'}
           </span>
         </div>
-        <div className="items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 hidden sm:flex">
+        <div className="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
           <Clock className="h-4 w-4 text-black" />
-          <span className="text-xs font-semibold text-gray-700">
-            {dateStr} | {timeStr}
+          <span className="text-[10px] sm:text-xs font-semibold text-gray-700">
+            {formatDateTime(currentTime)}
           </span>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
