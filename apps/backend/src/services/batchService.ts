@@ -59,13 +59,28 @@ export class LoteService {
             throw new AppError("El lote no existe", 404);
         }
 
+        let idProducto = lote.idProducto;
+        let unidad = lote.unidad;
+
+        if (data.idProducto && data.idProducto !== lote.idProducto) {
+            const producto = await prisma.producto.findUnique({ where: { idProducto: data.idProducto } });
+            if (!producto) throw new AppError("El producto seleccionado no existe", 400);
+
+            idProducto = data.idProducto;
+            unidad = producto.categoria === "quesos" ? "kg" : "litros";
+        }
+
         return prisma.loteProduccion.update({
             where: { idLote },
             data: {
                 cantidad: data.cantidad ?? lote.cantidad,
                 fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : lote.fechaProduccion,
                 estado: data.estado ?? lote.estado,
-            },
+            }, include: {
+                producto: true,
+                mermas: true,
+                costosDirectos: true
+            }
         });
     }
 

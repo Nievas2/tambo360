@@ -1,13 +1,7 @@
 import { api } from '@/src/services/api'
 import { BatchData } from '@/src/types/batch'
 
-export const createBatch = (dto: BatchData) =>
-  api.post('/lote/registrar', {
-    idProducto: dto.idProducto,
-    cantidad: dto.cantidad,
-    fechaProduccion: dto.fechaProduccion,
-    unidad: 'kg',
-  })
+export const createBatch = (dto: BatchData) => api.post('/lote/registrar', dto)
 
 export const updateBatch = (dto: BatchData, id: string) =>
   api.put(`/lote/actualizar/${id}`, dto)
