@@ -17,30 +17,28 @@ export const crearLoteSchema = z.object({
             .positive("La cantidad debe ser mayor a 0")
     ),
 
-    unidad: z.enum(["kg", "litros"], {
-        message: "Unidad inválida",
-    }),
 
-    fechaProduccion: z.string()
+    fechaProduccion: z
+        .string()
         .min(1, "La fecha de producción es obligatoria")
-        .refine((val) => {
-            const regex = /^\d{2}\/\d{2}\/\d{4}$/;
-            return regex.test(val);
-        }, { message: "Formato de fecha inválido, debe ser dd/mm/aaaa" })
+        .refine((val) => /^\d{2}\/\d{2}\/\d{4}$/.test(val), {
+            message: "Formato de fecha inválido, debe ser dd/mm/aaaa",
+        })
         .transform((val) => {
+            const now = new Date();
             const [dd, mm, yyyy] = val.split("/");
-            return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+            const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+
+            const fechaMinima = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+            const fechaMaxima = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            if (date < fechaMinima || date > fechaMaxima) {
+                throw new Error("La fecha de producción debe estar entre hoy y 7 días antes");
+            }
+
+            return date;
         }),
 
-    merma: z.preprocess((val) => {
-        if (val === "" || val === null || val === undefined) return undefined;
-        const parsed = Number(val);
-        return isNaN(parsed) ? undefined : parsed;
-    },
-        z.number()
-            .positive("La merma debe ser mayor a 0")
-            .optional()
-    ),
     estado: z.boolean().optional()
 });
 

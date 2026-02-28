@@ -21,14 +21,24 @@ export class LoteService {
             throw new AppError("El producto seleccionado no existe", 400);
         }
 
+        const ultimoLote = await prisma.loteProduccion.findFirst({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
+            orderBy: { numeroLote: 'desc' }
+        });
+
+        const nuevoNumeroLote = ultimoLote ? ultimoLote.numeroLote + 1 : 1;
+
+        const unidad: "kg" | "litros" = producto.categoria === "quesos" ? "kg" : "litros";
+
         const lote = await prisma.loteProduccion.create({
             data: {
                 idProducto: data.idProducto,
                 idEstablecimiento: establecimiento.idEstablecimiento,
                 cantidad: data.cantidad,
-                unidad: data.unidad,
+                unidad,
                 fechaProduccion: data.fechaProduccion ?? undefined,
                 estado: data.estado ?? false,
+                numeroLote: nuevoNumeroLote,
             },
             include: {
                 producto: {
@@ -44,19 +54,54 @@ export class LoteService {
     }
 
     static async editarLote(idLote: string, data: Partial<CrearLoteDTO>) {
-        const lote = await prisma.loteProduccion.findUnique({ where: { idLote } });
-        if (!lote) {
-            throw new AppError("El lote no existe", 404);
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { mermas: true, costosDirectos: true }
+        });
+
+        if (!lote) throw new AppError("El lote no existe", 404);
+
+        const tieneAsociados = (lote.mermas.length > 0 || lote.costosDirectos.length > 0);
+
+        if (tieneAsociados) {
+            throw new AppError(
+                "El lote tiene mermas o costos directos asociados y no puede editarse",
+                400
+            );
+        }
+
+        let idProducto = lote.idProducto;
+        let unidad = lote.unidad;
+
+        if (data.idProducto && data.idProducto !== lote.idProducto) {
+            const producto = await prisma.producto.findUnique({
+                where: { idProducto: data.idProducto }
+            });
+
+            if (!producto) {
+                throw new AppError("El producto seleccionado no existe", 400);
+            }
+
+            idProducto = data.idProducto;
+            unidad = producto.categoria === "quesos" ? "kg" : "litros";
         }
 
         return prisma.loteProduccion.update({
             where: { idLote },
             data: {
+                idProducto,
+                unidad,
                 cantidad: data.cantidad ?? lote.cantidad,
-                unidad: data.unidad ?? lote.unidad,
-                fechaProduccion: data.fechaProduccion ? new Date(data.fechaProduccion) : lote.fechaProduccion,
+                fechaProduccion: data.fechaProduccion
+                    ? new Date(data.fechaProduccion)
+                    : lote.fechaProduccion,
                 estado: data.estado ?? lote.estado,
             },
+            include: {
+                producto: true,
+                mermas: true,
+                costosDirectos: true
+            }
         });
     }
 
@@ -109,5 +154,22 @@ export class LoteService {
         }
 
         return lote;
+    }
+
+    static async listarProduccionDelDia(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({ where: { idUsuario } });
+        if (!establecimiento) throw new AppError("El usuario no tiene un establecimiento registrado", 400);
+
+        const hoy = new Date();
+        const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0);
+        const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59, 999);
+
+        return prisma.loteProduccion.findMany({
+            where: {
+                idEstablecimiento: establecimiento.idEstablecimiento,
+                fechaProduccion: { gte: inicioDia, lte: finDia }
+            },
+            include: { producto: true, mermas: true, costosDirectos: true }
+        });
     }
 }

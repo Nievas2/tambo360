@@ -1,4 +1,4 @@
-import { BatchData, BatchDto } from '@/src/types/batch'
+import { BatchData } from '@/src/types/batch'
 import { createBatch } from '@/src/utils/api/batch.api'
 import { queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'

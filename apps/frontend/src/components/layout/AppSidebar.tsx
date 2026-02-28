@@ -114,7 +114,9 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                 className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <User className={`h-5 w-5 shrink-0 text-gray-400 `} />
-                <span className="font-semibold text-gray-400">Mi perfil</span>
+                {!isCollapsed && (
+                  <span className="font-semibold text-gray-400">Mi perfil</span>
+                )}
               </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>

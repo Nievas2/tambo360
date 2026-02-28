@@ -28,6 +28,7 @@ export const batchKeys = {
   all: baseKeys.batch,
   lists: () => [...baseKeys.batch, 'list'] as const,
   detail: (id: string) => [...baseKeys.batch, id] as const,
+  day: () => [...baseKeys.batch, 'today'] as const,
 } as const
 
 export const productKeys = {

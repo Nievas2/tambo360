@@ -87,3 +87,13 @@ export const obtenerLote = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 };
+
+export const produccionDelDia = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const lotes = await LoteService.listarProduccionDelDia(user.id);
+        return res.status(200).json(ApiResponse.success(lotes, "Producción del día"));
+    } catch (error) { next(error); }
+};
