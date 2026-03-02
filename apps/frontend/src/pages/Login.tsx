@@ -10,6 +10,7 @@ import { EyeIcon, ArrowRight } from 'lucide-react'
 import { LoginSchema } from '@/src/types/login'
 import { useForm } from 'react-hook-form'
 import React, { useState } from 'react'
+import { ROUTES } from '../constants/routes'
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,16 +45,8 @@ const Login: React.FC = () => {
       <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
         <div className="w-full h-full max-w-lg flex items-center justify-center">
           <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
-            <img
-              src="/isotipo_tambo 1.svg"
-              alt="Logo"
-              className="w-3/4 h-auto"
-            />
-            <img
-              src="/logotipo 1.svg"
-              alt="Tambo"
-              className="w-1/2 h-auto mt-4"
-            />
+            <img src="/isotipo_tambo 1.svg" alt="Logo" className="w-3/4 h-auto" />
+            <img src="/logotipo 1.svg" alt="Tambo" className="w-1/2 h-auto mt-4" />
           </div>
         </div>
       </div>
@@ -64,58 +57,40 @@ const Login: React.FC = () => {
             <div className="flex flex-col items-center justify-start text-center space-y-4 h-full">
               <div className="h-12 lg:h-28 w-auto flex items-start gap-2">
                 <img src="/isotipo_tambo 1.svg" alt="logo" className="h-12" />
-
                 <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
               </div>
-
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">
-                  Bienvenido
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Ingresa tus credenciales para empezar a usar la plataforma.
-                </p>
+                <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Bienvenido</h1>
+                <p className="text-sm text-muted-foreground">Ingresa tus credenciales para empezar a usar la plataforma.</p>
               </div>
             </div>
 
             <form onSubmit={onSubmit} className="space-y-6">
               <div className="space-y-4">
-                {/* Email */}
                 <div className="space-y-2">
-                  <Label className="font-bold text-[#1a1c1e]">
-                    Correo electrónico
-                  </Label>
+                  <Label className="font-bold text-[#1a1c1e]">Correo electrónico</Label>
                   <Input
+                    type="email"
+                    autoComplete="username"
                     placeholder="Ingresa tu correo electrónico"
                     {...register('correo')}
                     data-test-id="email-login"
                     disabled={isPending}
                   />
-
-                  {errors.correo && (
-                    <small className="text-red-500">
-                      {errors.correo.message}
-                    </small>
-                  )}
+                  {errors.correo && <small className="text-red-500">{errors.correo.message}</small>}
                 </div>
 
-                {/* Password */}
                 <div className="space-y-2">
-                  <Label
-                    title="Contraseña"
-                    className="font-bold text-[#1a1c1e]"
-                  >
-                    Contraseña
-                  </Label>
+                  <Label className="font-bold text-[#1a1c1e]">Contraseña</Label>
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
                       placeholder="••••••••••••"
                       {...register('contraseña')}
                       data-test-id="password-login"
                       disabled={isPending}
                     />
-
                     <Button
                       type="button"
                       variant="ghost"
@@ -125,48 +100,42 @@ const Login: React.FC = () => {
                       <EyeIcon className="w-5 h-5" />
                     </Button>
                   </div>
+                  {errors.contraseña && <small className="text-red-500">{errors.contraseña.message}</small>}
 
-                  {errors.contraseña && (
-                    <small className="text-red-500">
-                      {errors.contraseña.message}
-                    </small>
-                  )}
-
-                  {/*  <div className="flex justify-end">
-                    <Link
-                      to="/reset-password"
+                  <div className="flex justify-end">
+                    <Link 
+                      to="/auth/reset-password"
+                      data-test-id="olvide-contrasena" 
                       className="text-xs text-slate-500 hover:underline"
                     >
                       ¿Olvidaste tu contraseña?
                     </Link>
-                  </div> */}
-
+                  </div>
                   {error && (
                     <small className="text-red-700">
-                      {error.response.data.message || 'Error al iniciar sesión'}
+                      {(error as any).response?.data?.message || 'Error al iniciar sesión'}
                     </small>
                   )}
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full h-14 rounded-lg text-lg font-medium transition-all"
-                data-test-id="iniciar-sesion"
+              <Button 
+                type="submit" 
+                data-test-id="iniciar-sesion" 
+                className="w-full h-14 rounded-lg text-lg font-medium transition-all" 
                 disabled={isPending}
               >
-                {isPending ? 'Cargando...' : 'Iniciar sesión'}
-                <ArrowRight className="ml-2 w-5 h-5" />
+                {isPending ? 'Cargando...' : 'Iniciar sesión'} <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </form>
 
             <div className="text-center pt-4">
               <p className="text-sm text-slate-600">
                 ¿No tienes una cuenta?{' '}
-                <Link
-                  to="/register"
+                <Link 
+                  to="/register" 
+                  data-test-id="crear-cuenta" 
                   className="font-bold text-[#1a1c1e] hover:underline"
-                  data-test-id="crear-cuenta"
                 >
                   Regístrate
                 </Link>
