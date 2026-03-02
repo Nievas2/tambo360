@@ -10,8 +10,6 @@ export function useBatchesDay() {
       return data
     },
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: false,
+    refetchOnWindowFocus: true,
   })
 }
