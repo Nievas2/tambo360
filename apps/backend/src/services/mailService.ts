@@ -1,18 +1,17 @@
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 
-// Setea la API Key de tu .env
-const apiKey = process.env.SENDGRID_API_KEY;
-if (!apiKey) throw new Error("SENDGRID_API_KEY no está definida en .env");
+const apiKey = process.env.RESEND_API_KEY;
+if (!apiKey) throw new Error("RESEND_API_KEY no está definida en .env");
 
-
-sgMail.setApiKey(apiKey);
+const resend = new Resend(apiKey);
 
 export async function sendVerificationEmail(to: string, link: string) {
-  const msg = {
-    to,
-    from: process.env.EMAIL_FROM!, // el remitente verificado en SendGrid (no personal)
-    subject: "Verificá tu cuenta en Tambo360",
-    text: `
+  try {
+    const res = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+      to,
+      subject: "Verificá tu cuenta en Tambo360",
+      text: `
 Hola,
 
 Recibimos tu solicitud para crear una cuenta en Tambo360.
@@ -29,7 +28,7 @@ Si no solicitaste esta cuenta, podés ignorar este mensaje.
 
 Equipo Tambo360
 `,
-    html: `
+      html: `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
       max-width:600px;
@@ -99,22 +98,21 @@ Equipo Tambo360
   </div>
 </div>
 `
-  };
+    });
 
-  try {
-    await sgMail.send(msg);
-    console.log("Correo de verificación enviado a", to);
+    console.log("Correo de verificación enviado:", res);
   } catch (error) {
-    console.error("Error enviando correo de verificación:", error);
+    console.error("Error enviando verificación:", error);
   }
 }
 
 export async function sendPasswordResetEmail(to: string, link: string) {
-  const msg = {
-    to,
-    from: process.env.EMAIL_FROM!, // el remitente verificado en SendGrid
-    subject: "Recuperá tu contraseña en Tambo360",
-    text: `
+  try {
+    const res = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+      to,
+      subject: "Recuperá tu contraseña en Tambo360",
+      text: `
 Hola,
 
 Recibimos una solicitud para restablecer la contraseña de tu cuenta en Tambo360.
@@ -130,7 +128,7 @@ Tu contraseña actual seguirá siendo válida.
 
 Equipo Tambo360
 `,
-    html: `
+      html: `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
       max-width:600px;
@@ -201,12 +199,10 @@ Equipo Tambo360
   </div>
 </div>
 `
-  };
+    });
 
-  try {
-    await sgMail.send(msg);
-    console.log("Correo de recuperación enviado a", to);
+    console.log("Correo de recuperación enviado:", res);
   } catch (error) {
-    console.error("Error enviando correo de recuperación:", error);
+    console.error("Error enviando recuperación:", error);
   }
 }
