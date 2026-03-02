@@ -1,10 +1,11 @@
+import { User } from '@/src/types'
 import { verifyEmail } from '@/src/utils/api/auth.api'
 import { useMutation } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 
 export function useVerifyEmail() {
   return useMutation<
-    { token: string },
+    AxiosResponse<{ user: User; token: string }>,
     AxiosError<{ message: string }>,
     string
   >({

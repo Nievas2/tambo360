@@ -4,12 +4,16 @@ import { Application, NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 
 export const setupMiddleware = (app: Application): void => {
-  app.use(cors(
-    {
-      origin: "http://localhost:5173",
-      credentials: true
-    }
-  ));
+  const origins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",")
+    : "http://localhost:5173";
+
+  app.use(
+    cors({
+      origin: origins,
+      credentials: true,
+    })
+  );
 
   app.use(bodyParser.json());
   app.use(cookieParser());
@@ -19,4 +23,3 @@ export const setupMiddleware = (app: Application): void => {
     next();
   });
 };
-

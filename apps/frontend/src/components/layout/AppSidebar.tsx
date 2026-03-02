@@ -1,5 +1,5 @@
 import { LayoutDashboard, Milk, Cpu, User } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { data, Link, useLocation } from 'react-router-dom'
 import { ROUTES } from '../../constants/routes'
 import {
   Sidebar,
@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../common/sidebar'
+import { useAuth } from '@/src/context/AuthContext'
+import { Button } from '@/src/components/common/Button'
 
 interface AppSidebarProps {
   forcedCollapsed?: boolean
@@ -16,12 +18,28 @@ interface AppSidebarProps {
 
 export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
   const location = useLocation()
+  const { logout } = useAuth()
   const isCollapsed = forcedCollapsed
 
   const mainMenuItems = [
-    { title: 'Dashboard', icon: LayoutDashboard, url: ROUTES.DASHBOARD },
-    { title: 'Producción', icon: Milk, url: '/produccion' },
-    { title: 'TamboEngine', icon: Cpu, url: '/tambo-engine' },
+    {
+      title: 'Dashboard',
+      icon: LayoutDashboard,
+      url: ROUTES.DASHBOARD,
+      data: "data-test-id='dashboard'",
+    },
+    {
+      title: 'Producción',
+      icon: Milk,
+      url: '/produccion',
+      data: "data-test-id='produccion'",
+    },
+    {
+      title: 'TamboEngine',
+      icon: Cpu,
+      url: '/tambo-engine',
+      data: "data-test-id='tambo-engine'",
+    },
   ]
 
   return (
@@ -57,19 +75,24 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
-                  className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+                  className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                     isCollapsed ? 'justify-center' : 'justify-start'
-                  } ${isActive ? 'bg-[#4A4A4A] !text-white' : 'bg-transparent text-gray-400 hover:bg-gray-50'}`}
+                  } ${isActive ? 'bg-[#BABABA] text-white! border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Link
                     to={item.url}
                     className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
+                    data-test-id={item.data}
                   >
                     <item.icon
-                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`}
+                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-black' : 'text-gray-400'}`}
                     />
                     {!isCollapsed && (
-                      <span className="font-semibold">{item.title}</span>
+                      <span
+                        className={`font-semibold ${isActive ? 'text-black' : 'text-gray-400'}`}
+                      >
+                        {item.title}
+                      </span>
                     )}
                   </Link>
                 </SidebarMenuButton>
@@ -82,21 +105,19 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center ${
+              className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center group ${
                 isCollapsed ? 'justify-center' : 'justify-start'
-              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] !text-white' : 'bg-transparent text-gray-400 hover:bg-gray-50'}`}
+              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] text-white!' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
             >
-              <Link
-                to="/perfil"
+              <Button
+                onClick={() => logout()}
                 className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
               >
-                <User
-                  className={`h-5 w-5 shrink-0 ${location.pathname === '/perfil' ? 'text-white' : 'text-gray-400'}`}
-                />
+                <User className={`h-5 w-5 shrink-0 text-gray-400 `} />
                 {!isCollapsed && (
-                  <span className="font-semibold">Mi Perfil</span>
+                  <span className="font-semibold text-gray-400">Mi perfil</span>
                 )}
-              </Link>
+              </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

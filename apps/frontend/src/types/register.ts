@@ -21,7 +21,13 @@ export const RegisterSchema = z
       })
       .refine((value) => /^(?=.*[0-9])/.test(value), {
         message: 'La contraseña debe tener al menos un número',
-      }),
+      })
+      .refine(
+        (value) => /^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value),
+        {
+          message: 'La contraseña debe tener al menos un caracter especial',
+        }
+      ),
     confirmarContraseña: z
       .string()
       .nonempty('La confirmación de contraseña es requerida')
@@ -35,7 +41,13 @@ export const RegisterSchema = z
       })
       .refine((value) => /^(?=.*[0-9])/.test(value), {
         message: 'La contraseña debe tener al menos un número',
-      }),
+      })
+      .refine(
+        (value) => /^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value),
+        {
+          message: 'La contraseña debe tener al menos un caracter especial',
+        }
+      ),
   })
   .refine((data) => data.contraseña === data.confirmarContraseña, {
     message: 'Las contraseñas no coinciden',

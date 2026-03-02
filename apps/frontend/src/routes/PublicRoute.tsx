@@ -6,9 +6,9 @@ interface PublicRouteProps {
 }
 
 const PublicRoute = ({ children }: PublicRouteProps) => {
-  const { token } = useAuth()
+  const { user } = useAuth()
 
-  if (token) {
+  if (user) {
     return <Navigate to="/dashboard" replace />
   }
 

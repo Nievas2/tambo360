@@ -32,13 +32,12 @@ model Usuario {
   idUsuario        String            @id @default(uuid())
   correo           String            @unique
   contrasena       String
-  nombre           String        @db.VarChar(50)
+  nombre           String            @db.VarChar(50)
   verificado       Boolean           @default(false)
   fechaCreacion    DateTime          @default(now())
   establecimientos Establecimiento[]
   tokens           VerificarToken[]
 }
-
 
 model Establecimiento {
   idEstablecimiento String           @id @default(uuid())
@@ -60,12 +59,14 @@ model Producto {
 
 model LoteProduccion {
   idLote            String          @id @default(uuid())
+  numeroLote        Int             @default(autoincrement())
   fechaProduccion   DateTime        @default(now())
   idProducto        String
   producto          Producto        @relation(fields: [idProducto], references: [idProducto])
   cantidad          Decimal
   unidad            Unidad
   idEstablecimiento String
+  estado            Boolean         @default(false)
   establecimiento   Establecimiento @relation(fields: [idEstablecimiento], references: [idEstablecimiento])
   mermas            Merma[]
   costosDirectos    CostosDirecto[]
@@ -91,15 +92,15 @@ model CostosDirecto {
   lote           LoteProduccion @relation(fields: [idLote], references: [idLote])
 }
 
-
 model VerificarToken {
-  tokenid String @id @default(uuid())
+  tokenid   String    @id @default(uuid())
   idUsuario String
-  usuario Usuario @relation(fields: [idUsuario], references: [idUsuario])
-  tipo TipoToken
+  usuario   Usuario   @relation(fields: [idUsuario], references: [idUsuario])
+  tipo      TipoToken
   tokenHash String
-  expiraEn DateTime
-  usadoEn DateTime?
-  creadoEn DateTime @default(now())
+  expiraEn  DateTime
+  usadoEn   DateTime?
+  creadoEn  DateTime  @default(now())
+
   @@index([idUsuario, tipo])
 }

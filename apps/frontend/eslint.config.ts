@@ -20,6 +20,18 @@ export default tseslint.config(
         },
       },
     },
+    rules: {
+      'no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],

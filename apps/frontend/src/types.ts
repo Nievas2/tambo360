@@ -13,9 +13,8 @@ export interface User {
   contrasena: string
   nombre: string
   fechaCreacion: string
-  establecimientos: string | Establecimiento[] 
+  establecimientos: Establecimiento[]
 }
-
 export interface AuthState {
   user: User | null
   token: string | null

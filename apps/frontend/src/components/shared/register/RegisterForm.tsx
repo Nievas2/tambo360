@@ -36,10 +36,10 @@ const RegisterForm = ({
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await mutateAsync(data)
+      await mutateAsync(data)
       handleAddEmail(data.correo)
       handleNextStep()
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error al iniciar sesión:', err)
     }
   })
@@ -106,20 +106,19 @@ const RegisterForm = ({
               )}
             </Button>
           </div>
+
           <small>
             <b>Requisitos:</b> 8 caracteres, mayúscula (A-Z), minúscula(a-z) y
             carácter especial.
           </small>
 
-          {errors.contraseña && (
-            <small className="text-red-500">{errors.contraseña.message}</small>
-          )}
-
-          {error && (
-            <small className="text-red-700">
-              {error.response.data.message || 'Error al iniciar sesión'}
-            </small>
-          )}
+          <div>
+            {errors.contraseña && (
+              <small className="text-red-500">
+                {errors.contraseña.message}
+              </small>
+            )}
+          </div>
         </div>
 
         {/* Confirmar Password */}

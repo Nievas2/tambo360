@@ -1,54 +1,175 @@
-type LoteEntrada = {
-    fechaProduccion: string;
-    tipoProduccion: string;
-    cantidad: number;
-    unidad: string;
-};
+import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/AppError";
+import { CrearLoteDTO } from "../schemas/batchSchema";
 
-type Lote = LoteEntrada & {
-    id: number;
-};
+export class LoteService {
 
-class ServicioLotes {
-    private lotes: Lote[] = [];
-    private idActual: number = 1;
+    static async crearLote(idUsuario: string, data: CrearLoteDTO) {
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario },
+        });
 
-    // Crear un nuevo lote
-    async crear(loteData: LoteEntrada): Promise<Lote> {
-        const nuevoLote: Lote = {
-            id: this.idActual++,
-            ...loteData,
-        };
-
-        this.lotes.push(nuevoLote);
-        return nuevoLote;
-    }
-
-    // Editar un lote existente por id
-    async editar(loteData: Lote): Promise<Lote> {
-        const loteExistente = this.lotes.find(l => l.id === loteData.id);
-        if (!loteExistente) {
-            throw new Error("Lote no encontrado");
+        if (!establecimiento) {
+            throw new AppError("El usuario no tiene un establecimiento registrado", 400);
         }
 
-        // Actualiza los campos
-        loteExistente.fechaProduccion = loteData.fechaProduccion;
-        loteExistente.tipoProduccion = loteData.tipoProduccion;
-        loteExistente.cantidad = loteData.cantidad;
-        loteExistente.unidad = loteData.unidad;
+        const producto = await prisma.producto.findUnique({
+            where: { idProducto: data.idProducto },
+        });
 
-        return loteExistente;
+        if (!producto) {
+            throw new AppError("El producto seleccionado no existe", 400);
+        }
+
+        const ultimoLote = await prisma.loteProduccion.findFirst({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
+            orderBy: { numeroLote: 'desc' }
+        });
+
+        const nuevoNumeroLote = ultimoLote ? ultimoLote.numeroLote + 1 : 1;
+
+        const unidad: "kg" | "litros" = producto.categoria === "quesos" ? "kg" : "litros";
+
+        const lote = await prisma.loteProduccion.create({
+            data: {
+                idProducto: data.idProducto,
+                idEstablecimiento: establecimiento.idEstablecimiento,
+                cantidad: data.cantidad,
+                unidad,
+                fechaProduccion: data.fechaProduccion ?? undefined,
+                estado: data.estado ?? false,
+                numeroLote: nuevoNumeroLote,
+            },
+            include: {
+                producto: {
+                    select: {
+                        nombre: true,
+                        categoria: true
+                    }
+                }
+            }
+        });
+
+        return lote;
     }
 
-    // Obtener todos los lotes
-    obtenerTodos(): Lote[] {
-        return this.lotes;
+    static async editarLote(idLote: string, data: Partial<CrearLoteDTO>) {
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { mermas: true, costosDirectos: true }
+        });
+
+        if (!lote) throw new AppError("El lote no existe", 404);
+
+        const tieneAsociados = (lote.mermas.length > 0 || lote.costosDirectos.length > 0);
+
+        if (tieneAsociados) {
+            throw new AppError(
+                "El lote tiene mermas o costos directos asociados y no puede editarse",
+                400
+            );
+        }
+
+        let idProducto = lote.idProducto;
+        let unidad = lote.unidad;
+
+        if (data.idProducto && data.idProducto !== lote.idProducto) {
+            const producto = await prisma.producto.findUnique({
+                where: { idProducto: data.idProducto }
+            });
+
+            if (!producto) {
+                throw new AppError("El producto seleccionado no existe", 400);
+            }
+
+            idProducto = data.idProducto;
+            unidad = producto.categoria === "quesos" ? "kg" : "litros";
+        }
+
+        return prisma.loteProduccion.update({
+            where: { idLote },
+            data: {
+                idProducto,
+                unidad,
+                cantidad: data.cantidad ?? lote.cantidad,
+                fechaProduccion: data.fechaProduccion
+                    ? new Date(data.fechaProduccion)
+                    : lote.fechaProduccion,
+                estado: data.estado ?? lote.estado,
+            },
+            include: {
+                producto: true,
+                mermas: true,
+                costosDirectos: true
+            }
+        });
     }
 
-    obtenerPorId(id: number): Lote | undefined {
-        return this.lotes.find(l => l.id === id);
+    static async eliminarLote(idLote: string) {
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { mermas: true, costosDirectos: true },
+        });
+
+        if (!lote) {
+            throw new AppError("El lote no existe", 404);
+        }
+
+        if ((lote.mermas.length > 0) || (lote.costosDirectos.length > 0)) {
+            throw new AppError("No se puede eliminar el lote, tiene información asociada", 400);
+        }
+
+        return prisma.loteProduccion.delete({ where: { idLote } });
     }
 
+    static async listarLotes(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario },
+        });
+
+        if (!establecimiento) {
+            throw new AppError("El usuario no tiene un establecimiento registrado", 400);
+        }
+
+        const lotes = await prisma.loteProduccion.findMany({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
+            include: { producto: true, mermas: true, costosDirectos: true },
+        });
+
+        return lotes;
+    }
+
+    static async obtenerLote(idLote: string, idUsuario: string) {
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { producto: true, mermas: true, costosDirectos: true, establecimiento: true },
+        });
+
+        if (!lote) {
+            throw new AppError("El lote no existe", 404);
+        }
+
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para ver este lote", 403);
+        }
+
+        return lote;
+    }
+
+    static async listarProduccionDelDia(idUsuario: string) {
+        const establecimiento = await prisma.establecimiento.findFirst({ where: { idUsuario } });
+        if (!establecimiento) throw new AppError("El usuario no tiene un establecimiento registrado", 400);
+
+        const hoy = new Date();
+        const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0);
+        const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59, 999);
+
+        return prisma.loteProduccion.findMany({
+            where: {
+                idEstablecimiento: establecimiento.idEstablecimiento,
+                fechaProduccion: { gte: inicioDia, lte: finDia }
+            },
+            include: { producto: true, mermas: true, costosDirectos: true }
+        });
+    }
 }
-
-export default new ServicioLotes();

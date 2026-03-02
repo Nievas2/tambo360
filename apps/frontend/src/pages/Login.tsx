@@ -35,7 +35,7 @@ const Login: React.FC = () => {
       const response = await mutateAsync(data)
       login({ token: response.data.token, user: response.data.user })
       navigate('/dashboard')
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error al iniciar sesión:', err)
     }
   })

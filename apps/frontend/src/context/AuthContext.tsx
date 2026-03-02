@@ -6,6 +6,7 @@ import { api } from '@/src/services/api'
 interface AuthContextType extends AuthState {
   setToken: (token: string | null) => void
   login: ({ user, token }: { user: User; token: string }) => void
+  setUser: (user: User | null) => void
   logout: () => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
@@ -23,28 +24,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const isAuthenticated = !!user
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const res = await api.get('/auth/me')
-        if (res?.data.data) {
-          setUser(res.data.data)
-        } else {
-          setUser(null)
-          setToken(null)
-        }
-      } catch (err) {
+  const fetchSession = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get('/auth/me')
+      if (res?.data.data) {
+        setUser(res.data.data)
+      } else {
         setUser(null)
         setToken(null)
-      } finally {
-        setLoading(false)
       }
+    } catch (err) {
+      console.error(err)
+      setUser(null)
+      setToken(null)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchSession()
   }, [])
 
-  const login = ({ user, token }: { user: User; token: string }) => {
+  const login = async ({ user, token }: { user: User; token: string }) => {
     setUser(user)
     setToken(token)
     setError(null)
@@ -62,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         token,
         setToken,
         isAuthenticated,

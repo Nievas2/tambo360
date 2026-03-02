@@ -15,6 +15,8 @@ import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
 import VerifyUser from '@/src/pages/VerifyUser'
 import BatchDetails from '@/src/pages/BatchDetails'
+import Establishment from '@/src/pages/Establishment'
+import CheckEstablishment from '@/src/routes/CheckEstablishment'
 
 export const AppRoutes = () => {
   const { loading } = useAuth()
@@ -38,12 +40,23 @@ export const AppRoutes = () => {
       </Route>
 
       <Route path={'/auth/verify'} element={<VerifyUser />} />
-      
+
+      <Route
+        path={'/establecimiento'}
+        element={
+          <ProtectedRoute>
+            <Establishment />
+          </ProtectedRoute>
+        }
+      />
+
       {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
       <Route
         element={
           <ProtectedRoute>
-            <Layout />
+            <CheckEstablishment>
+              <Layout />
+            </CheckEstablishment>
           </ProtectedRoute>
         }
       >
