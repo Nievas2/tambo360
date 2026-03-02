@@ -5,3 +5,8 @@ export const api = axios.create({
   baseURL: API_ENDPOINTS.BASE,
   withCredentials: true,
 })
+
+export const apiGob = axios.create({
+  baseURL: API_ENDPOINTS.GOB,
+  withCredentials: true,
+})
