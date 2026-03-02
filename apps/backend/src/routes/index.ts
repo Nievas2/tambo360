@@ -8,6 +8,7 @@ import RutasMermas from "./decrease";
 import RutasCostos from "./cost";
 import RutasProductos from "./product";
 
+
 const router = express.Router();
 
 // Rutas de la API
