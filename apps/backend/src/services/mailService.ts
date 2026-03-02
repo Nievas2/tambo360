@@ -1,14 +1,50 @@
-import { Resend } from "resend";
+// mailer.ts
+import nodemailer from "nodemailer";
 
-const apiKey = process.env.RESEND_API_KEY;
-if (!apiKey) throw new Error("RESEND_API_KEY no está definida en .env");
+// -----------------------------------------------------------------------------
+// ✅ Configuración de Gmail
+// Variables de entorno necesarias en Render:
+// GMAIL_USER=tuemail@gmail.com
+// GMAIL_APP_PASSWORD=xxxxxxxxxxxxxxxx
+// -----------------------------------------------------------------------------
+const gmailUser = process.env.GMAIL_USER;
+const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
-const resend = new Resend(apiKey);
+if (!gmailUser || !gmailPass) {
+  throw new Error("GMAIL_USER o GMAIL_APP_PASSWORD no definidas en .env");
+}
 
+// -----------------------------------------------------------------------------
+// Transporte Nodemailer
+// -----------------------------------------------------------------------------
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,          // puerto seguro para Gmail
+  secure: true,       // true para 465
+  auth: {
+    user: gmailUser,
+    pass: gmailPass,
+  },
+  tls: {
+    rejectUnauthorized: false, // Render Free a veces tiene problemas con certificados
+  },
+});
+
+// -----------------------------------------------------------------------------
+// Datos del remitente
+// -----------------------------------------------------------------------------
+const sender = {
+  email: gmailUser,
+  name: "Tambo360",
+};
+
+// -----------------------------------------------------------------------------
+// Función: enviar correo de verificación
+// -----------------------------------------------------------------------------
 export async function sendVerificationEmail(to: string, link: string) {
   try {
-    const res = await resend.emails.send({
-      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+    const mailOptions = {
+      from: `"${sender.name}" <${sender.email}>`,
       to,
       subject: "Verificá tu cuenta en Tambo360",
       text: `
@@ -40,28 +76,18 @@ Equipo Tambo360
       box-shadow:0 4px 12px rgba(0,0,0,0.05);
       text-align:left;
   ">
-    
     <h2 style="margin-top:0; color:#1f2937; text-align:center;">
       Verificá tu cuenta en Tambo360
     </h2>
-
-    <p style="color:#374151; line-height:1.6;">
-      Hola,
-    </p>
-
-    <p style="color:#374151; line-height:1.6;">
+    <p>Hola,</p>
+    <p>
       Recibimos tu solicitud para crear una cuenta en <strong>Tambo360</strong>.
     </p>
-
-    <p style="color:#374151; line-height:1.6;">
-      Para activar tu acceso y comenzar a registrar la producción de tu establecimiento,
-      necesitás verificar tu dirección de correo electrónico.
+    <p>
+      Para activar tu acceso necesitás verificar tu dirección de correo electrónico.
     </p>
-
     <div style="text-align:center; margin:35px 0;">
-      <a 
-        href="${link}" 
-        style="
+      <a href="${link}" style="
           background-color:#2563eb;
           color:#ffffff;
           padding:14px 24px;
@@ -69,62 +95,46 @@ Equipo Tambo360
           border-radius:6px;
           font-weight:bold;
           display:inline-block;
-        "
-      >
+      ">
         Verificar cuenta
       </a>
     </div>
-    <p style="font-size:12px; word-break:break-all; color:#6b7280;">
-      Si el botón no funciona, copiá y pegá este enlace en tu navegador:
-      <br/>
-      ${link}
-    </p>
-
-    <p style="color:#374151; line-height:1.6;">
-      Este enlace estará disponible por las próximas 24 horas.
-    </p>
-
-    <p style="color:#6b7280; font-size:12px; line-height:1.5;">
-      Si no solicitaste esta cuenta, podés ignorar este mensaje.
-      No se realizará ninguna acción adicional.
-    </p>
-
-    <hr style="border:none; border-top:1px solid #e5e7eb; margin:30px 0;" />
-
-    <p style="color:#6b7280; font-size:12px; text-align:center;">
-      Equipo Tambo360
-    </p>
-
+    <p style="font-size:12px; word-break:break-all;">${link}</p>
+    <hr style="margin:30px 0;" />
+    <p style="font-size:12px; text-align:center;">Equipo Tambo360</p>
   </div>
 </div>
 `
-    });
+    };
 
-    console.log("Correo de verificación enviado:", res);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Correo de verificación enviado a Gmail:", info.messageId);
   } catch (error) {
-    console.error("Error enviando verificación:", error);
+    console.error("❌ Error enviando verificación:", error);
   }
 }
 
+// -----------------------------------------------------------------------------
+// Función: enviar correo de recuperación de contraseña
+// -----------------------------------------------------------------------------
 export async function sendPasswordResetEmail(to: string, link: string) {
   try {
-    const res = await resend.emails.send({
-      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+    const mailOptions = {
+      from: `"${sender.name}" <${sender.email}>`,
       to,
       subject: "Recuperá tu contraseña en Tambo360",
       text: `
 Hola,
 
-Recibimos una solicitud para restablecer la contraseña de tu cuenta en Tambo360.
+Recibimos una solicitud para restablecer tu contraseña.
 
-Para continuar, copiá y pegá el siguiente enlace en tu navegador:
+Copiá y pegá este enlace en tu navegador:
 
 ${link}
 
 Este enlace estará disponible por 1 hora.
 
-Si no solicitaste este cambio, podés ignorar este mensaje. 
-Tu contraseña actual seguirá siendo válida.
+Si no solicitaste este cambio, podés ignorar este mensaje.
 
 Equipo Tambo360
 `,
@@ -140,28 +150,11 @@ Equipo Tambo360
       box-shadow:0 4px 12px rgba(0,0,0,0.05);
       text-align:left;
   ">
-    
-    <h2 style="margin-top:0; color:#1f2937; text-align:center;">
-      Recuperación de contraseña
-    </h2>
-
-    <p style="color:#374151; line-height:1.6;">
-      Hola,
-    </p>
-
-    <p style="color:#374151; line-height:1.6;">
-      Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>Tambo360</strong>.
-    </p>
-
-    <p style="color:#374151; line-height:1.6;">
-      Para continuar con el proceso y definir una nueva contraseña,
-      hacé clic en el siguiente botón:
-    </p>
-
+    <h2 style="text-align:center;">Recuperación de contraseña</h2>
+    <p>Hola,</p>
+    <p>Recibimos una solicitud para restablecer tu contraseña.</p>
     <div style="text-align:center; margin:35px 0;">
-      <a 
-        href="${link}" 
-        style="
+      <a href="${link}" style="
           background-color:#dc2626;
           color:#ffffff;
           padding:14px 24px;
@@ -169,40 +162,21 @@ Equipo Tambo360
           border-radius:6px;
           font-weight:bold;
           display:inline-block;
-        "
-      >
+      ">
         Restablecer contraseña
       </a>
     </div>
-
-    <p style="color:#374151; line-height:1.6;">
-      Este enlace estará disponible por 1 hora.
-    </p>
-
-    <p style="color:#6b7280; font-size:12px; line-height:1.5;">
-      Si no solicitaste este cambio, podés ignorar este mensaje.
-      Tu contraseña actual seguirá siendo válida.
-    </p>
-
-    <p style="font-size:12px; word-break:break-all; color:#6b7280;">
-      Si el botón no funciona, copiá y pegá este enlace en tu navegador:
-      <br/>
-      ${link}
-    </p>
-
-    <hr style="border:none; border-top:1px solid #e5e7eb; margin:30px 0;" />
-
-    <p style="color:#6b7280; font-size:12px; text-align:center;">
-      Equipo Tambo360
-    </p>
-
+    <p style="font-size:12px; word-break:break-all;">${link}</p>
+    <hr style="margin:30px 0;" />
+    <p style="font-size:12px; text-align:center;">Equipo Tambo360</p>
   </div>
 </div>
 `
-    });
+    };
 
-    console.log("Correo de recuperación enviado:", res);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Correo de recuperación enviado a Gmail:", info.messageId);
   } catch (error) {
-    console.error("Error enviando recuperación:", error);
+    console.error("❌ Error enviando recuperación:", error);
   }
 }
