@@ -3,12 +3,43 @@ import { Card, CardContent } from '@/src/components/common/card'
 import { Input } from '@/src/components/common/Input'
 import { Label } from '@/src/components/common/label'
 import { useCreateEstablishment } from '@/src/hooks/establishment/useCreateEstablishment'
+import { useLocality } from '@/src/hooks/ubication/useLocality'
+import { useProvince } from '@/src/hooks/ubication/useProvince'
 import { EstablishmentSchema } from '@/src/types/establishment'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useDebounce } from 'use-debounce'
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/src/components/common/combobox'
 
 const Establishment = () => {
+  const [searchProvince, setSearchProvince] = useState('')
+  const [idProvince, setIdProvince] = useState<string | undefined>('')
+  const [searchLocality, setSearchLocality] = useState('')
+
+  const [selectedProvinceName, setSelectedProvinceName] = useState('')
+  const [selectedLocalityName, setSelectedLocalityName] = useState('')
+
+  const [searchP] = useDebounce(searchProvince, 300)
+  const [searchL] = useDebounce(searchLocality, 300)
+
+  const { data: province } = useProvince({
+    name: searchP,
+  })
+
+  const { data: locality } = useLocality({
+    id: idProvince,
+    search: searchL,
+  })
+
   const {
     mutateAsync: createEstablishment,
     error: createEstablishmentError,
@@ -19,12 +50,9 @@ const Establishment = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
-    defaultValues: {
-      nombre: '',
-      localidad: '',
-      provincia: '',
-    },
+    defaultValues: { nombre: '', localidad: '', provincia: '' },
     resolver: zodResolver(EstablishmentSchema),
   })
 
@@ -34,7 +62,7 @@ const Establishment = () => {
         ...data,
         fechaCreacion: new Date().toISOString(),
       }
-      const response = await createEstablishment(values)
+      await createEstablishment(values)
 
       window.location.href = '/dashboard'
     } catch (err) {
@@ -99,12 +127,54 @@ const Establishment = () => {
 
                     <div className="space-y-4">
                       <Label>Provincia*</Label>
-                      <Input
-                        placeholder="Ingrese la provincia del establecimiento"
-                        data-test-id="provincia"
-                        {...register('provincia')}
-                        disabled={isPending}
-                      />
+                      <Combobox
+                        onValueChange={(id: string) => {
+                          const selectedProv = province?.provincias.find(
+                            (p) => p.id === id
+                          )
+                          if (selectedProv) {
+                            setIdProvince(id)
+                            setSelectedProvinceName(selectedProv.nombre)
+                            setSearchProvince(selectedProv.nombre)
+                            setValue('provincia', selectedProv.nombre)
+
+                            setIdProvince(id)
+                            setSelectedLocalityName('')
+                            setSearchLocality('')
+                            setValue('localidad', '')
+                          }
+                        }}
+                      >
+                        <ComboboxInput
+                          className="h-14 bg-[#EAEAEA]"
+                          placeholder="Seleccione una provincia"
+                          value={searchProvince}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            setSearchProvince(val)
+
+                            if (val !== selectedProvinceName) {
+                              setIdProvince('')
+                              setSelectedProvinceName('')
+                              setValue('provincia', '')
+                            }
+                          }}
+                        />
+                        <ComboboxContent>
+                          {!province?.provincias.length && (
+                            <ComboboxEmpty>
+                              No se encontraron provincias
+                            </ComboboxEmpty>
+                          )}
+                          <ComboboxList>
+                            {province?.provincias.map((item) => (
+                              <ComboboxItem key={item.id} value={item.id}>
+                                {item.nombre}
+                              </ComboboxItem>
+                            ))}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                       {errors.provincia && (
                         <small className="text-red-700">
                           {errors.provincia.message}
@@ -114,12 +184,59 @@ const Establishment = () => {
 
                     <div className="space-y-4">
                       <Label>Localidad*</Label>
-                      <Input
-                        placeholder="Ingrese la localidad del establecimiento"
-                        data-test-id="localidad"
-                        {...register('localidad')}
-                        disabled={isPending}
-                      />
+                      <Combobox
+                        disabled={!idProvince}
+                        onValueChange={(id) => {
+                          const selectedLoc = locality?.municipios.find(
+                            (l) => l.id === id
+                          )
+                          if (selectedLoc) {
+                            setSelectedLocalityName(selectedLoc.nombre)
+                            setSearchLocality(selectedLoc.nombre)
+                            setValue('localidad', selectedLoc.nombre)
+                          }
+                        }}
+                      >
+                        <ComboboxInput
+                          className="h-14 bg-[#EAEAEA]"
+                          placeholder={
+                            idProvince
+                              ? 'Seleccione una localidad'
+                              : 'Primero seleccione una provincia'
+                          }
+                          value={searchLocality}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            setSearchLocality(val)
+
+                            if (val !== selectedLocalityName) {
+                              setSelectedLocalityName('')
+                              setValue('localidad', '')
+                            }
+                          }}
+                          disabled={!idProvince}
+                        />
+                        <ComboboxContent>
+                          {!idProvince && (
+                            <ComboboxEmpty>
+                              Primero seleccione una provincia
+                            </ComboboxEmpty>
+                          )}
+
+                          {!locality?.municipios.length && (
+                            <ComboboxEmpty>
+                              No se encontraron localidades
+                            </ComboboxEmpty>
+                          )}
+                          <ComboboxList>
+                            {locality?.municipios.map((item) => (
+                              <ComboboxItem key={item.id} value={item.id}>
+                                {item.nombre}
+                              </ComboboxItem>
+                            ))}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                       {errors.localidad && (
                         <small className="text-red-700">
                           {errors.localidad.message}
@@ -128,8 +245,7 @@ const Establishment = () => {
 
                       {createEstablishmentError && (
                         <small className="text-red-700">
-                          {createEstablishmentError.message ||
-                            'Error al crear el establecimiento'}
+                          {createEstablishmentError.response.data.message}
                         </small>
                       )}
                     </div>
