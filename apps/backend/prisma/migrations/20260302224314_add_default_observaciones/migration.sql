@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "CostosDirecto" ALTER COLUMN "observaciones" SET DEFAULT '';
+ALTER TABLE "CostosDirecto" ADD COLUMN "observaciones" TEXT DEFAULT '';
