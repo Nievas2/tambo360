@@ -1,53 +1,34 @@
-// mailer.ts
-import nodemailer from "nodemailer";
+// mailer.ts en Render Free
+// ---------------------------------------------
+// Este archivo solo hace fetch a la función en Vercel
+// ---------------------------------------------
 
-// -----------------------------------------------------------------------------
-// ✅ Configuración de Gmail
-// Variables de entorno necesarias en Render:
-// GMAIL_USER=tuemail@gmail.com
-// GMAIL_APP_PASSWORD=xxxxxxxxxxxxxxxx
-// -----------------------------------------------------------------------------
-const gmailUser = process.env.GMAIL_USER;
-const gmailPass = process.env.GMAIL_APP_PASSWORD;
+// Función auxiliar que llama a la serverless function en Vercel
+async function sendMailViaVercel(to: string, subject: string, text: string, html: string) {
+  try {
+    const res = await fetch("https://api-email-lzrp.vercel.app/api/sendMail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to, subject, text, html }),
+    });
 
-if (!gmailUser || !gmailPass) {
-  throw new Error("GMAIL_USER o GMAIL_APP_PASSWORD no definidas en .env");
+    if (!res.ok) {
+      const errorData = await res.text();
+      console.error("❌ Error desde Vercel:", errorData);
+    } else {
+      console.log("✅ Mail enviado vía Vercel a:", to);
+    }
+  } catch (err) {
+    console.error("❌ Error haciendo fetch a Vercel:", err);
+  }
 }
 
-// -----------------------------------------------------------------------------
-// Transporte Nodemailer
-// -----------------------------------------------------------------------------
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,          // puerto seguro para Gmail
-  secure: true,       // true para 465
-  auth: {
-    user: gmailUser,
-    pass: gmailPass,
-  },
-  tls: {
-    rejectUnauthorized: false, // Render Free a veces tiene problemas con certificados
-  },
-});
-
-// -----------------------------------------------------------------------------
-// Datos del remitente
-// -----------------------------------------------------------------------------
-const sender = {
-  email: gmailUser,
-  name: "Tambo360",
-};
-
-// -----------------------------------------------------------------------------
+// ---------------------------------------------
 // Función: enviar correo de verificación
-// -----------------------------------------------------------------------------
+// ---------------------------------------------
 export async function sendVerificationEmail(to: string, link: string) {
-  try {
-    const mailOptions = {
-      from: `"${sender.name}" <${sender.email}>`,
-      to,
-      subject: "Verificá tu cuenta en Tambo360",
-      text: `
+  const subject = "Verificá tu cuenta en Tambo360";
+  const text =`
 Hola,
 
 Recibimos tu solicitud para crear una cuenta en Tambo360.
@@ -63,8 +44,9 @@ Este enlace estará disponible por 24 horas.
 Si no solicitaste esta cuenta, podés ignorar este mensaje.
 
 Equipo Tambo360
-`,
-      html: `
+`;
+
+const html = `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
       max-width:600px;
@@ -105,25 +87,16 @@ Equipo Tambo360
   </div>
 </div>
 `
-    };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Correo de verificación enviado a Gmail:", info.messageId);
-  } catch (error) {
-    console.error("❌ Error enviando verificación:", error);
-  }
+  await sendMailViaVercel(to, subject, text, html);
 }
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------
 // Función: enviar correo de recuperación de contraseña
-// -----------------------------------------------------------------------------
+// ---------------------------------------------
 export async function sendPasswordResetEmail(to: string, link: string) {
-  try {
-    const mailOptions = {
-      from: `"${sender.name}" <${sender.email}>`,
-      to,
-      subject: "Recuperá tu contraseña en Tambo360",
-      text: `
+  const subject = "Recuperá tu contraseña en Tambo360";
+  const text = `
 Hola,
 
 Recibimos una solicitud para restablecer tu contraseña.
@@ -137,8 +110,9 @@ Este enlace estará disponible por 1 hora.
 Si no solicitaste este cambio, podés ignorar este mensaje.
 
 Equipo Tambo360
-`,
-      html: `
+`;
+
+const html = `
 <div style="background-color:#f4f6f8; padding:40px 0; font-family: Arial, sans-serif;">
   <div style="
       max-width:600px;
@@ -172,11 +146,6 @@ Equipo Tambo360
   </div>
 </div>
 `
-    };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Correo de recuperación enviado a Gmail:", info.messageId);
-  } catch (error) {
-    console.error("❌ Error enviando recuperación:", error);
-  }
+  await sendMailViaVercel(to, subject, text, html);
 }
