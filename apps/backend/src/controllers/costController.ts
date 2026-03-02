@@ -1,93 +1,122 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import servicioCostos from "../services/costService";
+import { ApiResponse } from "../utils/ApiResponse";
+import { AppError } from "../utils/AppError";
+import { crearCostoSchema, actualizarCostoSchema, idParamSchema, loteParamSchema } from "../schemas/costShema";
 
-// Crear costo operativo directo
-export const crearCosto = async (req: Request, res: Response): Promise<void> => {
+export const crearCosto = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { loteId, concepto, monto, moneda, fecha } = req.body;
+        const parsed = crearCostoSchema.safeParse(req.body);
 
-        if (!loteId || !concepto || !monto || !moneda || !fecha) {
-            res.status(400).json({ error: "Todos los campos son obligatorios" });
-            return;
+        if (!parsed.success) {
+            const errores = parsed.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
         }
 
-        const nuevoCosto = await servicioCostos.crear({
-            loteId,
-            concepto,
-            monto,
-            moneda,
-            fecha,
-        });
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
 
-        res.status(201).json({
-            mensaje: "Costo registrado correctamente",
-            costo: nuevoCosto,
-        });
-    } catch (error: unknown) {
-        res.status(500).json({ error: "Error al registrar el costo" });
+        const nuevoCosto = await servicioCostos.crear(user.id, parsed.data);
+
+        res.status(201).json(
+            ApiResponse.success(nuevoCosto, "Costo registrado correctamente", 201)
+        );
+    } catch (error) {
+        next(error);
     }
 };
 
-// Obtener costo por ID
-export const obtenerCostoPorId = async (req: Request, res: Response): Promise<void> => {
+export const obtenerCostoPorId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
+        const parsedParams = idParamSchema.safeParse(req.params);
 
-        const costo = servicioCostos.obtenerPorId(id);
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
+
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const costo = await servicioCostos.obtenerPorId(parsedParams.data.id, user.id);
 
         if (!costo) {
-            res.status(404).json({ error: "Costo no encontrado" });
-            return;
+            throw new AppError("Costo no encontrado", 404);
         }
 
-        res.status(200).json(costo);
-    } catch (error: unknown) {
-        res.status(500).json({ error: "Error al obtener el costo" });
+        res.json(ApiResponse.success(costo));
+    } catch (error) {
+        next(error);
     }
 };
 
-// Obtener costos por lote
-export const obtenerCostosPorLote = async (req: Request, res: Response): Promise<void> => {
+export const obtenerCostosPorLote = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const loteId = Number(req.params.loteId);
+        const parsedParams = loteParamSchema.safeParse(req.params);
 
-        const costos = servicioCostos.obtenerPorLote(loteId);
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
 
-        res.status(200).json(costos);
-    } catch (error: unknown) {
-        res.status(500).json({ error: "Error al obtener los costos" });
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const costos = await servicioCostos.obtenerPorLote(parsedParams.data.loteId, user.id);
+
+        res.json(ApiResponse.success(costos));
+    } catch (error) {
+        next(error);
     }
 };
 
-// Actualizar costo
-export const actualizarCosto = async (req: Request, res: Response): Promise<void> => {
+export const actualizarCosto = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
-        const datos = req.body;
+        const parsedParams = idParamSchema.safeParse(req.params);
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
 
-        const costoActualizado = await servicioCostos.actualizar(id, datos);
+        const parsedBody = actualizarCostoSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            const errores = parsedBody.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
 
-        res.status(200).json({
-            mensaje: "Costo actualizado correctamente",
-            costo: costoActualizado,
-        });
-    } catch (error: unknown) {
-        res.status(404).json({ error: "Costo no encontrado" });
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const costoActualizado = await servicioCostos.actualizar(
+            parsedParams.data.id,
+            user.id,
+            parsedBody.data
+        );
+
+        res.json(
+            ApiResponse.success(costoActualizado, "Costo actualizado correctamente")
+        );
+    } catch (error) {
+        next(error);
     }
 };
 
-// Eliminar costo
-export const eliminarCosto = async (req: Request, res: Response): Promise<void> => {
+export const eliminarCosto = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
+        const parsedParams = idParamSchema.safeParse(req.params);
 
-        await servicioCostos.eliminar(id);
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
 
-        res.status(200).json({
-            mensaje: "Costo eliminado correctamente",
-        });
+        const user = (req as any).user;
+        if (!user) throw new AppError("Usuario no autenticado", 401);
 
-    } catch (error: unknown) {
-        res.status(404).json({ error: "Costo no encontrado" });
+        await servicioCostos.eliminar(parsedParams.data.id, user.id);
+
+        res.json(ApiResponse.success(null, "Costo eliminado correctamente"));
+    } catch (error) {
+        next(error);
     }
 };
