@@ -1,31 +1,21 @@
+// apps/frontend/src/pages/ResetPassword.tsx
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
 import { Card, CardContent } from "@/src/components/common/card";
 import { Button } from "@/src/components/common/Button";
+import { Input } from "@/src/components/common/Input"; // Componente Shadcn
+import { Label } from "@/src/components/common/label"; // Componente Shadcn
 import { toast } from "sonner";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
+// Importación del esquema y tipo desde el archivo de tipos (ajustar ruta si es necesario)
+import { resetSchema, type ResetFormData } from "@/src/types/auth"; 
 import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword"; 
 import { useResetPassword } from "@/src/hooks/auth/useResetPassword";
-
-const resetSchema = z.object({
-  contraseña: z.string()
-    .min(8, "Mínimo 8 caracteres")
-    .regex(/[A-Z]/, "Debe tener una mayúscula")
-    .regex(/[a-z]/, "Debe tener una minúscula")
-    .regex(/\d/, "Debe tener un número")
-    .regex(/[@$!%*?&]/, "Debe tener un carácter especial"),
-  confirm: z.string()
-}).refine((data) => data.contraseña === data.confirm, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirm"],
-});
-
-type ResetFormData = z.infer<typeof resetSchema>;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -133,14 +123,14 @@ const ResetPassword = () => {
                 </div>
                 <div className="space-y-4 text-left">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#1a1c1e]">Tu Email</label>
-                    <input
+                    <Label className="text-sm font-bold text-[#1a1c1e]">Tu Email</Label>
+                    <Input
                       type="email"
-                      className="w-full h-14 px-4 bg-[#fafafa] border border-slate-200 rounded-xl outline-none"
                       placeholder="ejemplo@correo.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      className="h-14 bg-[#fafafa] border-slate-200 rounded-xl"
                     />
                   </div>
                 </div>
@@ -177,12 +167,13 @@ const ResetPassword = () => {
                 <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} />
                 <div className="space-y-4 text-left">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#1a1c1e]">Nueva Contraseña</label>
+                    <Label className="text-sm font-bold text-[#1a1c1e]">Nueva Contraseña</Label>
                     <div className="relative">
-                      <input
+                      <Input
                         type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full h-14 px-4 bg-[#fafafa] border border-slate-200 rounded-xl outline-none"
+                        className="h-14 bg-[#fafafa] border-slate-200 rounded-xl pr-12"
                         {...register("contraseña")}
                       />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -192,12 +183,13 @@ const ResetPassword = () => {
                     {errors.contraseña && <small className="text-red-500">{errors.contraseña.message}</small>}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#1a1c1e]">Confirmar Contraseña</label>
+                    <Label className="text-sm font-bold text-[#1a1c1e]">Confirmar Contraseña</Label>
                     <div className="relative">
-                      <input
+                      <Input
                         type={showConfirm ? "text" : "password"}
+                        placeholder="••••••••"
                         autoComplete="new-password"
-                        className="w-full h-14 px-4 bg-[#fafafa] border border-slate-200 rounded-xl outline-none"
+                        className="h-14 bg-[#fafafa] border-slate-200 rounded-xl pr-12"
                         {...register("confirm")}
                       />
                       <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">

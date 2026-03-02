@@ -104,7 +104,7 @@ const Login: React.FC = () => {
 
                   <div className="flex justify-end">
                     <Link 
-                      to="/reset-password" 
+                      to="/auth/reset-password"
                       data-test-id="olvide-contrasena" 
                       className="text-xs text-slate-500 hover:underline"
                     >

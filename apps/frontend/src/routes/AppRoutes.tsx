@@ -34,7 +34,7 @@ export const AppRoutes = () => {
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
         {/* Nueva ruta añadida aquí */}
-        <Route path="/reset-password" element={<ResetPassword />} /> 
+        <Route path="/auth/reset-password" element={<ResetPassword />} />
       </Route>
 
       <Route path={'/auth/verify'} element={<VerifyUser />} />

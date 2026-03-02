@@ -3,6 +3,7 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  RESET_PASSWORD: '/auth/reset-password',
 
   // Rutas Privadas (Dashboard y Operaciones)
   DASHBOARD: '/dashboard',
