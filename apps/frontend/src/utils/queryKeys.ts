@@ -39,6 +39,12 @@ export const productKeys = {
   detail: (id: string) => [...baseKeys.product, id] as const,
 }
 
+export const costKeys = {
+  all: baseKeys.product,
+  lists: () => [...baseKeys.product, 'list'] as const,
+  detail: (id: string) => [...baseKeys.product, id] as const,
+}
+
 export const provinceKeys = {
   all: baseKeys.province,
   lists: () => [...baseKeys.province, 'list'] as const,
@@ -59,6 +65,7 @@ export const queryKeys = {
   auth: authKeys,
   batch: batchKeys,
   product: productKeys,
+  cost: costKeys,
   province: provinceKeys,
   locality: localityKeys,
 } as const
