@@ -1,10 +1,15 @@
 import { deleteBatch } from '@/src/utils/api/batch.api'
 import { queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AxiosError, AxiosResponse } from 'axios'
 
 export function useDeleteBatch() {
   const queryClient = useQueryClient()
-  return useMutation({
+  return useMutation<
+    AxiosResponse,
+    AxiosError<{ message: string }>,
+    { id: string }
+  >({
     mutationFn: async ({ id }: { id: string }) => {
       const { data } = await deleteBatch(id)
       return data
