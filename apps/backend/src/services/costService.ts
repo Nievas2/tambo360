@@ -23,6 +23,7 @@ class ServicioCostos {
             throw new AppError("No se pueden agregar costos a un lote terminado", 400);
         }
 
+
         return prisma.costosDirecto.create({
             data: {
                 idLote: data.loteId,
