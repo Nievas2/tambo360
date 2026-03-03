@@ -1,6 +1,6 @@
 // Importamos el JSON (asegúrate de que la ruta sea la correcta en tu proyecto)
-import provincesData from '../../../public/ubications/provinces.json'
-import localitiesData from '../../../public/ubications/localities.json'
+import provincesData from '@/src/utils/assets/ubications/provinces.json'
+import localitiesData from '@/src/utils/assets/ubications/localities.json'
 
 const removeAccents = (str: string) => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
