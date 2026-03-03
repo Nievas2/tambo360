@@ -4,13 +4,25 @@ export const crearCostoSchema = z.object({
     loteId: z.string().uuid("loteId inválido"),
     concepto: z
         .string()
-        .min(1, "Concepto requerido")
-        .max(255, "Concepto demasiado largo"),
-    monto: z.coerce.number().positive("El monto debe ser mayor a cero"),
+        .trim()
+        .min(2, "El concepto debe tener al menos 2 caracteres")
+        .max(255, "Concepto demasiado largo")
+        .refine((val) => /[a-zA-ZÁÉÍÓÚáéíóúÑñ]/.test(val), {
+            message: "El concepto debe contener al menos una letra",
+        }),
+
+    monto: z.coerce
+        .number()
+        .positive("El monto debe ser mayor a cero")
+        .transform((val) => Number(val.toFixed(2))), // convierte a decimal con 2 decimales
+
     observaciones: z
         .string()
         .max(500, "Observaciones demasiado largas")
-        .optional(),
+        .optional()
+        .refine((val) => !val || val.trim().length > 0, {
+            message: "Observaciones no puede contener solo espacios",
+        }),
 });
 
 export const actualizarCostoSchema = z.object({
