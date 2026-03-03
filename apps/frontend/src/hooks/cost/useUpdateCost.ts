@@ -1,13 +1,13 @@
 import { UpdateCostData } from '@/src/types/cost'
-import { createCost } from '@/src/utils/api/cost.api'
+import { updateCost } from '@/src/utils/api/cost.api'
 import { queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 
-export function useCreateCost() {
+export function useUpdateCost() {
   const queryClient = useQueryClient()
   return useMutation<
-    AxiosResponse,
+    AxiosResponse<{ cost: UpdateCostData }>,
     AxiosError<{ message: string }>,
     { values: UpdateCostData; id: string }
   >({
@@ -18,7 +18,7 @@ export function useCreateCost() {
       values: UpdateCostData
       id: string
     }) => {
-      const { data } = await createCost(values, id)
+      const { data } = await updateCost(values, id)
       return data
     },
 

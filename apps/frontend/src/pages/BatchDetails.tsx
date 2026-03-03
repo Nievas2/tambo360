@@ -300,6 +300,7 @@ export default function BatchDetails() {
       <ChangeCost
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
+        loteId={batch?.data.idLote}
       />
     </div>
   )

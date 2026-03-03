@@ -1,8 +1,12 @@
 import { api } from '@/src/services/api'
-import { CreateCostData, UpdateCostData } from '@/src/types/cost'
+import { UpdateCostData } from '@/src/types/cost'
 
-export const createCost = async (values: CreateCostData) =>
-  api.post('/costos/registrar', values)
+export const createCost = async (values: UpdateCostData, id: string) =>
+  api.post('/costos/registrar', {
+    loteId: id,
+    observaciones: '',
+    ...values,
+  })
 
 export const getBatchCosts = (id: string) =>
   api.get('/costos/costos-lote/' + id)
