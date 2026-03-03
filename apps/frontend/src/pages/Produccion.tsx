@@ -229,16 +229,23 @@ const Produccion: React.FC = () => {
                                   setSelectedBatch(batch)
                                   setIsChangeBatchOpen(true)
                                 }}
+                                disabled={
+                                  batch.costosDirectos.length > 0 ||
+                                  batch.mermas.length > 0 ||
+                                  batch.estado
+                                }
                               >
                                 <Pencil /> Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setIsChangeDecreaseOpen(true)}
+                                disabled={batch.estado}
                               >
                                 <DropletOff /> Registrar merma
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setIsChangeCostOpen(true)}
+                                disabled={batch.estado}
                               >
                                 <BanknoteArrowUp /> Registrar costo
                               </DropdownMenuItem>
@@ -247,7 +254,7 @@ const Produccion: React.FC = () => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuGroup>
-                              <DropdownMenuItem disabled={true}>
+                              <DropdownMenuItem>
                                 <Trash /> Eliminar
                               </DropdownMenuItem>
                             </DropdownMenuGroup>
@@ -295,7 +302,6 @@ const Produccion: React.FC = () => {
                     ? parseFloat(selectedBatch.cantidad)
                     : Number(selectedBatch.cantidad ?? 0),
                 fechaProduccion: selectedBatch.fechaProduccion,
-                unidad: selectedBatch.unidad as 'kg' | 'litros',
               }
             : undefined
         }
