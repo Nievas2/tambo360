@@ -300,7 +300,6 @@ const Produccion: React.FC = () => {
                     ? parseFloat(selectedBatch.cantidad)
                     : Number(selectedBatch.cantidad ?? 0),
                 fechaProduccion: selectedBatch.fechaProduccion,
-                unidad: selectedBatch.unidad as 'kg' | 'litros',
               }
             : undefined
         }
