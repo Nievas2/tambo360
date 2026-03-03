@@ -292,13 +292,15 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
 
               {error && (
                 <span className="text-xs text-red-600">
-                  {error.message || 'Algo salió mal al crear el lote'}
+                  {error.response.data.message ||
+                    'Algo salió mal al crear el lote'}
                 </span>
               )}
 
               {errorUpdate && (
                 <span className="text-xs text-red-600">
-                  {errorUpdate.message || 'Algo salió mal al editar el lote'}
+                  {errorUpdate.response.data.message ||
+                    'Algo salió mal al editar el lote'}
                 </span>
               )}
             </div>
