@@ -25,12 +25,26 @@ export const crearLoteSchema = z.object({
             message: "Formato de fecha inválido, debe ser dd/mm/aaaa",
         })
         .transform((val) => {
-            const now = new Date();
-            const [dd, mm, yyyy] = val.split("/");
-            const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+            const [dd, mm, yyyy] = val.split("/").map(Number);
 
-            const fechaMinima = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-            const fechaMaxima = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const ahora = new Date();
+            const horaArg = new Date(
+                ahora.toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })
+            );
+
+            const date = new Date(
+                yyyy,
+                mm - 1,
+                dd,
+                horaArg.getHours(),
+                horaArg.getMinutes(),
+                horaArg.getSeconds(),
+                horaArg.getMilliseconds()
+            );
+
+            const hoyArg = new Date(horaArg);
+            const fechaMinima = new Date(hoyArg.getFullYear(), hoyArg.getMonth(), hoyArg.getDate() - 7);
+            const fechaMaxima = new Date(hoyArg.getFullYear(), hoyArg.getMonth(), hoyArg.getDate());
 
             if (date < fechaMinima || date > fechaMaxima) {
                 throw new Error("La fecha de producción debe estar entre hoy y 7 días antes");

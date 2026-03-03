@@ -70,7 +70,10 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
       <SidebarContent className="px-4 flex flex-col justify-between h-full pb-8">
         <SidebarMenu>
           {mainMenuItems.map((item) => {
-            const isActive = location.pathname === item.url
+            const isActive =
+              item.url === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.url)
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton

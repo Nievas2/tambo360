@@ -4,7 +4,7 @@ import RutasAutenticacion from "./auth";
 import HealthRoutes from "./health";
 import RutasEstablecimientos from "./establishment";
 import RutasLotes from "./batch";
-import RutasMermas from "./decrease";
+import RutasMermas from "./mermas";
 import RutasCostos from "./cost";
 import RutasProductos from "./product";
 
