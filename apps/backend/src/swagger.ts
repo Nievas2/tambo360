@@ -13,11 +13,7 @@ export const setupSwagger = (app: Express) => {
       },
       servers: [
         {
-<<<<<<< HEAD
           url: process.env.BACKEND_URL ? process.env.BACKEND_URL + "/api" : "http://localhost:3000/api",
-=======
-          url: process.env.BACKEND_URL ? process.env.BACKEND_URL : "http://localhost:3000/api",
->>>>>>> 4a7ee3c0adfe06c60bd4c608adb8f57e0694f109
         },
       ],
     },
