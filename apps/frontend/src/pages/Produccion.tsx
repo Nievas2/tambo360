@@ -229,16 +229,23 @@ const Produccion: React.FC = () => {
                                   setSelectedBatch(batch)
                                   setIsChangeBatchOpen(true)
                                 }}
+                                disabled={
+                                  batch.costosDirectos.length > 0 ||
+                                  batch.mermas.length > 0 ||
+                                  batch.estado
+                                }
                               >
                                 <Pencil /> Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setIsChangeDecreaseOpen(true)}
+                                disabled={batch.estado}
                               >
                                 <DropletOff /> Registrar merma
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setIsChangeCostOpen(true)}
+                                disabled={batch.estado}
                               >
                                 <BanknoteArrowUp /> Registrar costo
                               </DropdownMenuItem>
