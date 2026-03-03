@@ -8,6 +8,7 @@ import Register from '../pages/Register'
 import Produccion from '../pages/Produccion'
 import TamboEngine from '../pages/TamboEngine'
 import Perfil from '../pages/Perfil'
+import ResetPassword from '../pages/ResetPassword' // <--- Importación añadida
 
 import { ROUTES } from '../constants/routes'
 import LoadingSpinner from '../components/layout/LoadingSpinner'
@@ -34,6 +35,8 @@ export const AppRoutes = () => {
       >
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
+        {/* Nueva ruta añadida aquí */}
+        <Route path="/auth/reset-password" element={<ResetPassword />} />
       </Route>
 
       <Route path={'/auth/verify'} element={<VerifyUser />} />

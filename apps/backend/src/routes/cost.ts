@@ -1,12 +1,14 @@
 import { Router } from "express";
+import { authenticate } from "../middleware/authMiddleware";
 import { crearCosto, obtenerCostoPorId, obtenerCostosPorLote, actualizarCosto, eliminarCosto } from "../controllers/costController";
+
 
 const router = Router();
 
-router.post("/", crearCosto);
-router.get("/lote/:loteId", obtenerCostosPorLote);
-router.get("/:id", obtenerCostoPorId);
-router.put("/:id", actualizarCosto);
-router.delete("/:id", eliminarCosto);
+router.post("/registrar", authenticate, crearCosto);
+router.get("/costos-lote/:loteId", authenticate, obtenerCostosPorLote);
+router.get("/detalle/:id", authenticate, obtenerCostoPorId);
+router.put("/actualizar/:id", authenticate, actualizarCosto);
+router.delete("/eliminar/:id", authenticate, eliminarCosto);
 
 export default router;

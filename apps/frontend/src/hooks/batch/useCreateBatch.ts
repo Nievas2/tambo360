@@ -22,10 +22,12 @@ export function useCreateBatch() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
     },
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
     },
   })
 }

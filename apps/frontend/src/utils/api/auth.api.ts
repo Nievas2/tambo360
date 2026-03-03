@@ -13,3 +13,17 @@ export const resendVerificationEmail = (correo: string) =>
 
 export const verifyEmail = (token: string) =>
   api.post(`/auth/verificar-email`, { token })
+
+export const forgotPassword = async (email: string) => {
+  // Cambiado de { email } a { correo } para coincidir con authController.ts
+  const { data } = await api.post('/auth/contrasena-olvidada', { correo: email });
+  return data;
+};
+
+export const resetPassword = async (password: string, token: string) => {
+  const { data } = await api.post('/auth/restablecer-contrasena', { 
+    nuevaContraseña: password, 
+    token: token 
+  });
+  return data;
+};
