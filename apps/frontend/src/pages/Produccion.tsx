@@ -7,7 +7,6 @@ import {
   Eye,
   DropletOff,
   BanknoteArrowUp,
-  Trash,
   Ellipsis,
   Pencil,
 } from 'lucide-react'
@@ -43,6 +42,7 @@ import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import { Badge } from '@/src/components/common/badge'
 import { Batch } from '@/src/types/batch'
 import { useBatches } from '@/src/hooks/batch/useBatches'
+import DeleteBatch from '@/src/components/shared/dashboard/batch/DeleteBatch'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
@@ -247,9 +247,7 @@ const Produccion: React.FC = () => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuGroup>
-                              <DropdownMenuItem disabled={true}>
-                                <Trash /> Eliminar
-                              </DropdownMenuItem>
+                              <DeleteBatch batch={batch} />
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -295,7 +293,6 @@ const Produccion: React.FC = () => {
                     ? parseFloat(selectedBatch.cantidad)
                     : Number(selectedBatch.cantidad ?? 0),
                 fechaProduccion: selectedBatch.fechaProduccion,
-                unidad: selectedBatch.unidad as 'kg' | 'litros',
               }
             : undefined
         }
