@@ -1,7 +1,11 @@
 import { prisma } from "../lib/prisma"
-
+import { TipoMerma } from "@prisma/client"
 
 export class MermaService {
+
+  async getTipos() {
+    return Object.values(TipoMerma)
+  }
 
   async create(data: any) {
 
@@ -13,6 +17,15 @@ export class MermaService {
       throw new Error("El lote no existe")
     }
 
+    if (!data.tipo) {
+      throw new Error("El tipo de merma es obligatorio")
+    }
+
+    // Validación real del enum
+    if (!Object.values(TipoMerma).includes(data.tipo)) {
+      throw new Error("Tipo de merma inválido")
+    }
+
     if (Number(data.cantidad) > Number(lote.cantidad)) {
       throw new Error("La cantidad supera el stock disponible")
     }
@@ -21,9 +34,9 @@ export class MermaService {
 
       const merma = await tx.merma.create({
         data: {
-          descripcion: data.descripcion,
+          tipo: data.tipo as TipoMerma,
+          observacion: data.observacion,
           cantidad: data.cantidad,
-          unidad: data.unidad,
           idLote: data.idLote
         }
       })
@@ -66,8 +79,12 @@ export class MermaService {
 
     return prisma.$transaction(async (tx) => {
 
+      const nuevaCantidad =
+        data.cantidad ?? mermaAnterior.cantidad
+
       const diferencia =
-        Number(data.cantidad) - Number(mermaAnterior.cantidad)
+        Number(nuevaCantidad) -
+        Number(mermaAnterior.cantidad)
 
       const lote = await tx.loteProduccion.findUnique({
         where: { idLote: mermaAnterior.idLote }
@@ -79,6 +96,11 @@ export class MermaService {
 
       if (diferencia > 0 && diferencia > Number(lote.cantidad)) {
         throw new Error("Stock insuficiente")
+      }
+
+      // Validar tipo si lo envían
+      if (data.tipo && !Object.values(TipoMerma).includes(data.tipo)) {
+        throw new Error("Tipo de merma inválido")
       }
 
       await tx.loteProduccion.update({
@@ -93,9 +115,11 @@ export class MermaService {
       return tx.merma.update({
         where: { idMerma: id },
         data: {
-          descripcion: data.descripcion ?? mermaAnterior.descripcion,
-          cantidad: data.cantidad ?? mermaAnterior.cantidad,
-          unidad: data.unidad ?? mermaAnterior.unidad
+          tipo: data.tipo
+            ? (data.tipo as TipoMerma)
+            : mermaAnterior.tipo,
+          observacion: data.observacion ?? mermaAnterior.observacion,
+          cantidad: nuevaCantidad
         }
       })
     })

@@ -1,12 +1,14 @@
 import { Router } from "express"
-import {createMerma, getMermas, getMermaById, updateMerma, deleteMerma } from "../controllers/mermaController"
+import { MermaController } from "../controllers/mermaController"
 
 const router = Router()
+const controller = new MermaController()
 
-router.post("/", createMerma)
-router.get("/", getMermas)
-router.get("/:id", getMermaById)
-router.put("/:id", updateMerma)
-router.delete("/:id", deleteMerma)
+router.get("/tipos", controller.getTipos.bind(controller))
+router.post("/", controller.create.bind(controller))
+router.get("/", controller.findAll.bind(controller))
+router.get("/:id", controller.findById.bind(controller))
+router.put("/:id", controller.update.bind(controller))
+router.delete("/:id", controller.delete.bind(controller))
 
 export default router
