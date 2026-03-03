@@ -1,14 +1,10 @@
 import { prisma } from "../lib/prisma"
+import { TipoMerma } from "@prisma/client"
 
 export class MermaService {
 
   async getTipos() {
-    return [
-      "Natural",
-      "Tecnica",
-      "Administrativa",
-      "Danio"
-    ]
+    return Object.values(TipoMerma)
   }
 
   async create(data: any) {
@@ -25,6 +21,11 @@ export class MermaService {
       throw new Error("El tipo de merma es obligatorio")
     }
 
+    // Validación real del enum
+    if (!Object.values(TipoMerma).includes(data.tipo)) {
+      throw new Error("Tipo de merma inválido")
+    }
+
     if (Number(data.cantidad) > Number(lote.cantidad)) {
       throw new Error("La cantidad supera el stock disponible")
     }
@@ -33,7 +34,7 @@ export class MermaService {
 
       const merma = await tx.merma.create({
         data: {
-          tipo: data.tipo,
+          tipo: data.tipo as TipoMerma,
           observacion: data.observacion,
           cantidad: data.cantidad,
           idLote: data.idLote
@@ -97,6 +98,11 @@ export class MermaService {
         throw new Error("Stock insuficiente")
       }
 
+      // Validar tipo si lo envían
+      if (data.tipo && !Object.values(TipoMerma).includes(data.tipo)) {
+        throw new Error("Tipo de merma inválido")
+      }
+
       await tx.loteProduccion.update({
         where: { idLote: mermaAnterior.idLote },
         data: {
@@ -109,7 +115,9 @@ export class MermaService {
       return tx.merma.update({
         where: { idMerma: id },
         data: {
-          tipo: data.tipo ?? mermaAnterior.tipo,
+          tipo: data.tipo
+            ? (data.tipo as TipoMerma)
+            : mermaAnterior.tipo,
           observacion: data.observacion ?? mermaAnterior.observacion,
           cantidad: nuevaCantidad
         }
