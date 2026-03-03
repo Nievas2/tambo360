@@ -1,7 +1,15 @@
 import { prisma } from "../lib/prisma"
 
-
 export class MermaService {
+
+  async getTipos() {
+    return [
+      "Natural",
+      "Tecnica",
+      "Administrativa",
+      "Danio"
+    ]
+  }
 
   async create(data: any) {
 
@@ -13,6 +21,10 @@ export class MermaService {
       throw new Error("El lote no existe")
     }
 
+    if (!data.tipo) {
+      throw new Error("El tipo de merma es obligatorio")
+    }
+
     if (Number(data.cantidad) > Number(lote.cantidad)) {
       throw new Error("La cantidad supera el stock disponible")
     }
@@ -21,9 +33,9 @@ export class MermaService {
 
       const merma = await tx.merma.create({
         data: {
-          descripcion: data.descripcion,
+          tipo: data.tipo,
+          observacion: data.observacion,
           cantidad: data.cantidad,
-          unidad: data.unidad,
           idLote: data.idLote
         }
       })
@@ -66,8 +78,12 @@ export class MermaService {
 
     return prisma.$transaction(async (tx) => {
 
+      const nuevaCantidad =
+        data.cantidad ?? mermaAnterior.cantidad
+
       const diferencia =
-        Number(data.cantidad) - Number(mermaAnterior.cantidad)
+        Number(nuevaCantidad) -
+        Number(mermaAnterior.cantidad)
 
       const lote = await tx.loteProduccion.findUnique({
         where: { idLote: mermaAnterior.idLote }
@@ -93,9 +109,9 @@ export class MermaService {
       return tx.merma.update({
         where: { idMerma: id },
         data: {
-          descripcion: data.descripcion ?? mermaAnterior.descripcion,
-          cantidad: data.cantidad ?? mermaAnterior.cantidad,
-          unidad: data.unidad ?? mermaAnterior.unidad
+          tipo: data.tipo ?? mermaAnterior.tipo,
+          observacion: data.observacion ?? mermaAnterior.observacion,
+          cantidad: nuevaCantidad
         }
       })
     })
