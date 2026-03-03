@@ -14,7 +14,7 @@ export const crearCostoSchema = z.object({
     monto: z.coerce
         .number()
         .positive("El monto debe ser mayor a cero")
-        .transform((val) => Number(val.toFixed(2))), // convierte a decimal con 2 decimales
+        .transform((val) => Number(val.toFixed(2))),
 
     observaciones: z
         .string()

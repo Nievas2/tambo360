@@ -77,8 +77,14 @@ export const obtenerLote = async (req: Request, res: Response, next: NextFunctio
         const user = (req as any).user;
         if (!user) throw new AppError("Usuario no autenticado", 401);
 
+        const parsedParams = idLoteParamSchema.safeParse(req.params);
+
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
+
         const { idLote } = req.params;
-        if (!idLote) throw new AppError("Id de lote requerido", 400);
 
         const lote = await LoteService.obtenerLote(idLote, user.id);
 
@@ -101,12 +107,17 @@ export const produccionDelDia = async (req: Request, res: Response, next: NextFu
 
 export const completarLote = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const params = idLoteParamSchema.parse(req.params);
+        const parsedParams = idLoteParamSchema.safeParse(req.params);
+
+        if (!parsedParams.success) {
+            const errores = parsedParams.error.issues.map(e => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
 
         const user = (req as any).user;
         if (!user) throw new AppError("Usuario no autenticado", 401);
 
-        const loteActualizado = await LoteService.completarLote(params.idLote, user.id);
+        const loteActualizado = await LoteService.completarLote(parsedParams.data.idLote, user.id);
 
         return res.status(200).json(
             ApiResponse.success(loteActualizado, "Lote completado correctamente")
