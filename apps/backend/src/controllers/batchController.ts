@@ -110,3 +110,18 @@ export const completarLote = async (req: Request, res: Response, next: NextFunct
         next(error);
     }
 };
+
+export const listarPorMes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = (req as any).user;
+        console.log(user)
+        const {producto, metrica} = req.query
+        if (!user) throw new AppError("Usuario no autenticado", 401);
+
+        const respuesta = await LoteService.listarPorMes(user.id)
+
+        return res.status(200).json(ApiResponse.success(respuesta, "prueba"));
+    } catch (error) {
+        next(error);
+    }
+}

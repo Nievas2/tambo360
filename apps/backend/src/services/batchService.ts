@@ -183,4 +183,30 @@ export class LoteService {
             data: { estado: true },
         });
     }
+
+    static async listarPorMes(userId: string) {
+        const hoy = new Date();
+        const anio = hoy.getFullYear();
+        const mes = hoy.getMonth() + 1; // 0-11, por eso +1
+        const fechaInicio = new Date(anio, mes - 1, 1); // 1er día del mes
+        const fechaFin = new Date(anio, mes, 0, 23, 59, 59, 999); // último día del mes
+
+        const result = await prisma.loteProduccion.findMany({
+            where: {
+                establecimiento: {
+                    idUsuario: userId
+                },
+                fechaProduccion: {
+                    gte: fechaInicio,
+                    lte: fechaFin
+                }
+            },
+            include: {
+                mermas: true,
+                costosDirectos: true
+            }
+        })
+        
+        return result
+    }
 }
