@@ -97,3 +97,16 @@ export const produccionDelDia = async (req: Request, res: Response, next: NextFu
         return res.status(200).json(ApiResponse.success(lotes, "Producción del día"));
     } catch (error) { next(error); }
 };
+
+export const completarLote = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { idLote } = req.params;
+        if (!idLote) throw new AppError("Id de lote requerido", 400);
+
+        const loteActualizado = await LoteService.completarLote(idLote);
+
+        return res.status(200).json(ApiResponse.success(loteActualizado, "Lote completado correctamente"));
+    } catch (error) {
+        next(error);
+    }
+};

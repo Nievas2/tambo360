@@ -95,7 +95,6 @@ export class LoteService {
                 fechaProduccion: data.fechaProduccion
                     ? new Date(data.fechaProduccion)
                     : lote.fechaProduccion,
-                estado: data.estado ?? lote.estado,
             },
             include: {
                 producto: true,
@@ -170,6 +169,18 @@ export class LoteService {
                 fechaProduccion: { gte: inicioDia, lte: finDia }
             },
             include: { producto: true, mermas: true, costosDirectos: true }
+        });
+    }
+
+    static async completarLote(idLote: string) {
+        const lote = await prisma.loteProduccion.findUnique({ where: { idLote } });
+        if (!lote) throw new AppError("El lote no existe", 404);
+
+        if (lote.estado) throw new AppError("El lote ya está completado", 400);
+
+        return prisma.loteProduccion.update({
+            where: { idLote },
+            data: { estado: true },
         });
     }
 }
