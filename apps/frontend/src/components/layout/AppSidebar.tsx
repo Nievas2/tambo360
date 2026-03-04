@@ -80,7 +80,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                   asChild
                   className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                     isCollapsed ? 'justify-center' : 'justify-start'
-                  } ${isActive ? 'bg-[#D7ECAF] text-[#669213] hover:bg-[#D7ECAF]/60 hover:text-[#669213]/60 border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+                  } ${isActive ? 'bg-[#D7ECAF] hover:bg-[#D7ECAF]/60 hover:text-[#669213]/60 border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Link
                     to={item.url}
@@ -88,11 +88,11 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                     data-test-id={item.data}
                   >
                     <item.icon
-                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-black' : 'text-gray-400'}`}
+                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
                     />
                     {!isCollapsed && (
                       <span
-                        className={`font-semibold ${isActive ? 'text-black' : 'text-gray-400'}`}
+                        className={`font-semibold ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
                       >
                         {item.title}
                       </span>
