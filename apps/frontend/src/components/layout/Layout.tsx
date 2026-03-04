@@ -30,7 +30,7 @@ const LayoutContent = () => {
   }
 
   return (
-    <div className="flex h-screen w-full bg-[#F9FAFB] overflow-hidden">
+    <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
       {/* Overlay para móvil */}
       {isMobile && showMobileMenu && (
         <div
