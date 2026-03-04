@@ -53,17 +53,19 @@ export class LoteService {
         return lote;
     }
 
-    static async editarLote(idLote: string, data: Partial<CrearLoteDTO>) {
+    static async editarLote(idLote: string, data: Partial<CrearLoteDTO>, idUsuario: string) {
         const lote = await prisma.loteProduccion.findUnique({
             where: { idLote },
-            include: { mermas: true, costosDirectos: true }
+            include: { establecimiento: true, mermas: true, costosDirectos: true }
         });
 
         if (!lote) throw new AppError("El lote no existe", 404);
 
-        const tieneAsociados = (lote.mermas.length > 0 || lote.costosDirectos.length > 0);
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para modificar este lote", 403);
+        }
 
-        if (tieneAsociados) {
+        if (lote.mermas.length > 0 || lote.costosDirectos.length > 0) {
             throw new AppError(
                 "El lote tiene mermas o costos directos asociados y no puede editarse",
                 400
@@ -95,7 +97,6 @@ export class LoteService {
                 fechaProduccion: data.fechaProduccion
                     ? new Date(data.fechaProduccion)
                     : lote.fechaProduccion,
-                estado: data.estado ?? lote.estado,
             },
             include: {
                 producto: true,
@@ -105,14 +106,18 @@ export class LoteService {
         });
     }
 
-    static async eliminarLote(idLote: string) {
+    static async eliminarLote(idLote: string, idUsuario: string) {
         const lote = await prisma.loteProduccion.findUnique({
             where: { idLote },
-            include: { mermas: true, costosDirectos: true },
+            include: { establecimiento: true, mermas: true, costosDirectos: true },
         });
 
         if (!lote) {
             throw new AppError("El lote no existe", 404);
+        }
+
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para eliminar este lote", 403);
         }
 
         if ((lote.mermas.length > 0) || (lote.costosDirectos.length > 0)) {
@@ -170,6 +175,31 @@ export class LoteService {
                 fechaProduccion: { gte: inicioDia, lte: finDia }
             },
             include: { producto: true, mermas: true, costosDirectos: true }
+        });
+    }
+
+    static async completarLote(idLote: string, idUsuario: string) {
+
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote },
+            include: { establecimiento: true }
+        });
+
+        if (!lote) {
+            throw new AppError("El lote no existe", 404);
+        }
+
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para modificar este lote", 403);
+        }
+
+        if (lote.estado) {
+            throw new AppError("El lote ya está completado", 400);
+        }
+
+        return prisma.loteProduccion.update({
+            where: { idLote },
+            data: { estado: true },
         });
     }
 }

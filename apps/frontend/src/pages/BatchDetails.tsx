@@ -9,6 +9,7 @@ import {
   EmptyTitle,
 } from '@/src/components/common/empty'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
+import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import { StatCard } from '@/src/components/shared/StatCard'
@@ -27,7 +28,8 @@ export default function BatchDetails() {
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
-  const { data: batch, isLoading } = useBatch({ id: id })
+  const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false) // Nuevo estado
+  const { data: batch, isLoading, refetch } = useBatch({ id: id })
 
   if (isLoading) {
     return (
@@ -125,10 +127,17 @@ export default function BatchDetails() {
             variant="outline"
             className="h-12 w-full max-w-36"
             onClick={() => setIsChangeBatchOpen(true)}
+            disabled={batch?.data?.estado}
           >
             Editar lote
           </Button>
-          <Button className="h-12 w-full max-w-36">Completar lote</Button>
+          <Button
+            className="h-12 w-full max-w-36"
+            onClick={() => setIsCompleteBatchOpen(true)}
+            disabled={batch?.data?.estado}
+          >
+            Completar lote
+          </Button>
         </div>
       </div>
 
@@ -203,6 +212,7 @@ export default function BatchDetails() {
               <Button
                 className="w-52"
                 onClick={() => setIsChangeDecreaseOpen(true)}
+                disabled={batch?.data?.estado}
               >
                 Agregar merma
               </Button>
@@ -222,7 +232,10 @@ export default function BatchDetails() {
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
-                  <Button onClick={() => setIsChangeDecreaseOpen(true)}>
+                  <Button
+                    onClick={() => setIsChangeDecreaseOpen(true)}
+                    disabled={batch?.data?.estado}
+                  >
                     Registrar Merma
                   </Button>
                 </EmptyContent>
@@ -244,6 +257,7 @@ export default function BatchDetails() {
               <Button
                 className="w-52"
                 onClick={() => setIsChangeCostOpen(true)}
+                disabled={batch?.data?.estado}
               >
                 Agregar costo
               </Button>
@@ -263,7 +277,10 @@ export default function BatchDetails() {
                     No se han reportado pérdidas ni ajustes para este lote hasta
                     el momento.
                   </EmptyDescription>
-                  <Button onClick={() => setIsChangeCostOpen(true)}>
+                  <Button
+                    onClick={() => setIsChangeCostOpen(true)}
+                    disabled={batch?.data?.estado}
+                  >
                     Registrar costo
                   </Button>
                 </EmptyContent>
@@ -286,7 +303,6 @@ export default function BatchDetails() {
                     ? parseFloat(batch.data.cantidad)
                     : Number(batch.data.cantidad ?? 0),
                 fechaProduccion: batch.data.fechaProduccion,
-                unidad: batch.data.unidad as 'kg' | 'litros',
               }
             : undefined
         }
@@ -301,6 +317,13 @@ export default function BatchDetails() {
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
         loteId={batch?.data.idLote}
+      />
+
+      <CompleteBatch
+        open={isCompleteBatchOpen}
+        onClose={() => setIsCompleteBatchOpen(false)}
+        batchId={id}
+        refetch={refetch}
       />
     </div>
   )

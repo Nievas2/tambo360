@@ -1,112 +1,108 @@
 /**
  * @swagger
- * components:
- *   schemas:
- *     CrearCostoRequest:
- *       type: object
- *       required:
- *         - loteId
- *         - concepto
- *         - monto
- *       properties:
- *         loteId:
- *           type: string
- *           format: uuid
- *           description: ID del lote asociado
- *         concepto:
- *           type: string
- *           description: Concepto del costo
- *         monto:
- *           type: number
- *           description: Monto del costo
- *         observaciones:
- *           type: string
- *           description: Observaciones opcionales
- *       example:
- *         loteId: "4ef0daea-a4e3-4b9c-adec-ee2d0df2ea93"
- *         concepto: "Compra de fertilizante"
- *         monto: 15000
- *         observaciones: "Proveedor local"
- *
- *     ActualizarCostoRequest:
- *       type: object
- *       properties:
- *         concepto:
- *           type: string
- *         monto:
- *           type: number
- *         observaciones:
- *           type: string
- *       example:
- *         concepto: "Actualización fertilizante"
- *         monto: 18000
- *         observaciones: "Cambio de precio"
- *
- *     Costo:
- *       type: object
- *       properties:
- *         idCostoDirecto:
- *           type: string
- *           format: uuid
- *         idLote:
- *           type: string
- *           format: uuid
- *         concepto:
- *           type: string
- *         monto:
- *           type: number
- *         observaciones:
- *           type: string
- *         fechaCreacion:
- *           type: string
- *           format: date-time
- *
+ * tags:
+ *   - name: Costos
+ *     description: Gestión de costos directos asociados a los lotes
+ */
+
+/**
+ * @swagger
  * /costos/registrar:
  *   post:
- *     tags:
- *       - costos
- *     summary: Registrar un costo directo
+ *     summary: Crear un nuevo costo
+ *     tags: [Costos]
  *     security:
- *       - cookieAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CrearCostoRequest'
+ *             type: object
+ *             required:
+ *               - loteId
+ *               - concepto
+ *               - monto
+ *             properties:
+ *               loteId:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "b2c3d4e5-6789-01ab-cdef-234567890abc"
+ *               concepto:
+ *                 type: string
+ *                 example: "Leche en polvo"
+ *               monto:
+ *                 type: number
+ *                 example: 1200.50
+ *               observaciones:
+ *                 type: string
+ *                 example: "Costo estimado para producción del lote"
  *     responses:
  *       201:
  *         description: Costo registrado correctamente
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Costo'
+ *               type: object
+ *               properties:
+ *                 statusCode: { type: integer, example: 201 }
+ *                 message: { type: string, example: "Costo registrado correctamente" }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     idCostoDirecto: { type: string, format: uuid }
+ *                     idLote: { type: string, format: uuid }
+ *                     concepto: { type: string }
+ *                     monto: { type: number }
+ *                     observaciones: { type: string, nullable: true }
+ *                     fechaCreacion: { type: string, format: date-time }
  *       400:
- *         description: Datos inválidos
- *         content:
- *           application/json:
- *             example:
- *               message: Datos inválidos
+ *         description: Datos inválidos o lote terminado
  *       401:
  *         description: Usuario no autenticado
- *         content:
- *           application/json:
- *             example:
- *               message: Usuario no autenticado
  *       403:
- *         description: No tiene permisos sobre este lote
- *         content:
- *           application/json:
- *             example:
- *               message: No tiene permisos sobre este lote
- *
+ *         description: No tiene permisos para ese lote
+ *       404:
+ *         description: Lote no encontrado
+ */
+
+/**
+ * @swagger
+ * /costos/detalle/{id}:
+ *   get:
+ *     summary: Obtener un costo por ID
+ *     tags: [Costos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del costo
+ *     responses:
+ *       200:
+ *         description: Costo obtenido correctamente
+ *       400:
+ *         description: ID inválido
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: No tiene permisos
+ *       404:
+ *         description: Costo no encontrado
+ */
+
+/**
+ * @swagger
  * /costos/costos-lote/{loteId}:
  *   get:
- *     tags:
- *       - costos
- *     summary: Obtener costos por lote
+ *     summary: Listar todos los costos de un lote
+ *     tags: [Costos]
  *     security:
- *       - cookieAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: loteId
@@ -114,81 +110,28 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *         description: ID del lote
  *     responses:
  *       200:
- *         description: Lista de costos obtenida correctamente
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Costo'
+ *         description: Costos obtenidos correctamente
+ *       400:
+ *         description: ID de lote inválido
  *       401:
  *         description: Usuario no autenticado
- *         content:
- *           application/json:
- *             example:
- *               message: Usuario no autenticado
  *       403:
- *         description: No tiene permisos para ver los costos de este lote
- *         content:
- *           application/json:
- *             example:
- *               message: No tiene permisos para ver los costos de este lote
+ *         description: No tiene permisos para ver los costos
  *       404:
  *         description: Lote no encontrado
- *         content:
- *           application/json:
- *             example:
- *               message: Lote no encontrado
- *
- * /costos/detalle/{id}:
- *   get:
- *     tags:
- *       - costos
- *     summary: Obtener detalle de un costo
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: Costo obtenido correctamente
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Costo'
- *       401:
- *         description: Usuario no autenticado
- *         content:
- *           application/json:
- *             example:
- *               message: Usuario no autenticado
- *       403:
- *         description: No tiene permisos para ver este costo
- *         content:
- *           application/json:
- *             example:
- *               message: No tiene permisos para ver este costo
- *       404:
- *         description: Costo no encontrado
- *         content:
- *           application/json:
- *             example:
- *               message: Costo no encontrado
- *
+ */
+
+/**
+ * @swagger
  * /costos/actualizar/{id}:
  *   put:
- *     tags:
- *       - costos
- *     summary: Actualizar un costo
+ *     summary: Actualizar un costo existente
+ *     tags: [Costos]
  *     security:
- *       - cookieAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -196,51 +139,44 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *         description: ID del costo
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ActualizarCostoRequest'
+ *             type: object
+ *             properties:
+ *               concepto:
+ *                 type: string
+ *                 example: "Leche pasteurizada"
+ *               monto:
+ *                 type: number
+ *                 example: 1300
+ *               observaciones:
+ *                 type: string
+ *                 example: "Actualización de monto"
  *     responses:
  *       200:
  *         description: Costo actualizado correctamente
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Costo'
  *       400:
- *         description: Datos inválidos
- *         content:
- *           application/json:
- *             example:
- *               message: Datos inválidos
+ *         description: Datos inválidos o lote terminado
  *       401:
  *         description: Usuario no autenticado
- *         content:
- *           application/json:
- *             example:
- *               message: Usuario no autenticado
  *       403:
- *         description: No tiene permisos para actualizar este costo
- *         content:
- *           application/json:
- *             example:
- *               message: No tiene permisos para actualizar este costo
+ *         description: No tiene permisos
  *       404:
  *         description: Costo no encontrado
- *         content:
- *           application/json:
- *             example:
- *               message: Costo no encontrado
- *
+ */
+
+/**
+ * @swagger
  * /costos/eliminar/{id}:
  *   delete:
- *     tags:
- *       - costos
  *     summary: Eliminar un costo
+ *     tags: [Costos]
  *     security:
- *       - cookieAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -248,29 +184,16 @@
  *         schema:
  *           type: string
  *           format: uuid
+ *         description: ID del costo a eliminar
  *     responses:
  *       200:
  *         description: Costo eliminado correctamente
- *         content:
- *           application/json:
- *             example:
- *               message: Costo eliminado correctamente
+ *       400:
+ *         description: No se puede eliminar (lote terminado)
  *       401:
  *         description: Usuario no autenticado
- *         content:
- *           application/json:
- *             example:
- *               message: Usuario no autenticado
  *       403:
- *         description: No tiene permisos para eliminar este costo
- *         content:
- *           application/json:
- *             example:
- *               message: No tiene permisos para eliminar este costo
+ *         description: No tiene permisos
  *       404:
  *         description: Costo no encontrado
- *         content:
- *           application/json:
- *             example:
- *               message: Costo no encontrado
  */

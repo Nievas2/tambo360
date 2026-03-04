@@ -7,7 +7,6 @@ import {
   Eye,
   DropletOff,
   BanknoteArrowUp,
-  Trash,
   Ellipsis,
   Pencil,
 } from 'lucide-react'
@@ -43,6 +42,7 @@ import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import { Badge } from '@/src/components/common/badge'
 import { Batch } from '@/src/types/batch'
 import { useBatches } from '@/src/hooks/batch/useBatches'
+import DeleteBatch from '@/src/components/shared/dashboard/batch/DeleteBatch'
 
 const Produccion: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
@@ -231,11 +231,17 @@ const Produccion: React.FC = () => {
                                   setSelectedBatch(batch)
                                   setIsChangeBatchOpen(true)
                                 }}
+                                disabled={
+                                  batch.costosDirectos.length > 0 ||
+                                  batch.mermas.length > 0 ||
+                                  batch.estado
+                                }
                               >
                                 <Pencil /> Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => setIsChangeDecreaseOpen(true)}
+                                disabled={batch.estado}
                               >
                                 <DropletOff /> Registrar merma
                               </DropdownMenuItem>
@@ -244,6 +250,7 @@ const Produccion: React.FC = () => {
                                   setLoteId(batch.idLote)
                                   setIsChangeCostOpen(true)
                                 }}
+                                disabled={batch.estado}
                               >
                                 <BanknoteArrowUp /> Registrar costo
                               </DropdownMenuItem>
@@ -252,9 +259,7 @@ const Produccion: React.FC = () => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuGroup>
-                              <DropdownMenuItem disabled={true}>
-                                <Trash /> Eliminar
-                              </DropdownMenuItem>
+                              <DeleteBatch batch={batch} />
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
