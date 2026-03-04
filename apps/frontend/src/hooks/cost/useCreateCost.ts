@@ -22,6 +22,13 @@ export function useCreateCost() {
       return data
     },
 
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.cost.lists() })
+      const previous = queryClient.getQueryData(queryKeys.cost.lists())
+      queryClient.setQueryData(queryKeys.cost.lists(), () => previous)
+      return { previous }
+    },
+
     onError: (error, _, context: { previous: unknown } | undefined) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKeys.cost.lists(), context.previous)
@@ -29,8 +36,11 @@ export function useCreateCost() {
       throw error
     },
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cost.lists() })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.batch.detail(variables.id),
+      })
     },
   })
 }

@@ -11,6 +11,7 @@ import {
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
+import CostTable from '@/src/components/shared/dashboard/cost/CostTable'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import { StatCard } from '@/src/components/shared/StatCard'
 import { useBatch } from '@/src/hooks/batch/useBatch'
@@ -29,9 +30,9 @@ export default function BatchDetails() {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false) // Nuevo estado
-  const { data: batch, isLoading, refetch } = useBatch({ id: id })
+  const { data: batch, isPending, refetch } = useBatch({ id: id })
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-screen space-y-6 animate-pulse">
         {/* Header skeleton */}
@@ -156,7 +157,7 @@ export default function BatchDetails() {
             value={
               '$' +
               batch?.data?.costosDirectos
-                .reduce((total, costo) => total + costo.monto, 0)
+                .reduce((total, costo) => total + Number(costo.monto), 0)
                 .toString()
             }
           />
@@ -210,7 +211,6 @@ export default function BatchDetails() {
               </Button>
 
               <Button
-                className="w-52"
                 onClick={() => setIsChangeDecreaseOpen(true)}
                 disabled={batch?.data?.estado}
               >
@@ -245,7 +245,7 @@ export default function BatchDetails() {
         </Card>
 
         <Card className="py-2">
-          <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+          <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex gap-1">
               <p className="text-md font-bold">Historial de costos</p>
             </div>
@@ -255,7 +255,6 @@ export default function BatchDetails() {
               </Button>
 
               <Button
-                className="w-52"
                 onClick={() => setIsChangeCostOpen(true)}
                 disabled={batch?.data?.estado}
               >
@@ -264,29 +263,12 @@ export default function BatchDetails() {
             </div>
           </div>
 
-          <CardContent className="p-0">
-            {batch?.data?.costosDirectos.length === 0 && (
-              <Empty className="w-full gap-4">
-                <EmptyHeader>
-                  <EmptyTitle className="font-bold">
-                    Sin costos registrados
-                  </EmptyTitle>
-                </EmptyHeader>
-                <EmptyContent className="w-full max-w-xl">
-                  <EmptyDescription className="w-full">
-                    No se han reportado pérdidas ni ajustes para este lote hasta
-                    el momento.
-                  </EmptyDescription>
-                  <Button
-                    onClick={() => setIsChangeCostOpen(true)}
-                    disabled={batch?.data?.estado}
-                  >
-                    Registrar costo
-                  </Button>
-                </EmptyContent>
-              </Empty>
-            )}
-          </CardContent>
+          <CostTable
+            changeCost={() => setIsChangeCostOpen(true)}
+            batch={batch?.data}
+            disabled={batch?.data?.estado}
+            isPending={isPending}
+          />
         </Card>
       </div>
 

@@ -63,6 +63,7 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
         await updateCost({
           values: data,
           id: cost.idCostoDirecto,
+          loteId: loteId!,
         })
         closeDialog()
       } else {

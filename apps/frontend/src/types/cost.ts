@@ -18,7 +18,7 @@ export type UpdateCostData = z.infer<typeof UpdateCostSchema>
 export interface Cost {
   idCostoDirecto: string
   concepto: string
-  monto: number
+  monto: string
   moneda: string
   fechaCreacion: string
   idLote: string
