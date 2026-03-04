@@ -136,7 +136,7 @@ export const listarPorMes = async (req: Request, res: Response, next: NextFuncti
 
         const respuesta = await LoteService.listarPorMes(user.id)
 
-        return res.status(200).json(ApiResponse.success(respuesta, "prueba"));
+        return res.status(200).json(ApiResponse.success(respuesta, "Resumen del mes actual"));
     } catch (error) {
         next(error);
     }

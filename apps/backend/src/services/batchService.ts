@@ -1,6 +1,9 @@
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { CrearLoteDTO } from "../schemas/batchSchema";
+import { Categoria, CostosDirecto, Merma } from "@prisma/client";
+import { InfoMes, SummaryResult } from "../types";
+import { meses } from "../utils/data";
 
 export class LoteService {
 
@@ -209,28 +212,86 @@ export class LoteService {
     }
 
     static async listarPorMes(userId: string) {
-        const hoy = new Date();
-        const anio = hoy.getFullYear();
-        const mes = hoy.getMonth() + 1; // 0-11, por eso +1
-        const fechaInicio = new Date(anio, mes - 1, 1); // 1er día del mes
-        const fechaFin = new Date(anio, mes, 0, 23, 59, 59, 999); // último día del mes
+        // Fechas del mes actual
+        const hoy = new Date()
+        const anio = hoy.getFullYear()
+        const mes = hoy.getMonth() + 1 // 0-11, por eso +1
 
-        const result = await prisma.loteProduccion.findMany({
-            where: {
-                establecimiento: {
-                    idUsuario: userId
+        const fechaInicio = new Date(anio, mes - 1, 1)
+        const fechaFin = new Date(anio, mes, 0, 23, 59, 59, 999)
+
+        // Fechas del mes anterior
+        const mesAnterior = mes - 1
+        const anioAnterior = mesAnterior === 0 ? anio - 1 : anio
+        const mesAnteriorNormalizado = mesAnterior === 0 ? 12 : mesAnterior
+
+        const fechaInicioMesAnterior = new Date(anioAnterior, mesAnteriorNormalizado - 1, 1)
+        const fechaFinMesAnterior = new Date(anioAnterior, mesAnteriorNormalizado, 0, 23, 59, 59, 999)
+
+        // Consultas en paralelo
+        const [resultActual, resultPrev] = await Promise.all([
+            prisma.loteProduccion.findMany({
+                where: {
+                    establecimiento: { idUsuario: userId },
+                    fechaProduccion: { gte: fechaInicio, lte: fechaFin }
                 },
-                fechaProduccion: {
-                    gte: fechaInicio,
-                    lte: fechaFin
+                include: { mermas: true, costosDirectos: true, producto: true }
+            }),
+            prisma.loteProduccion.findMany({
+                where: {
+                    establecimiento: { idUsuario: userId },
+                    fechaProduccion: { gte: fechaInicioMesAnterior, lte: fechaFinMesAnterior }
+                },
+                include: { mermas: true, costosDirectos: true, producto: true }
+            })
+        ])
+
+
+        // Función para armar resumen
+        const buildSummary = (result: InfoMes) => {
+            const summary = result.reduce<SummaryResult>((acc, lote) => {
+                const category = lote.producto.categoria
+                if (!acc[category]) {
+                    acc[category] = { cantidad: 0, costos: 0, mermas: 0 }
                 }
-            },
-            include: {
-                mermas: true,
-                costosDirectos: true
+                acc[category].cantidad += Number(lote.cantidad)
+                acc[category].costos += lote.costosDirectos.reduce((sum: number, costo: CostosDirecto) => sum + Number(costo.monto), 0)
+                acc[category].mermas += lote.mermas.reduce((sum: number, merma: Merma) => sum + Number(merma.cantidad), 0)
+                return acc
+            }, {})
+
+
+            const totalMermas = Object.values(summary).reduce((sum, cat: any) => sum + cat.mermas, 0)
+            const totalCostos = Object.values(summary).reduce((sum, cat: any) => sum + cat.costos, 0)
+
+            return {
+                leches: summary.leches?.cantidad || 0,
+                quesos: summary.quesos?.cantidad || 0,
+                mermas: totalMermas,
+                costos: totalCostos
             }
-        })
-        
-        return result
+        }
+
+        const actual = buildSummary(resultActual)
+        const prev = buildSummary(resultPrev)
+
+        // Función para calcular variación porcentual
+        const variacion = (actual: number, anterior: number): number | null => {
+            if (anterior === 0) return null // no hay mes previo
+            return ((actual - anterior) / anterior) * 100
+        }
+
+        const variaciones = {
+            leches: variacion(actual.leches, prev.leches),
+            quesos: variacion(actual.quesos, prev.quesos),
+            mermas: variacion(actual.mermas, prev.mermas),
+            costos: variacion(actual.costos, prev.costos)
+        }
+
+        return { actual, variaciones, mesPrevio: meses[mesAnterior - 1] }
     }
 }
+
+
+
+

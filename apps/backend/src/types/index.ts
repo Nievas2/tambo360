@@ -1,7 +1,10 @@
+import { Categoria, ConceptoCosto, Merma, TipoMerma, Unidad } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+
 declare module 'express' {
   interface Request {
     user?: { id: string };
-     
+
   }
 }
 
@@ -21,3 +24,38 @@ interface ValidationError {
   message: string;
 }
 export { RegistrationData, LoginData, ValidationError };
+
+export type InfoMes = {
+  idLote: string;
+  numeroLote: number;
+  fechaProduccion: Date;
+  cantidad: Decimal;
+  unidad: Unidad;
+  estado: boolean;
+  idProducto: string;
+  idEstablecimiento: string;
+  producto: {
+    idProducto: string;
+    nombre: string;
+    categoria: Categoria;
+  };
+  mermas: {
+    idLote: string;
+    cantidad: Decimal;
+    fechaCreacion: Date;
+    idMerma: string;
+    tipo: TipoMerma;
+    observacion: string | null;
+  }[];
+  costosDirectos: {
+    idLote: string;
+    fechaCreacion: Date;
+    idCostoDirecto: string;
+    concepto: ConceptoCosto;
+    monto: Decimal;
+    observaciones: string | null;
+  }[];
+}[]
+
+type CategorySummary = { cantidad: number; costos: number; mermas: number; };
+export type SummaryResult = Record<string, CategorySummary>;
