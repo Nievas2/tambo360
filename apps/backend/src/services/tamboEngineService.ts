@@ -5,6 +5,26 @@ const IA_URL = process.env.TAMBO_AI_URL || "http://127.0.0.1:8000";
 const MINIMO_LOTES = 15;
 
 export class TamboEngineService {
+    private static async fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (error: any) {
+            clearTimeout(id);
+            if (error.name === 'AbortError') {
+                throw new AppError("Timeout: La IA tardó demasiado en responder", 504);
+            }
+            throw new AppError("Error de red: No se pudo conectar con la IA", 503);
+        }
+    }
+
     static async analizarSiCorresponde(idEstablecimiento: string) {
         try {
             // 1. Buscar todos los lotes COMPLETOS del establecimiento
@@ -41,46 +61,56 @@ export class TamboEngineService {
                 }))
             };
 
-            // 4. Llamar al servicio de IA
-            const response = await fetch(`${IA_URL}/api/v1/tambo/analyze`, {
+            // 4. Llamar al servicio de IA con Timeout ampliado para análisis pesado (10s)
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/analyze`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            });
+            }, 10000);
 
             if (!response.ok) {
-                console.error("[TamboEngine] Error de análisis:", await response.text());
+                console.error(`[TamboEngine] Error de análisis (HTTP ${response.status}):`, await response.text());
             } else {
                 console.log("[TamboEngine] Análisis completado correctamente");
             }
-        } catch (error) {
-            console.error("[TamboEngine] Excepción al disparar análisis:", error);
+        } catch (error: any) {
+            // Como este es un proceso de fondo disparado desde un endpoint, solo logueamos para no romper la app
+            console.error("[TamboEngine] Falló el análisis en background:", error.message || error);
         }
     }
 
     static async getAlertas(idEstablecimiento: string) {
         try {
-            const response = await fetch(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`);
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`, {}, 5000);
+
             if (!response.ok) {
-                throw new Error("Error HTTP de la IA: " + response.status);
+                if (response.status === 404) return []; // Si no hay respuestas de IA aún, retornar array vacío
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
+
             return await response.json();
-        } catch (error) {
+        } catch (error: any) {
             console.error("[TamboEngine] Error consultando alertas:", error);
-            throw new AppError("Error conectando con el servicio de Inteligencia Artificial", 502);
+            // Re-lanzamos el AppError si ya lo es, sino envolvemos en un 502 generico
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada.", 502);
         }
     }
 
     static async getUltimasAlertas(idEstablecimiento: string) {
         try {
-            const response = await fetch(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/ultimas`);
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/ultimas`, {}, 5000);
+
             if (!response.ok) {
-                throw new Error("Error HTTP de la IA: " + response.status);
+                if (response.status === 404) return [];
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
+
             return await response.json();
-        } catch (error) {
+        } catch (error: any) {
             console.error("[TamboEngine] Error consultando últimas alertas:", error);
-            throw new AppError("Error conectando con el servicio de Inteligencia Artificial", 502);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada.", 502);
         }
     }
 }
