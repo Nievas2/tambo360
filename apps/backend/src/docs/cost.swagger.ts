@@ -27,16 +27,20 @@
  *               loteId:
  *                 type: string
  *                 format: uuid
- *                 example: "b2c3d4e5-6789-01ab-cdef-234567890abc"
  *               concepto:
  *                 type: string
- *                 example: "Leche en polvo"
+ *                 enum:
+ *                   - insumos_basicos
+ *                   - leche_cruda
+ *                   - cuajo_y_fermentos
+ *                   - refrigeracion
+ *                 example: leche_cruda
  *               monto:
  *                 type: number
  *                 example: 1200.50
  *               observaciones:
  *                 type: string
- *                 example: "Costo estimado para producción del lote"
+ *                 example: Costo estimado para producción del lote
  *     responses:
  *       201:
  *         description: Costo registrado correctamente
@@ -45,23 +49,40 @@
  *             schema:
  *               type: object
  *               properties:
- *                 statusCode: { type: integer, example: 201 }
- *                 message: { type: string, example: "Costo registrado correctamente" }
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 201
+ *                 message:
+ *                   type: string
+ *                   example: Costo registrado correctamente
  *                 data:
  *                   type: object
  *                   properties:
- *                     idCostoDirecto: { type: string, format: uuid }
- *                     idLote: { type: string, format: uuid }
- *                     concepto: { type: string }
- *                     monto: { type: number }
- *                     observaciones: { type: string, nullable: true }
- *                     fechaCreacion: { type: string, format: date-time }
+ *                     idCostoDirecto:
+ *                       type: string
+ *                       format: uuid
+ *                     idLote:
+ *                       type: string
+ *                       format: uuid
+ *                     concepto:
+ *                       type: string
+ *                     monto:
+ *                       type: number
+ *                     observaciones:
+ *                       type: string
+ *                       nullable: true
+ *                     fechaCreacion:
+ *                       type: string
+ *                       format: date-time
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
  *       400:
  *         description: Datos inválidos o lote terminado
  *       401:
  *         description: Usuario no autenticado
  *       403:
- *         description: No tiene permisos para ese lote
+ *         description: No tiene permisos
  *       404:
  *         description: Lote no encontrado
  */
@@ -81,10 +102,42 @@
  *         schema:
  *           type: string
  *           format: uuid
- *         description: ID del costo
  *     responses:
  *       200:
  *         description: Costo obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Costo obtenido correctamente
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     idCostoDirecto:
+ *                       type: string
+ *                       format: uuid
+ *                     idLote:
+ *                       type: string
+ *                       format: uuid
+ *                     concepto:
+ *                       type: string
+ *                     monto:
+ *                       type: number
+ *                     observaciones:
+ *                       type: string
+ *                       nullable: true
+ *                     fechaCreacion:
+ *                       type: string
+ *                       format: date-time
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
  *       400:
  *         description: ID inválido
  *       401:
@@ -110,16 +163,47 @@
  *         schema:
  *           type: string
  *           format: uuid
- *         description: ID del lote
  *     responses:
  *       200:
  *         description: Costos obtenidos correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Costos obtenidos correctamente
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       idCostoDirecto:
+ *                         type: string
+ *                         format: uuid
+ *                       concepto:
+ *                         type: string
+ *                       monto:
+ *                         type: number
+ *                       observaciones:
+ *                         type: string
+ *                         nullable: true
+ *                       fechaCreacion:
+ *                         type: string
+ *                         format: date-time
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
  *       400:
  *         description: ID de lote inválido
  *       401:
  *         description: Usuario no autenticado
  *       403:
- *         description: No tiene permisos para ver los costos
+ *         description: No tiene permisos
  *       404:
  *         description: Lote no encontrado
  */
@@ -139,7 +223,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *         description: ID del costo
  *     requestBody:
  *       required: true
  *       content:
@@ -149,13 +232,15 @@
  *             properties:
  *               concepto:
  *                 type: string
- *                 example: "Leche pasteurizada"
+ *                 enum:
+ *                   - insumos_basicos
+ *                   - leche_cruda
+ *                   - cuajo_y_fermentos
+ *                   - refrigeracion
  *               monto:
  *                 type: number
- *                 example: 1300
  *               observaciones:
  *                 type: string
- *                 example: "Actualización de monto"
  *     responses:
  *       200:
  *         description: Costo actualizado correctamente
@@ -184,7 +269,6 @@
  *         schema:
  *           type: string
  *           format: uuid
- *         description: ID del costo a eliminar
  *     responses:
  *       200:
  *         description: Costo eliminado correctamente

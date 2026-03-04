@@ -35,9 +35,6 @@
  *                 type: string
  *                 format: date
  *                 example: "01/03/2026"
- *               estado:
- *                 type: boolean
- *                 example: false
  *     responses:
  *       201:
  *         description: Lote creado correctamente
@@ -175,6 +172,52 @@
 
 /**
  * @swagger
+ * /lote/actualizar/{idLote}:
+ *   put:
+ *     summary: Editar un lote existente
+ *     tags: [Lotes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idLote
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del lote a editar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idProducto:
+ *                 type: string
+ *                 format: uuid
+ *                 example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+ *               cantidad:
+ *                 type: number
+ *                 example: 150
+ *               fechaProduccion:
+ *                 type: string
+ *                 example: "03/03/2026"
+ *     responses:
+ *       200:
+ *         description: Lote actualizado correctamente
+ *       400:
+ *         description: Datos inválidos o lote con información asociada
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: No tiene permisos
+ *       404:
+ *         description: Lote no encontrado
+ */
+
+/**
+ * @swagger
  * /lote/eliminar/{idLote}:
  *   delete:
  *     summary: Eliminar un lote
@@ -246,4 +289,6 @@
  *         description: Usuario sin establecimiento
  *       401:
  *         description: Usuario no autenticado
+ *       404:
+ *         description: No hay producción registrada para el día de hoy
  */
