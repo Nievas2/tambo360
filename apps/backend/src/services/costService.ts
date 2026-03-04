@@ -2,6 +2,8 @@ import { prisma } from "../lib/prisma";
 import { CrearCostoDTO, ActualizarCostoDTO } from "../schemas/costShema";
 import { AppError } from "../utils/AppError";
 
+
+
 class ServicioCostos {
 
     async crear(idUsuario: string, data: CrearCostoDTO) {
@@ -22,6 +24,7 @@ class ServicioCostos {
         if (lote.estado) {
             throw new AppError("No se pueden agregar costos a un lote terminado", 400);
         }
+
 
 
         return prisma.costosDirecto.create({
@@ -102,6 +105,7 @@ class ServicioCostos {
         if (costo.lote.estado) {
             throw new AppError("No se pueden modificar costos de un lote terminado", 400);
         }
+
 
         return prisma.costosDirecto.update({
             where: { idCostoDirecto: id },

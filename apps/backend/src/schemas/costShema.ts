@@ -1,19 +1,12 @@
 import { z } from "zod";
+import { ConceptoCosto } from "@prisma/client";
 
-const conceptoEnumValues = [
-    "insumos_basicos",
-    "leche_cruda",
-    "cuajo_y_fermentos",
-    "refrigeracion",
-] as const;
+
 
 export const crearCostoSchema = z.object({
     loteId: z.string().uuid("loteId inválido"),
 
-    concepto: z.string().refine(
-        (val) => conceptoEnumValues.includes(val as typeof conceptoEnumValues[number]),
-        { message: `El concepto debe ser uno de: ${conceptoEnumValues.join(", ")}` }
-    ),
+    concepto: z.nativeEnum(ConceptoCosto),
 
     monto: z.coerce
         .number()
@@ -32,10 +25,7 @@ export const crearCostoSchema = z.object({
 
 export const actualizarCostoSchema = z.object({
 
-    concepto: z.string().refine(
-        (val) => conceptoEnumValues.includes(val as typeof conceptoEnumValues[number]),
-        { message: `El concepto debe ser uno de: ${conceptoEnumValues.join(", ")}` }
-    ).optional(),
+    concepto: z.nativeEnum(ConceptoCosto).optional(),
 
     monto: z.coerce
         .number()
