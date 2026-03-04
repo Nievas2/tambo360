@@ -43,7 +43,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
   ]
 
   return (
-    <Sidebar className="w-full border-none h-full bg-white">
+    <Sidebar className="w-full border-none h-full bg-[#F1F5F9]">
       <SidebarHeader
         className={`transition-all duration-300 ${isCollapsed ? 'p-4' : 'p-8'}`}
       >
@@ -70,14 +70,17 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
       <SidebarContent className="px-4 flex flex-col justify-between h-full pb-8">
         <SidebarMenu>
           {mainMenuItems.map((item) => {
-            const isActive = location.pathname === item.url
+            const isActive =
+              item.url === '/'
+                ? location.pathname === '/'
+                : location.pathname.startsWith(item.url)
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
                   className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                     isCollapsed ? 'justify-center' : 'justify-start'
-                  } ${isActive ? 'bg-[#BABABA] text-white! border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+                  } ${isActive ? 'bg-[#D7ECAF] hover:bg-[#D7ECAF]/60 hover:text-[#669213]/60 border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Link
                     to={item.url}
@@ -85,11 +88,11 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                     data-test-id={item.data}
                   >
                     <item.icon
-                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-black' : 'text-gray-400'}`}
+                      className={`h-5 w-5 shrink-0 ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
                     />
                     {!isCollapsed && (
                       <span
-                        className={`font-semibold ${isActive ? 'text-black' : 'text-gray-400'}`}
+                        className={`font-semibold ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
                       >
                         {item.title}
                       </span>
@@ -107,7 +110,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
               asChild
               className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center group ${
                 isCollapsed ? 'justify-center' : 'justify-start'
-              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] text-white!' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+              } ${location.pathname === '/perfil' ? 'bg-[#D7ECAF] text-[#669213]' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
             >
               <Button
                 onClick={() => logout()}
