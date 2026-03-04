@@ -68,7 +68,7 @@ const DecreaseTable = ({ batch, isPending }: DecreaseTableProps) => {
         </Empty>
       ) : (
         <Table>
-          <TableHeader className="bg-[#EAEAEA]">
+          <TableHeader className="bg-tables">
             <TableRow>
               <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                 Fecha
