@@ -5,13 +5,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/src/components/common/label'
 import { RegisterSchema } from '@/src/types/register'
 import { Input } from '@/src/components/common/Input'
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 interface RegisterFormProps {
   handleNextStep: () => void
+  // Deshabilitamos ESLint para esta línea porque el nombre del parámetro es necesario
+  // pero no se usa en este archivo (solo es parte de la firma)
+  // eslint-disable-next-line no-unused-vars
   handleAddEmail: (email: string) => void
 }
+
 const RegisterForm = ({
   handleNextStep,
   handleAddEmail,
@@ -37,10 +41,10 @@ const RegisterForm = ({
   const onSubmit = handleSubmit(async (data) => {
     try {
       await mutateAsync(data)
-      handleAddEmail(data.correo)
+      handleAddEmail(data.correo) // aquí se usa el parámetro, pero ESLint no lo ve porque está en la definición del tipo
       handleNextStep()
     } catch (err) {
-      console.error('Error al iniciar sesión:', err)
+      console.error('Error al registrarse:', err)
     }
   })
 
@@ -56,7 +60,6 @@ const RegisterForm = ({
             data-test-id="nombre-registro"
             disabled={isPending}
           />
-
           {errors.nombre && (
             <small className="text-red-500">{errors.nombre.message}</small>
           )}
@@ -64,16 +67,13 @@ const RegisterForm = ({
 
         {/* Email */}
         <div className="space-y-2">
-          <Label className="font-bold text-[#1a1c1e]">
-            Correo electrónico*
-          </Label>
+          <Label className="font-bold text-[#1a1c1e]">Correo electrónico*</Label>
           <Input
             placeholder="Ingresa tu correo electrónico"
             {...register('correo')}
             data-test-id="email-registro"
             disabled={isPending}
           />
-
           {errors.correo && (
             <small className="text-red-500">{errors.correo.message}</small>
           )}
@@ -81,9 +81,7 @@ const RegisterForm = ({
 
         {/* Password */}
         <div className="space-y-2">
-          <Label title="Contraseña" className="font-bold text-[#1a1c1e]">
-            Contraseña*
-          </Label>
+          <Label title="Contraseña" className="font-bold text-[#1a1c1e]">Contraseña*</Label>
           <div className="relative">
             <Input
               type={showPassword ? 'text' : 'password'}
@@ -92,40 +90,24 @@ const RegisterForm = ({
               data-test-id="password-registro"
               disabled={isPending}
             />
-
             <Button
               type="button"
               variant="ghost"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
             >
-              {showPassword ? (
-                <EyeClosed className="w-5 h-5" />
-              ) : (
-                <EyeIcon className="w-5 h-5" />
-              )}
+              {showPassword ? <EyeClosed className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
             </Button>
           </div>
-
-          <small>
-            <b>Requisitos:</b> 8 caracteres, mayúscula (A-Z), minúscula(a-z) y
-            carácter especial.
-          </small>
-
-          <div>
-            {errors.contraseña && (
-              <small className="text-red-500">
-                {errors.contraseña.message}
-              </small>
-            )}
-          </div>
+          <small><b>Requisitos:</b> 8 caracteres, mayúscula, minúscula y carácter especial.</small>
+          {errors.contraseña && (
+            <div><small className="text-red-500">{errors.contraseña.message}</small></div>
+          )}
         </div>
 
         {/* Confirmar Password */}
         <div className="space-y-2">
-          <Label title="Contraseña" className="font-bold text-[#1a1c1e]">
-            Confirmar contraseña*
-          </Label>
+          <Label title="Contraseña" className="font-bold text-[#1a1c1e]">Confirmar contraseña*</Label>
           <div className="relative">
             <Input
               type={showConfirmPassword ? 'text' : 'password'}
@@ -134,31 +116,24 @@ const RegisterForm = ({
               data-test-id="confirm-password"
               disabled={isPending}
             />
-
             <Button
               type="button"
               variant="ghost"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
             >
-              {showConfirmPassword ? (
-                <EyeClosed className="size-5" />
-              ) : (
-                <Eye className="size-5" />
-              )}
+              {showConfirmPassword ? <EyeClosed className="size-5" /> : <Eye className="size-5" />}
             </Button>
           </div>
-
           {errors.confirmarContraseña && (
-            <small className="text-red-500">
-              {errors.confirmarContraseña.message}
-            </small>
+            <small className="text-red-500">{errors.confirmarContraseña.message}</small>
           )}
-
           {error && (
-            <small className="text-red-700">
-              {error.response.data.message || 'Error al iniciar sesión'}
-            </small>
+            <div className="pt-2">
+              <small className="text-red-700">
+                {error.response?.data?.message || 'Error al crear la cuenta. Inténtalo de nuevo.'}
+              </small>
+            </div>
           )}
         </div>
       </div>

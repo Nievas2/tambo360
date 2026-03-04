@@ -10,7 +10,6 @@ import { EyeIcon, ArrowRight } from 'lucide-react'
 import { LoginSchema } from '@/src/types/login'
 import { useForm } from 'react-hook-form'
 import React, { useState } from 'react'
-import { ROUTES } from '../constants/routes'
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -33,7 +32,8 @@ const Login: React.FC = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const response = await mutateAsync(data)
-      login({ token: response.data.token, user: response.data.user })
+      // Se eliminó .data porque el hook ya devuelve el objeto directo
+      login({ token: response.token, user: response.user })
       navigate('/dashboard')
     } catch (err) {
       console.error('Error al iniciar sesión:', err)
@@ -69,11 +69,12 @@ const Login: React.FC = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="font-bold text-[#1a1c1e]">Correo electrónico</Label>
-                  <Input
+                  <input
                     type="email"
                     autoComplete="username"
                     placeholder="Ingresa tu correo electrónico"
                     {...register('correo')}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     data-test-id="email-login"
                     disabled={isPending}
                   />
@@ -113,7 +114,7 @@ const Login: React.FC = () => {
                   </div>
                   {error && (
                     <small className="text-red-700">
-                      {(error as any).response?.data?.message || 'Error al iniciar sesión'}
+                      {error.response?.data?.message || 'Error al iniciar sesión. Por favor, intenta de nuevo.'}
                     </small>
                   )}
                 </div>
