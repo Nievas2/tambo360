@@ -8,13 +8,21 @@ import {
 } from '@/src/components/common/dialog'
 import { Input } from '@/src/components/common/Input'
 import { Label } from '@/src/components/common/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/components/common/select'
 import { useCreateCost } from '@/src/hooks/cost/useCreateCost'
 import { useUpdateCost } from '@/src/hooks/cost/useUpdateCost'
-import { Cost, UpdateCostSchema } from '@/src/types/cost'
+import { Concept, Cost, UpdateCostSchema } from '@/src/types/cost'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 
 interface ChangeCostProps {
   open: boolean
@@ -35,10 +43,12 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
     formState: { errors },
     handleSubmit,
     reset,
+    control,
   } = useForm({
     defaultValues: {
-      concepto: '',
+      concepto: Concept.insumos_basicos,
       monto: '',
+      observaciones: '',
     },
     resolver: zodResolver(UpdateCostSchema),
   })
@@ -46,13 +56,15 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
   useEffect(() => {
     if (cost) {
       reset({
-        concepto: cost.concepto,
+        concepto: cost.concepto as Concept,
         monto: cost.monto.toString(),
+        observaciones: cost.observaciones,
       })
     } else {
       reset({
-        concepto: '',
+        concepto: Concept.insumos_basicos,
         monto: '',
+        observaciones: '',
       })
     }
   }, [cost, reset])
@@ -99,14 +111,40 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
           <div className="space-y-2">
             <Label>Concepto del costo*</Label>
 
-            <Input
-              placeholder="transporte refrigerado"
-              {...register('concepto')}
-              disabled={isPending || isUpdatePending}
+            <Controller
+              name="concepto"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isPending}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Seleccionar tipo de merma..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value={Concept.insumos_basicos}>
+                        Insumos básicos
+                      </SelectItem>
+                      <SelectItem value={Concept.leche_cruda}>
+                        Leche cruda
+                      </SelectItem>
+                      <SelectItem value={Concept.cuajo_y_fermentos}>
+                        Cuajo y fermentos
+                      </SelectItem>
+                      <SelectItem value={Concept.refrigeracion}>
+                        Refrigeración
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
             />
 
             {errors.concepto && (
-              <span className="text-xs text-red-600">
+              <span className="text-xs text-red-main">
                 {errors.concepto.message}
               </span>
             )}
@@ -122,26 +160,41 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
             />
 
             {errors.monto && (
-              <span className="text-xs text-red-600">
+              <span className="text-xs text-red-main">
                 {errors.monto.message}
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Observaciones*</Label>
+            <Input
+              placeholder="Observaciones"
+              {...register('observaciones')}
+              disabled={isPending || isUpdatePending}
+            />
+
+            {errors.observaciones && (
+              <span className="text-xs text-red-main">
+                {errors.observaciones.message}
               </span>
             )}
 
             {error && (
-              <span className="text-xs text-red-600">
+              <span className="text-xs text-red-main">
                 {error.response.data.message}
               </span>
             )}
 
             {updateError && (
-              <span className="text-xs text-red-600">
+              <span className="text-xs text-red-main">
                 {updateError.response.data.message}
               </span>
             )}
           </div>
 
           <span className="flex items-center gap-2 text-xs">
-            <AlertCircle className="size-5 text-red-600" /> Verifica que los
+            <AlertCircle className="size-5 text-red-main" /> Verifica que los
             datos sean correctos antes de {cost ? 'actualizar' : 'registrar'}{' '}
             los costo
           </span>

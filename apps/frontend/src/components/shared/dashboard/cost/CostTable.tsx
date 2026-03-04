@@ -27,7 +27,7 @@ import { ConfirmDeleteDialog } from '@/src/components/shared/dashboard/batch/Del
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import { useDeleteCost } from '@/src/hooks/cost/useDeleteCost'
 import { Batch } from '@/src/types/batch'
-import { Cost } from '@/src/types/cost'
+import { CONCEPTO_LABELS, Cost } from '@/src/types/cost'
 import { Ellipsis, Pencil, Trash } from 'lucide-react'
 import { useState } from 'react'
 
@@ -75,18 +75,21 @@ const CostTable = ({
         </Empty>
       ) : (
         <Table>
-          <TableHeader className="bg-[#EAEAEA]">
+          <TableHeader className="bg-tables">
             <TableRow>
-              <TableHead className="w-24 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+              <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                 Fecha
               </TableHead>
-              <TableHead className="w-[50%] min-w-40 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+              <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                 Tipo
               </TableHead>
-              <TableHead className="w-64 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+              <TableHead className="w-[15%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                 Cantidad
               </TableHead>
-              <TableHead className="pr-6 pl-4 w-32 text-right font-bold text-gray-400 uppercase text-xs tracking-wider">
+              <TableHead className="w-[55%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                Observación
+              </TableHead>
+              <TableHead className="pr-6 pl-4 w-[10%] text-right font-bold text-gray-400 uppercase text-xs tracking-wider">
                 Acción
               </TableHead>
             </TableRow>
@@ -119,9 +122,14 @@ const CostTable = ({
                         .reverse()
                         .join('/')}
                     </TableCell>
-                    <TableCell>{cost.concepto}</TableCell>
+                    <TableCell>
+                      {CONCEPTO_LABELS[cost.concepto] || cost.concepto}
+                    </TableCell>
                     <TableCell>
                       $ {Number(cost.monto).toLocaleString('es-AR')}
+                    </TableCell>
+                    <TableCell>
+                      {cost.observaciones || 'Sin observaciones'}
                     </TableCell>
                     <TableCell className="text-center mr-2">
                       <DropdownMenu>
