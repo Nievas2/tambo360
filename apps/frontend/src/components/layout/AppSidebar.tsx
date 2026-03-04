@@ -43,7 +43,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
   ]
 
   return (
-    <Sidebar className="w-full border-none h-full bg-white">
+    <Sidebar className="w-full border-none h-full bg-[#F1F5F9]">
       <SidebarHeader
         className={`transition-all duration-300 ${isCollapsed ? 'p-4' : 'p-8'}`}
       >
@@ -80,7 +80,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                   asChild
                   className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                     isCollapsed ? 'justify-center' : 'justify-start'
-                  } ${isActive ? 'bg-[#BABABA] text-white! border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+                  } ${isActive ? 'bg-[#D7ECAF] text-[#669213] hover:bg-[#D7ECAF]/60 hover:text-[#669213]/60 border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Link
                     to={item.url}
@@ -110,7 +110,7 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
               asChild
               className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center group ${
                 isCollapsed ? 'justify-center' : 'justify-start'
-              } ${location.pathname === '/perfil' ? 'bg-[#4A4A4A] text-white!' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+              } ${location.pathname === '/perfil' ? 'bg-[#D7ECAF] text-[#669213]' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
             >
               <Button
                 onClick={() => logout()}
