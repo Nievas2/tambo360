@@ -169,13 +169,18 @@ export class LoteService {
         const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0);
         const finDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 23, 59, 59, 999);
 
-        return prisma.loteProduccion.findMany({
+        const producciones = await prisma.loteProduccion.findMany({
             where: {
                 idEstablecimiento: establecimiento.idEstablecimiento,
                 fechaProduccion: { gte: inicioDia, lte: finDia }
             },
             include: { producto: true, mermas: true, costosDirectos: true }
         });
+
+        if (producciones.length === 0) {
+            throw new AppError("No hay producción registrada para el día de hoy", 404);
+        }
+        return producciones;
     }
 
     static async completarLote(idLote: string, idUsuario: string) {
