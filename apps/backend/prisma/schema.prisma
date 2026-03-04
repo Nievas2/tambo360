@@ -100,7 +100,7 @@ model CostosDirecto {
   idCostoDirecto String         @id @default(uuid())
   concepto       ConceptoCosto
   monto          Decimal        @db.Decimal(13, 2)
-  observaciones  String?        @default("") 
+  observaciones  String?        @default("")
   fechaCreacion  DateTime       @default(now())
   idLote         String
   lote           LoteProduccion @relation(fields: [idLote], references: [idLote])
