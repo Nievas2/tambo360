@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { CrearLoteDTO } from "../schemas/batchSchema";
+import { TamboEngineService } from "./tamboEngineService";
 
 export class LoteService {
 
@@ -86,7 +87,7 @@ export class LoteService {
             unidad = producto.categoria === "quesos" ? "kg" : "litros";
         }
 
-        return prisma.loteProduccion.update({
+        const loteActualizado = await prisma.loteProduccion.update({
             where: { idLote },
             data: {
                 idProducto,
@@ -95,6 +96,7 @@ export class LoteService {
                 fechaProduccion: data.fechaProduccion
                     ? new Date(data.fechaProduccion)
                     : lote.fechaProduccion,
+                estado: data.estado ?? lote.estado,
             },
             include: {
                 producto: true,
@@ -102,6 +104,12 @@ export class LoteService {
                 costosDirectos: true
             }
         });
+
+        if (data.estado === true && lote.estado === false) {
+            TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
+        }
+
+        return loteActualizado;
     }
 
     static async eliminarLote(idLote: string) {
@@ -178,9 +186,13 @@ export class LoteService {
 
         if (lote.estado) throw new AppError("El lote ya está completado", 400);
 
-        return prisma.loteProduccion.update({
+        const loteActualizado = await prisma.loteProduccion.update({
             where: { idLote },
             data: { estado: true },
         });
+
+        TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
+
+        return loteActualizado;
     }
 }

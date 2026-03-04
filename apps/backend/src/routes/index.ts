@@ -9,6 +9,8 @@ import RutasCostos from "./cost";
 import RutasProductos from "./product";
 
 
+import RutasAlertas from "./alertRoutes";
+
 const router = express.Router();
 
 // Rutas de la API
@@ -19,5 +21,6 @@ router.use('/lote', RutasLotes);
 router.use('/mermas', RutasMermas);
 router.use('/costos', RutasCostos);
 router.use('/productos', RutasProductos);
+router.use('/alertas', RutasAlertas);
 
 export default router;
