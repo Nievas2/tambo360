@@ -148,7 +148,7 @@ export default function BatchDetails() {
           <StatCard
             icon={<Droplet />}
             title="Cantidad Producida"
-            value={batch?.data?.cantidad}
+            value={batch?.data?.cantidad + ' ' + batch?.data?.unidad}
           />
 
           <StatCard
@@ -165,15 +165,17 @@ export default function BatchDetails() {
           <StatCard
             icon={<TrendingDown />}
             title="Merma Registrada"
-            value={batch?.data.mermas
-              ?.reduce((total, m) => {
-                const qty =
-                  typeof m.cantidad === 'string'
-                    ? parseFloat(m.cantidad)
-                    : (m.cantidad ?? 0)
-                return total + qty
-              }, 0)
-              .toString()}
+            value={
+              batch?.data.mermas
+                ?.reduce((total, m) => {
+                  const qty =
+                    typeof m.cantidad === 'string'
+                      ? parseFloat(m.cantidad)
+                      : (m.cantidad ?? 0)
+                  return total + qty
+                }, 0)
+                .toString() + batch?.data.unidad
+            }
           />
         </div>
 
