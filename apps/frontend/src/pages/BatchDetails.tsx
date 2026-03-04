@@ -12,6 +12,7 @@ import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
+import DecreaseTable from '@/src/components/shared/dashboard/decrease/DecreaseTable'
 import { StatCard } from '@/src/components/shared/StatCard'
 import { useBatch } from '@/src/hooks/batch/useBatch'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
@@ -29,9 +30,9 @@ export default function BatchDetails() {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false) // Nuevo estado
-  const { data: batch, isLoading, refetch } = useBatch({ id: id })
+  const { data: batch, isPending, refetch } = useBatch({ id: id })
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-screen space-y-6 animate-pulse">
         {/* Header skeleton */}
@@ -200,7 +201,7 @@ export default function BatchDetails() {
         </Card> */}
 
         <Card className="py-2">
-          <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+          <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex gap-1">
               <p className="text-md font-bold">Historial de mermas</p>
             </div>
@@ -219,29 +220,7 @@ export default function BatchDetails() {
             </div>
           </div>
 
-          <CardContent className="p-0">
-            {batch?.data?.mermas.length === 0 && (
-              <Empty className="w-full gap-4">
-                <EmptyHeader>
-                  <EmptyTitle className="font-bold">
-                    Sin mermas registradas
-                  </EmptyTitle>
-                </EmptyHeader>
-                <EmptyContent className="w-full max-w-xl">
-                  <EmptyDescription className="w-full">
-                    No se han reportado pérdidas ni ajustes para este lote hasta
-                    el momento.
-                  </EmptyDescription>
-                  <Button
-                    onClick={() => setIsChangeDecreaseOpen(true)}
-                    disabled={batch?.data?.estado}
-                  >
-                    Registrar Merma
-                  </Button>
-                </EmptyContent>
-              </Empty>
-            )}
-          </CardContent>
+          <DecreaseTable batch={batch?.data} isPending={isPending} />
         </Card>
 
         <Card className="py-2">
@@ -311,6 +290,7 @@ export default function BatchDetails() {
       <ChangeDecrease
         open={isChangeDecreaseOpen}
         onClose={() => setIsChangeDecreaseOpen(false)}
+        idBatch={batch.data.idLote}
       />
 
       <ChangeCost
