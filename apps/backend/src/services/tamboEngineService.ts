@@ -5,7 +5,7 @@ const IA_URL = process.env.TAMBO_AI_URL || "http://127.0.0.1:8000";
 const MINIMO_LOTES = 15;
 
 export class TamboEngineService {
-    private static async fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000) {
+    private static async fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 15000) {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
 
@@ -49,9 +49,9 @@ export class TamboEngineService {
                     cantidad: Number(l.cantidad),
                     unidad: l.unidad,
                     mermas: l.mermas.map(m => ({
-                        descripcion: m.descripcion,
+                        descripcion: m.observacion || m.tipo,
                         cantidad: Number(m.cantidad),
-                        unidad: m.unidad,
+                        unidad: l.unidad, // La merma ahora usa la misma unidad que el lote
                     })),
                     costosDirectos: l.costosDirectos.map(c => ({
                         concepto: c.concepto,
@@ -61,12 +61,12 @@ export class TamboEngineService {
                 }))
             };
 
-            // 4. Llamar al servicio de IA con Timeout ampliado para análisis pesado (10s)
+            // 4. Llamar al servicio de IA con Timeout ampliado para análisis pesado (15s)
             const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/analyze`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
-            }, 10000);
+            }, 15000);
 
             if (!response.ok) {
                 console.error(`[TamboEngine] Error de análisis (HTTP ${response.status}):`, await response.text());
@@ -81,7 +81,7 @@ export class TamboEngineService {
 
     static async getAlertas(idEstablecimiento: string) {
         try {
-            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`, {}, 5000);
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`, {}, 15000);
 
             if (!response.ok) {
                 if (response.status === 404) return []; // Si no hay respuestas de IA aún, retornar array vacío
@@ -99,7 +99,7 @@ export class TamboEngineService {
 
     static async getUltimasAlertas(idEstablecimiento: string) {
         try {
-            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/ultimas`, {}, 5000);
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/ultimas`, {}, 15000);
 
             if (!response.ok) {
                 if (response.status === 404) return [];
