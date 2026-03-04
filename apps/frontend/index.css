@@ -7,6 +7,16 @@
 
 @theme {
   --font-inter: 'Inter', sans-serif;
+  --color-red-main: #e51e00;
+  --color-green-main: #29845a;
+  --color-body-text: #4b5563;
+  --color-alert-bg: #fce8e5;
+  --color-tables: #e9eff5;
+  --color-border-cards: #acd164;
+  --color-dialogs: #e0f5eb;
+  --color-orange-alert: #d3a430;
+  --color-blue-graph: #8ddfeb;
+  --color-blue-line-graph: #5cabb6;
 }
 
 @theme inline {
@@ -54,7 +64,7 @@
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
