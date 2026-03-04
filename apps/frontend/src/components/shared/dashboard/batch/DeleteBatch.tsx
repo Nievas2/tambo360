@@ -56,6 +56,7 @@ const DeleteBatch = ({ batch, onSuccess }: DeleteBatchProps) => {
         isLoading={isPending}
         title="¿Deseas eliminar este lote?"
         description="Al eliminar este lote, toda su información dejará de estar disponible para consulta y edición. Los registros de costos y producción asociados se ocultarán del panel principal."
+        buttonText="Eliminar lote"
         error={error?.response?.data.message}
       />
     </>
@@ -72,9 +73,10 @@ interface ConfirmDeleteDialogProps {
   title: string
   description: string
   error?: string
+  buttonText?: string
 }
 
-const ConfirmDeleteDialog = ({
+export const ConfirmDeleteDialog = ({
   isOpen,
   onClose,
   onConfirm,
@@ -82,6 +84,7 @@ const ConfirmDeleteDialog = ({
   title,
   description,
   error,
+  buttonText = 'Eliminar',
 }: ConfirmDeleteDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -107,7 +110,7 @@ const ConfirmDeleteDialog = ({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Eliminando...' : 'Eliminar lote'}
+            {isLoading ? 'Eliminando...' : buttonText}
           </Button>
 
           <Button

@@ -23,7 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/components/common/table'
+import { ConfirmDeleteDialog } from '@/src/components/shared/dashboard/batch/DeleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
+import { useDeleteCost } from '@/src/hooks/cost/useDeleteCost'
 import { Batch } from '@/src/types/batch'
 import { Cost } from '@/src/types/cost'
 import { Ellipsis, Pencil, Trash } from 'lucide-react'
@@ -42,7 +44,15 @@ const CostTable = ({
   isPending,
 }: CostTableProps) => {
   const [open, setOpen] = useState(false)
+  const [openDelete, setOpenDelete] = useState(false)
   const [cost, setCost] = useState<Cost | undefined>(undefined)
+  const [idDelete, setIdDelete] = useState('')
+  const { mutateAsync, error } = useDeleteCost({ idBatch: batch.idLote })
+
+  const handleDelete = async (idCost: string) => {
+    await mutateAsync(idCost)
+    setOpenDelete(false)
+  }
 
   return (
     <CardContent className="p-0">
@@ -138,7 +148,10 @@ const CostTable = ({
 
                           <DropdownMenuGroup>
                             <DropdownMenuItem
-                              onSelect={(e) => {}}
+                              onSelect={() => {
+                                setIdDelete(cost.idCostoDirecto)
+                                setOpenDelete(true)
+                              }}
                               disabled={isPending}
                             >
                               <Trash className="size-4" /> Eliminar
@@ -152,6 +165,17 @@ const CostTable = ({
           </TableBody>
         </Table>
       )}
+
+      <ConfirmDeleteDialog
+        isOpen={openDelete}
+        onClose={() => setOpenDelete(false)}
+        onConfirm={() => handleDelete(idDelete)}
+        isLoading={isPending}
+        title="¿Deseas eliminar este costo?"
+        description="Al eliminar este costo, toda su información dejará de estar disponible para consulta y edición."
+        buttonText="Eliminar costo"
+        error={error?.response?.data?.message}
+      />
 
       <ChangeCost
         open={open}
