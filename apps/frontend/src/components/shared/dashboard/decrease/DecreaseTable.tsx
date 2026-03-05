@@ -27,7 +27,7 @@ import { ConfirmDeleteDialog } from '@/src/components/shared/dashboard/batch/Del
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import { useDeleteDecrease } from '@/src/hooks/decrease/useDeleteDecrease'
 import { Batch } from '@/src/types/batch'
-import { Decrease } from '@/src/types/decrease'
+import { Decrease, TIPO_MERMA_LABELS } from '@/src/types/decrease'
 import { Ellipsis, Pencil, Trash } from 'lucide-react'
 import { useState } from 'react'
 
@@ -118,7 +118,7 @@ const DecreaseTable = ({ batch, isPending }: DecreaseTableProps) => {
                         .reverse()
                         .join('/')}
                     </TableCell>
-                    <TableCell>{decrease.tipo}</TableCell>
+                    <TableCell>{TIPO_MERMA_LABELS[decrease.tipo]}</TableCell>
                     <TableCell>
                       {Number(decrease.cantidad).toLocaleString('es-AR')}{' '}
                       {batch.unidad}

@@ -86,7 +86,13 @@ const ChangeDecrease = ({
   })
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        onClose()
+        reset()
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
