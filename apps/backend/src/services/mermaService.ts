@@ -47,9 +47,17 @@ export class MermaService {
       throw new Error("El lote indicado no existe")
     }
 
-    // validar que la merma no supere la cantidad del lote
-    if (Number(data.cantidad) > Number(lote.cantidad)) {
-      throw new Error("La merma no puede superar la cantidad del lote")
+    // obtener suma de mermas existentes
+    const totalMermas = await prisma.merma.aggregate({
+      _sum: { cantidad: true },
+      where: { idLote: data.idLote }
+    })
+
+    const sumaMermas = Number(totalMermas._sum.cantidad || 0)
+
+    // validar que no supere la cantidad del lote
+    if (sumaMermas + Number(data.cantidad) > Number(lote.cantidad)) {
+      throw new Error("La merma supera la cantidad disponible del lote")
     }
 
     const merma = await prisma.merma.create({
@@ -96,7 +104,6 @@ export class MermaService {
   // Obtener mermas por lote
   async getByLote(idLote: string) {
 
-    // validar que el lote exista
     const lote = await prisma.loteProduccion.findUnique({
       where: { idLote }
     })
@@ -115,7 +122,6 @@ export class MermaService {
   // Actualizacion de mermas
   async update(idMerma: string, data: any) {
 
-    // validar que exista la merma
     const merma = await prisma.merma.findUnique({
       where: { idMerma }
     })
@@ -124,19 +130,34 @@ export class MermaService {
       throw new Error("La merma no existe")
     }
 
-    // validar cantidad si la envían
+    const lote = await prisma.loteProduccion.findUnique({
+      where: { idLote: merma.idLote }
+    })
+
+    if (!lote) {
+      throw new Error("El lote asociado no existe")
+    }
+
+    // validar cantidad si la envían para que sea numerico y > 0
     if (data.cantidad !== undefined) {
 
       if (isNaN(Number(data.cantidad)) || Number(data.cantidad) <= 0) {
-        throw new Error("La cantidad debe ser mayor a 0")
+        throw new Error("La cantidad debe ser un número y mayor a 0")
       }
 
-      const lote = await prisma.loteProduccion.findUnique({
-        where: { idLote: merma.idLote }
+      // obtener suma de otras mermas del mismo lote
+      const totalMermas = await prisma.merma.aggregate({
+        _sum: { cantidad: true },
+        where: {
+          idLote: merma.idLote,
+          NOT: { idMerma }
+        }
       })
 
-      if (Number(data.cantidad) > Number(lote?.cantidad)) {
-        throw new Error("La merma no puede superar la cantidad del lote")
+      const sumaMermas = Number(totalMermas._sum.cantidad || 0)
+
+      if (sumaMermas + Number(data.cantidad) > Number(lote.cantidad)) {
+        throw new Error("La merma supera la cantidad disponible del lote")
       }
     }
 
