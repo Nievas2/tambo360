@@ -13,8 +13,6 @@ api.interceptors.response.use(
     const isLogout = error.config?.url?.includes('/auth/logout')
 
     if (error.response?.status === 401) {
-      // Si falla /auth/me, no redirigimos por fuera de React
-      // Solo dejamos que el catch de AuthContext lo maneje
       if (!isAuthMe && !isLogout && typeof window !== 'undefined') {
         window.location.href = '/login'
       }
