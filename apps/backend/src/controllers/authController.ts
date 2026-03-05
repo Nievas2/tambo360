@@ -115,7 +115,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    const response = ApiResponse.success({...userData}, "Email verificado exitosamente");
+    const response = ApiResponse.success({ ...userData }, "Email verificado exitosamente");
     res.status(response.statusCode).json(response);
 
   } catch (error) {
@@ -236,3 +236,26 @@ export const getMe = async (req: Request, res: Response, next: NextFunction): Pr
     next(error);
   }
 }
+
+// Función para cerrar sesion eliminando las cookies con el jwt
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax"
+    });
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: "Sesión cerrada correctamente",
+      success: true
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};

@@ -462,3 +462,38 @@
  *             schema:
  *               $ref: '#/components/schemas/ErrorValidationResponse'
  */
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     tags:
+ *       - auth
+ *     summary: Cierra la sesión del usuario
+ *     description: Elimina la cookie de autenticación y finaliza la sesión del usuario.
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: "Sesión cerrada correctamente"
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       401:
+ *         description: Usuario no autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UnauthorizedResponse'
+ */
