@@ -50,6 +50,8 @@ const Produccion: React.FC = () => {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
+  const [loteId, setLoteId] = useState('')
+
   const { data, isPending } = useBatches()
 
   return (
@@ -251,7 +253,10 @@ const Produccion: React.FC = () => {
                                 <DropletOff /> Registrar merma
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => setIsChangeCostOpen(true)}
+                                onClick={() => {
+                                  setLoteId(batch.idLote)
+                                  setIsChangeCostOpen(true)
+                                }}
                                 disabled={batch.estado}
                               >
                                 <BanknoteArrowUp /> Registrar costo
@@ -320,6 +325,7 @@ const Produccion: React.FC = () => {
       <ChangeCost
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
+        loteId={loteId}
       />
     </div>
   )
