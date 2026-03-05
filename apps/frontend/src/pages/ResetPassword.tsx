@@ -1,227 +1,132 @@
-// apps/frontend/src/pages/ResetPassword.tsx
+import { Card, CardContent } from '@/src/components/common/card'
+import { Button } from '@/src/components/common/Button'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Label } from '@/src/components/common/label'
+import { Input } from '@/src/components/common/Input'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useResetPassword } from '@/src/hooks/auth/useResetPassword'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import React, { useState } from 'react'
 
-import { useState, useEffect } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
-import { Card, CardContent } from "@/src/components/common/card";
-import { Button } from "@/src/components/common/Button";
-import { Input } from "@/src/components/common/Input"; // Componente Shadcn
-import { Label } from "@/src/components/common/label"; // Componente Shadcn
-import { toast } from "sonner";
-import { Eye, EyeOff, ArrowRight } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+const ResetSchema = z.object({
+  contraseña: z.string().min(8, 'Mínimo 8 caracteres'),
+  confirmarContraseña: z.string()
+}).refine((data) => data.contraseña === data.confirmarContraseña, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmarContraseña"],
+})
 
-// Importación del esquema y tipo desde el archivo de tipos (ajustar ruta si es necesario)
-import { resetSchema, type ResetFormData } from "@/src/types/auth"; 
-import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword"; 
-import { useResetPassword } from "@/src/hooks/auth/useResetPassword";
-
-const ResetPassword = () => {
-  const navigate = useNavigate();
-  const { search } = useLocation();
-  const tokenFromUrl = new URLSearchParams(search).get("token");
-
-  const [step, setStep] = useState(tokenFromUrl ? 3 : 1);
-  const [email, setEmail] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(0);
-
-  const { mutate: forgotPassword, isPending: isSendingEmail } = useForgotPassword();
-  const { mutate: resetPassword, isPending: isResetting } = useResetPassword();
+const ResetPassword: React.FC = () => {
+  const [showPass, setShowPass] = useState(false)
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token')
+  const { mutateAsync, isPending, error: apiError } = useResetPassword()
+  const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetFormData>({
-    resolver: zodResolver(resetSchema),
-  });
+  } = useForm({
+    resolver: zodResolver(ResetSchema),
+  })
 
-  useEffect(() => {
-    if (step === 2) setSecondsLeft(180);
-  }, [step]);
+  const hasAnyError = Object.keys(errors).length > 0 || !!apiError
 
-  useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const timer = setInterval(() => setSecondsLeft((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(timer);
-  }, [secondsLeft]);
-
-  const handleRequestReset = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!email) {
-      toast.error("Por favor, ingresa tu correo electrónico");
-      return;
+  const onSubmit = handleSubmit(async (data) => {
+    if (!token) return
+    try {
+      await mutateAsync({ token, password: data.contraseña })
+      navigate('/login')
+    } catch (err) {
+      console.error('Error al restablecer:', err)
     }
-
-    forgotPassword(email, {
-      onSuccess: () => {
-        setStep(2);
-        setSecondsLeft(180);
-        toast.success("Instrucciones enviadas nuevamente");
-      },
-      onError: (error: any) => {
-        const msg = error.response?.data?.message || "Error al enviar el correo";
-        toast.error(msg);
-      }
-    });
-  };
-
-  const onResetSubmit = (formData: ResetFormData) => {
-    if (!tokenFromUrl) {
-      toast.error("Token no válido o expirado");
-      return;
-    }
-
-    resetPassword(
-      { 
-        token: tokenFromUrl, 
-        password: formData.contraseña 
-      }, 
-      {
-        onSuccess: () => {
-          setStep(4);
-        },
-        onError: (error: any) => {
-          const msg = Array.isArray(error.response?.data) 
-            ? error.response.data[0] 
-            : error.response?.data?.message || "Error al actualizar contraseña";
-          toast.error(msg);
-        }
-      }
-    );
-  };
+  })
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#e5e5e5] font-inter">
-      <div className="hidden md:flex md:w-1/3 xl:w-1/2 items-center justify-center">
-        <div className="w-full h-full max-w-lg flex items-center justify-center">
-          <div className="rounded-2xl w-full aspect-square flex flex-col items-center justify-center">
-            <img src="/isotipo_tambo 1.svg" alt="Logo" className="w-3/4 h-auto" />
-            <img src="/logotipo 1.svg" alt="Tambo" className="w-1/2 h-auto mt-4" />
-          </div>
+    // Background: #F2F1EC (Crema de fondo según Handoff)
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#F2F1EC] p-4 relative font-inter">
+      {/* Aviso General Centrado Arriba */}
+      {hasAnyError && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[400px] flex items-center justify-center gap-2 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300">
+          <AlertCircle 
+            className="w-5 h-5 fill-[#EF4444]" 
+            stroke="#FCE8E5" 
+            strokeWidth={3}
+          />
+          <span>Revisa los campos resaltados e intenta nuevamente</span>
         </div>
-      </div>
+      )}
 
-      <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-center md:justify-end p-4 md:p-8">
-        <Card className="w-full max-w-125 border-none shadow-none md:shadow-sm py-8 bg-white rounded-xl">
-          <CardContent className="space-y-8">
-            <div className="flex flex-col items-center justify-start text-center space-y-4">
-              <div className="w-auto flex items-start gap-2">
-                <img src="/isotipo_tambo 1.svg" alt="logo" className="h-12" />
-                <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
+      <Card className="w-full max-w-md border-none shadow-sm py-8 bg-white rounded-xl">
+        <CardContent className="space-y-8">
+          <div className="text-center space-y-2">
+            {/* Título: Negro Olivo #0B1001 */}
+            <h1 className="text-3xl font-bold text-[#0B1001]">Nueva contraseña</h1>
+            <p className="text-sm text-[#626059]">Ingresa tu nueva clave de acceso</p>
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                {/* Labels: Negro Olivo o Rojo Error */}
+                <Label className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+                  Nueva contraseña*
+                </Label>
+                <div className="relative">
+                  <Input
+                    type={showPass ? 'text' : 'password'}
+                    {...register('contraseña')}
+                    // Input: Fondo #F9F9F7 y bordes según estado
+                    className={`h-14 ${errors.contraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
+                    disabled={isPending}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-auto p-0 text-[#626059] hover:bg-transparent"
+                  >
+                    {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </Button>
+                </div>
+                {errors.contraseña && (
+                  <p className="text-xs font-medium text-[#B91C1C]">{errors.contraseña.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label className={`font-bold ${errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+                  Confirmar nueva contraseña*
+                </Label>
+                <Input
+                  type="password"
+                  {...register('confirmarContraseña')}
+                  className={`h-14 ${errors.confirmarContraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
+                  disabled={isPending}
+                />
+                {errors.confirmarContraseña && (
+                  <p className="text-xs font-medium text-[#B91C1C]">{errors.confirmarContraseña.message}</p>
+                )}
               </div>
             </div>
 
-            {step === 1 && (
-              <form onSubmit={handleRequestReset} className="space-y-6">
-                <div className="space-y-2 text-center">
-                  <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Recuperar contraseña</h1>
-                  <p className="text-sm text-muted-foreground">Te enviaremos un email con las instrucciones.</p>
-                </div>
-                <div className="space-y-4 text-left">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-[#1a1c1e]">Tu Email</Label>
-                    <Input
-                      type="email"
-                      placeholder="ejemplo@correo.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="h-14 bg-[#fafafa] border-slate-200 rounded-xl"
-                    />
-                  </div>
-                </div>
-                <Button disabled={isSendingEmail} type="submit" className="w-full h-14 bg-[#1a1c1e] text-white rounded-xl font-bold flex items-center justify-center gap-2">
-                  {isSendingEmail ? "Enviando..." : "Enviar instrucciones"} <ArrowRight size={20} />
-                </Button>
-                <div className="text-center">
-                  <Link to={ROUTES.LOGIN} className="text-sm font-bold text-[#1a1c1e] hover:underline">Volver al inicio</Link>
-                </div>
-              </form>
-            )}
-
-            {step === 2 && (
-              <section className="flex flex-col items-center justify-center gap-6 py-4 text-center">
-                <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Revisa tu email</h2>
-                <p className="text-sm text-muted-foreground">Hemos enviado un enlace a <b>{email}</b> para restablecer tu contraseña.</p>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-14 border-slate-200 font-bold rounded-xl" 
-                  disabled={secondsLeft > 0 || isSendingEmail}
-                  onClick={() => handleRequestReset()}
-                >
-                  {isSendingEmail ? "Enviando..." : secondsLeft > 0 ? `Reenviar en ${secondsLeft}s` : 'Reenviar email'}
-                </Button>
-              </section>
-            )}
-
-            {step === 3 && (
-              <form onSubmit={handleSubmit(onResetSubmit)} className="space-y-6">
-                <div className="space-y-2 text-center">
-                  <h1 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">Nueva contraseña</h1>
-                  <p className="text-sm text-muted-foreground">Crea una nueva clave segura para tu cuenta.</p>
-                </div>
-                <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} />
-                <div className="space-y-4 text-left">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-[#1a1c1e]">Nueva Contraseña</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        className="h-14 bg-[#fafafa] border-slate-200 rounded-xl pr-12"
-                        {...register("contraseña")}
-                      />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    {errors.contraseña && <small className="text-red-500">{errors.contraseña.message}</small>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-bold text-[#1a1c1e]">Confirmar Contraseña</Label>
-                    <div className="relative">
-                      <Input
-                        type={showConfirm ? "text" : "password"}
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        className="h-14 bg-[#fafafa] border-slate-200 rounded-xl pr-12"
-                        {...register("confirm")}
-                      />
-                      <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
-                    </div>
-                    {errors.confirm && <small className="text-red-500">{errors.confirm.message}</small>}
-                  </div>
-                </div>
-                <Button disabled={isResetting} type="submit" className="w-full h-14 bg-[#1a1c1e] text-white rounded-xl font-bold flex items-center justify-center gap-2">
-                  {isResetting ? "Actualizando..." : "Actualizar contraseña"} <ArrowRight size={20} />
-                </Button>
-              </form>
-            )}
-
-            {step === 4 && (
-              <section className="flex flex-col items-center justify-center gap-8 py-4 text-center">
-                <img src="/successIcon.svg" alt="Éxito" className="w-24 h-24" />
-                <div className="space-y-2">
-                  <h2 className="text-4xl font-bold tracking-tight text-[#1a1c1e]">¡Todo listo!</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">Tu contraseña ha sido actualizada. Ya puedes iniciar sesión.</p>
-                </div>
-                <Button onClick={() => navigate(ROUTES.LOGIN)} className="w-full h-14 bg-[#1a1c1e] text-white rounded-xl font-bold">
-                  Ir al Login
-                </Button>
-              </section>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            {/* Botón Primario: Negro Olivo #0B1001, Texto Crema #FFFBF1, Gap 8px */}
+            <Button 
+              type="submit" 
+              className="w-full h-14 rounded-lg text-lg font-medium bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] flex items-center justify-center gap-2 transition-all" 
+              disabled={isPending || !token}
+            >
+              {isPending ? 'Guardando...' : 'Restablecer contraseña'} 
+              <ArrowRight className="size-5" />
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
-  );
-};
+  )
+}
 
 export default ResetPassword;
