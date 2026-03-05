@@ -76,7 +76,7 @@ export class MermaService {
     return mermas
   }
 
-  // Para obtener merma determinada por id
+  // Para obtener merma particular por id
   async findById(idMerma: string) {
 
     const merma = await prisma.merma.findUnique({
