@@ -1,4 +1,4 @@
-import { prisma} from "../lib/prisma"
+import { prisma } from "../lib/prisma"
 import { TipoMerma } from "@prisma/client"
 
 export class MermaService {
@@ -15,7 +15,7 @@ export class MermaService {
   // Registro de mermas
   async create(data: any) {
 
-    // validar campos obligatorios de los imputs
+    // validar campos obligatorios de los inputs
     if (!data.idLote) {
       throw new Error("El id del lote es obligatorio")
     }
@@ -64,6 +64,36 @@ export class MermaService {
     return merma
   }
 
+  // Para obtener todas las mermas en general
+  async findAll() {
+
+    const mermas = await prisma.merma.findMany({
+      include: {
+        lote: true
+      }
+    })
+
+    return mermas
+  }
+
+  // Para obtener merma determinada por id
+  async findById(idMerma: string) {
+
+    const merma = await prisma.merma.findUnique({
+      where: { idMerma },
+      include: {
+        lote: true
+      }
+    })
+
+    if (!merma) {
+      throw new Error("La merma no existe")
+    }
+
+    return merma
+  }
+
+  // Obtener mermas por lote
   async getByLote(idLote: string) {
 
     // validar que el lote exista
@@ -94,7 +124,7 @@ export class MermaService {
       throw new Error("La merma no existe")
     }
 
-    // validar cantidad si la envían (que se numerico y mayor a cero)
+    // validar cantidad si la envían
     if (data.cantidad !== undefined) {
 
       if (isNaN(Number(data.cantidad)) || Number(data.cantidad) <= 0) {
@@ -118,9 +148,9 @@ export class MermaService {
     const mermaActualizada = await prisma.merma.update({
       where: { idMerma },
       data: {
-        tipo: data.tipo,
-        observacion: data.observacion,
-        cantidad: data.cantidad
+        tipo: data.tipo ?? merma.tipo,
+        observacion: data.observacion ?? merma.observacion,
+        cantidad: data.cantidad ?? merma.cantidad
       }
     })
 
@@ -144,4 +174,5 @@ export class MermaService {
 
     return { message: "Merma eliminada correctamente" }
   }
+
 }
