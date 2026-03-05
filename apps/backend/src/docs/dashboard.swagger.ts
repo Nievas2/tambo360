@@ -101,6 +101,7 @@
  *                   type: null
  */
 
+
 /**
  * @swagger
  * /dashboard/grafico:
@@ -140,21 +141,32 @@
  *                   example: 200
  *                 message:
  *                   type: string
- *                   example: "Resumen de los últimos 6 meses"
+ *                   example: "Resumen de los ultimo 6 meses"
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       mes:
- *                         type: string
- *                         example: "Enero"
- *                       anio:
- *                         type: integer
- *                         example: 2026
- *                       valor:
- *                         type: number
- *                         example: 120
+ *                   type: object
+ *                   properties:
+ *                     resultado:
+ *                       type: array
+ *                       description: Lista de meses con el valor agregado de la métrica
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           mes:
+ *                             type: string
+ *                             example: "Marzo"
+ *                           anio:
+ *                             type: integer
+ *                             example: 2026
+ *                           valor:
+ *                             type: number
+ *                             example: 1730
+ *                     lote:
+ *                       type: boolean
+ *                       description: Indica si existen lotes en el período consultado
+ *                       example: true
  *       400:
  *         description: Parámetros inválidos o faltantes
  *         content:

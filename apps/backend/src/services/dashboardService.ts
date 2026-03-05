@@ -107,6 +107,11 @@ export class DashboardService {
             }
         })
 
+        if(!lotes.length){
+            return {resultado: [], Lote: false}
+        }
+        console.log("lotes", lotes)
+
         const mesesMap: Record<string, number> = {}
 
         for (let i = 6; i >= 0; i--) {
@@ -159,7 +164,7 @@ export class DashboardService {
 
         })
 
-        return resultado
+        return {resultado, Lote: true}
 
     }
 }
