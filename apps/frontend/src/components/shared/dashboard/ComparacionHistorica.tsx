@@ -31,11 +31,11 @@ const ComparacionHistorica = () => {
     metrica: 'cantidad',
   })
 
-  const { data, isLoading } = useGraph({ params })
-  const chartData: BackendDataPoint[] = data?.data || []
+  const { data, isPending } = useGraph({ params })
+  const chartData: BackendDataPoint[] = data?.data.resultado || []
 
   const isAllZero = useMemo(() => {
-    return chartData.length > 0 && chartData.every((d) => d.valor === 0)
+    return data?.data.Lote === 'false'
   }, [chartData, data])
 
   const { yMax, yTicks, hasData } = useMemo(() => {
@@ -73,7 +73,13 @@ const ComparacionHistorica = () => {
 
   return (
     <Card className="w-full overflow-hidden">
-      {!hasData || isAllZero ? (
+      {isPending ? (
+        <div className="h-60 flex items-center justify-center">
+          <span className="text-sm text-muted-foreground animate-pulse">
+            Cargando datos...
+          </span>
+        </div>
+      ) : !hasData || isAllZero ? (
         <div className="flex flex-col items-center justify-center text-center p-6 bg-white rounded-b-lg ">
           <h3 className="text-xl font-bold text-black mb-2">
             Tu historial comienza aca
@@ -135,7 +141,7 @@ const ComparacionHistorica = () => {
           </CardHeader>
 
           <CardContent className="pt-0">
-            {isLoading ? (
+            {isPending ? (
               <div className="h-60 flex items-center justify-center">
                 <span className="text-sm text-muted-foreground animate-pulse">
                   Cargando datos...
