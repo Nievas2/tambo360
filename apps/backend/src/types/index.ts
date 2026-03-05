@@ -1,5 +1,6 @@
 import { Categoria, ConceptoCosto, Merma, TipoMerma, Unidad } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import e from "express";
 
 declare module 'express' {
   interface Request {
@@ -59,3 +60,11 @@ export type InfoMes = {
 
 type CategorySummary = { cantidad: number; costos: number; mermas: number; };
 export type SummaryResult = Record<string, CategorySummary>;
+
+export const MetricaObj = {
+  cantidad: "cantidad",
+  mermas: "mermas",
+  costos: "costos"
+} as const;
+
+export type Metrica = typeof MetricaObj[keyof typeof MetricaObj];
