@@ -44,9 +44,9 @@ export const AppRoutes = () => {
       <Route
         path={'/establecimiento'}
         element={
-          <ProtectedRoute>
+          
             <Establishment />
-          </ProtectedRoute>
+          
         }
       />
 

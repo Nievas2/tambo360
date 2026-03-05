@@ -69,6 +69,13 @@ export const decreaseKeys = {
   types: () => [...baseKeys.decrease, 'types'] as const,
 }
 
+export const alertKeys = {
+  all: baseKeys.decrease,
+  lists: () => [...baseKeys.decrease, 'list'] as const,
+  lasts: () => [...baseKeys.decrease, 'lasts'] as const,
+  detail: (id: string) => [...baseKeys.decrease, id] as const,
+}
+
 // Export all keys for easy access
 export const queryKeys = {
   auth: authKeys,
@@ -78,4 +85,5 @@ export const queryKeys = {
   province: provinceKeys,
   locality: localityKeys,
   decrease: decreaseKeys,
+  alert: alertKeys,
 } as const
