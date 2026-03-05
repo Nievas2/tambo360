@@ -7,6 +7,13 @@ export enum TipoMerma {
   Administrativa = 'Administrativa',
   Danio = 'Danio',
 }
+
+export const TIPO_MERMA_LABELS = {
+  [TipoMerma.Natural]: 'Natural',
+  [TipoMerma.Tecnica]: 'Técnica',
+  [TipoMerma.Administrativa]: 'Administrativa',
+  [TipoMerma.Danio]: 'Daño',
+}
 export const DecreaseSchema = z.object({
   tipo: z
     .enum([
