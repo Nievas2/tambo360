@@ -108,19 +108,26 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className={`py-6 transition-all duration-200 rounded-lg border-none !shadow-none flex items-center group ${
+              className={`py-4 transition-all duration-200 rounded-lg shadow-none! flex items-center ${
                 isCollapsed ? 'justify-center' : 'justify-start'
-              } ${location.pathname === '/perfil' ? 'bg-[#D7ECAF] text-[#669213]' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
+              } ${location.pathname === '/perfil' ? 'bg-[#D7ECAF] hover:bg-[#D7ECAF]/60 hover:text-[#669213]/60 border-l-6 border-l-black' : 'bg-transparent text-gray-400 hover:bg-gray-100'}`}
             >
-              <Button
-                onClick={() => logout()}
+              <Link
+                to="/perfil"
                 className={`flex items-center gap-3 w-full ${isCollapsed ? 'justify-center' : ''}`}
+                data-test-id="data-test-id='perfil'"
               >
-                <User className={`h-5 w-5 shrink-0 text-gray-400 `} />
+                <User
+                  className={`h-5 w-5 shrink-0 ${location.pathname === '/perfil' ? 'text-[#669213]' : 'text-gray-400'}`}
+                />
                 {!isCollapsed && (
-                  <span className="font-semibold text-gray-400">Mi perfil</span>
+                  <span
+                    className={`font-semibold ${location.pathname === '/perfil' ? 'text-[#669213]' : 'text-gray-400'}`}
+                  >
+                    Perfil
+                  </span>
                 )}
-              </Button>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

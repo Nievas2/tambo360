@@ -2,6 +2,8 @@ import { RegisterData } from '@/src/types/register'
 import { LoginData } from '@/src/types/login'
 import { api } from '@/src/services/api'
 
+export const logOut = () => api.post('/auth/logout')
+
 export const registerUser = (dto: RegisterData) =>
   api.post('/auth/crear-cuenta', dto)
 
@@ -16,14 +18,16 @@ export const verifyEmail = (token: string) =>
 
 export const forgotPassword = async (email: string) => {
   // Cambiado de { email } a { correo } para coincidir con authController.ts
-  const { data } = await api.post('/auth/contrasena-olvidada', { correo: email });
-  return data;
-};
+  const { data } = await api.post('/auth/contrasena-olvidada', {
+    correo: email,
+  })
+  return data
+}
 
 export const resetPassword = async (password: string, token: string) => {
-  const { data } = await api.post('/auth/restablecer-contrasena', { 
-    nuevaContraseña: password, 
-    token: token 
-  });
-  return data;
-};
+  const { data } = await api.post('/auth/restablecer-contrasena', {
+    nuevaContraseña: password,
+    token: token,
+  })
+  return data
+}
