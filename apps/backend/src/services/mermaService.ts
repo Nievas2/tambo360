@@ -1,154 +1,147 @@
-import { prisma } from "../lib/prisma"
+import prisma from "../lib/prisma"
 import { TipoMerma } from "@prisma/client"
 
 export class MermaService {
 
   async getTipos() {
-    return Object.values(TipoMerma)
+    return [
+      "Natural",
+      "Tecnica",
+      "Administrativa",
+      "Danio"
+    ]
   }
 
+  // Registro de mermas
   async create(data: any) {
 
-    const lote = await prisma.loteProduccion.findUnique({
-      where: { idLote: data.idLote }
-    })
-
-    if (!lote) {
-      throw new Error("El lote no existe")
+    // validar campos obligatorios de los imputs
+    if (!data.idLote) {
+      throw new Error("El id del lote es obligatorio")
     }
 
     if (!data.tipo) {
       throw new Error("El tipo de merma es obligatorio")
     }
 
-    // Validación real del enum
+    if (!data.cantidad) {
+      throw new Error("La cantidad es obligatoria")
+    }
+
+    // validar tipo de merma
     if (!Object.values(TipoMerma).includes(data.tipo)) {
       throw new Error("Tipo de merma inválido")
     }
 
+    // validar cantidad
+    if (isNaN(Number(data.cantidad)) || Number(data.cantidad) <= 0) {
+      throw new Error("La cantidad debe ser un número mayor a 0")
+    }
+
+    // validar que el lote exista
+    const lote = await prisma.loteProduccion.findUnique({
+      where: { idLote: data.idLote }
+    })
+
+    if (!lote) {
+      throw new Error("El lote indicado no existe")
+    }
+
+    // validar que la merma no supere la cantidad del lote
     if (Number(data.cantidad) > Number(lote.cantidad)) {
-      throw new Error("La cantidad supera el stock disponible")
+      throw new Error("La merma no puede superar la cantidad del lote")
     }
 
-    return prisma.$transaction(async (tx) => {
-
-      const merma = await tx.merma.create({
-        data: {
-          tipo: data.tipo as TipoMerma,
-          observacion: data.observacion,
-          cantidad: data.cantidad,
-          idLote: data.idLote
-        }
-      })
-
-      await tx.loteProduccion.update({
-        where: { idLote: data.idLote },
-        data: {
-          cantidad: {
-            decrement: data.cantidad
-          }
-        }
-      })
-
-      return merma
+    const merma = await prisma.merma.create({
+      data: {
+        tipo: data.tipo,
+        observacion: data.observacion,
+        cantidad: data.cantidad,
+        idLote: data.idLote
+      }
     })
+
+    return merma
   }
 
-  async findAll() {
-    return prisma.merma.findMany({
-      include: { lote: true }
-    })
-  }
+  async getByLote(idLote: string) {
 
-  async findById(id: string) {
-    return prisma.merma.findUnique({
-      where: { idMerma: id },
-      include: { lote: true }
-    })
-  }
-
-  async update(id: string, data: any) {
-
-    const mermaAnterior = await prisma.merma.findUnique({
-      where: { idMerma: id }
+    // validar que el lote exista
+    const lote = await prisma.loteProduccion.findUnique({
+      where: { idLote }
     })
 
-    if (!mermaAnterior) {
-      throw new Error("Merma no encontrada")
+    if (!lote) {
+      throw new Error("El lote indicado no existe")
     }
 
-    return prisma.$transaction(async (tx) => {
-
-      const nuevaCantidad =
-        data.cantidad ?? mermaAnterior.cantidad
-
-      const diferencia =
-        Number(nuevaCantidad) -
-        Number(mermaAnterior.cantidad)
-
-      const lote = await tx.loteProduccion.findUnique({
-        where: { idLote: mermaAnterior.idLote }
-      })
-
-      if (!lote) {
-        throw new Error("Lote no encontrado")
-      }
-
-      if (diferencia > 0 && diferencia > Number(lote.cantidad)) {
-        throw new Error("Stock insuficiente")
-      }
-
-      // Validar tipo si lo envían
-      if (data.tipo && !Object.values(TipoMerma).includes(data.tipo)) {
-        throw new Error("Tipo de merma inválido")
-      }
-
-      await tx.loteProduccion.update({
-        where: { idLote: mermaAnterior.idLote },
-        data: {
-          cantidad: {
-            decrement: diferencia
-          }
-        }
-      })
-
-      return tx.merma.update({
-        where: { idMerma: id },
-        data: {
-          tipo: data.tipo
-            ? (data.tipo as TipoMerma)
-            : mermaAnterior.tipo,
-          observacion: data.observacion ?? mermaAnterior.observacion,
-          cantidad: nuevaCantidad
-        }
-      })
+    const mermas = await prisma.merma.findMany({
+      where: { idLote }
     })
+
+    return mermas
   }
 
-  async delete(id: string) {
+  // Actualizacion de mermas
+  async update(idMerma: string, data: any) {
 
+    // validar que exista la merma
     const merma = await prisma.merma.findUnique({
-      where: { idMerma: id }
+      where: { idMerma }
     })
 
     if (!merma) {
-      throw new Error("Merma no encontrada")
+      throw new Error("La merma no existe")
     }
 
-    return prisma.$transaction(async (tx) => {
+    // validar cantidad si la envían (que se numerico y mayor a cero)
+    if (data.cantidad !== undefined) {
 
-      await tx.loteProduccion.update({
-        where: { idLote: merma.idLote },
-        data: {
-          cantidad: {
-            increment: merma.cantidad
-          }
-        }
+      if (isNaN(Number(data.cantidad)) || Number(data.cantidad) <= 0) {
+        throw new Error("La cantidad debe ser mayor a 0")
+      }
+
+      const lote = await prisma.loteProduccion.findUnique({
+        where: { idLote: merma.idLote }
       })
 
-      return tx.merma.delete({
-        where: { idMerma: id }
-      })
+      if (Number(data.cantidad) > Number(lote?.cantidad)) {
+        throw new Error("La merma no puede superar la cantidad del lote")
+      }
+    }
+
+    // validar tipo si lo envían
+    if (data.tipo && !Object.values(TipoMerma).includes(data.tipo)) {
+      throw new Error("Tipo de merma inválido")
+    }
+
+    const mermaActualizada = await prisma.merma.update({
+      where: { idMerma },
+      data: {
+        tipo: data.tipo,
+        observacion: data.observacion,
+        cantidad: data.cantidad
+      }
     })
+
+    return mermaActualizada
+  }
+
+  // Eliminacion de mermas
+  async delete(idMerma: string) {
+
+    const merma = await prisma.merma.findUnique({
+      where: { idMerma }
+    })
+
+    if (!merma) {
+      throw new Error("La merma no existe")
+    }
+
+    await prisma.merma.delete({
+      where: { idMerma }
+    })
+
+    return { message: "Merma eliminada correctamente" }
   }
 }
