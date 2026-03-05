@@ -50,6 +50,8 @@ const Produccion: React.FC = () => {
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
+  const [loteId, setLoteId] = useState('')
+
   const { data, isPending } = useBatches()
 
   return (
@@ -175,20 +177,25 @@ const Produccion: React.FC = () => {
                       </TableCell>
                       <TableCell>{batch.producto.nombre}</TableCell>
                       <TableCell>
-                        {batch.cantidad} {batch.unidad}
+                        {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
+                        {batch.unidad}
                       </TableCell>
                       {/* calcula todas las mermas y las suma */}
                       <TableCell>
-                        {batch.mermas?.reduce((total, m) => {
-                          const qty =
-                            typeof m.cantidad === 'string'
-                              ? parseFloat(m.cantidad)
-                              : (m.cantidad ?? 0)
-                          return total + qty
-                        }, 0)}
+                        {batch.mermas
+                          ?.reduce((total, m) => {
+                            const qty =
+                              typeof m.cantidad === 'string'
+                                ? parseFloat(m.cantidad)
+                                : (m.cantidad ?? 0)
+                            return total + qty
+                          }, 0)
+                          .toLocaleString('es-AR') +
+                          ' ' +
+                          batch.unidad}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
+                        <Badge variant={batch.estado ? 'default' : 'secondary'}>
                           {batch.estado ? 'Completo' : 'Incompleto'}
                         </Badge>
                       </TableCell>
@@ -196,13 +203,15 @@ const Produccion: React.FC = () => {
                         {(batch.costosDirectos.length > 0 &&
                           batch.costosDirectos[0].moneda) ||
                           '$'}{' '}
-                        {batch.costosDirectos?.reduce((total, m) => {
-                          const qty =
-                            typeof m.monto === 'string'
-                              ? parseFloat(m.monto)
-                              : (m.monto ?? 0)
-                          return total + qty
-                        }, 0)}
+                        {batch.costosDirectos
+                          ?.reduce((total, m) => {
+                            const qty =
+                              typeof m.monto === 'string'
+                                ? parseFloat(m.monto)
+                                : (m.monto ?? 0)
+                            return total + qty
+                          }, 0)
+                          .toLocaleString('es-AR')}
                       </TableCell>
                       <TableCell className="text-center mr-2">
                         <DropdownMenu>
@@ -244,7 +253,10 @@ const Produccion: React.FC = () => {
                                 <DropletOff /> Registrar merma
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => setIsChangeCostOpen(true)}
+                                onClick={() => {
+                                  setLoteId(batch.idLote)
+                                  setIsChangeCostOpen(true)
+                                }}
                                 disabled={batch.estado}
                               >
                                 <BanknoteArrowUp /> Registrar costo
@@ -313,6 +325,7 @@ const Produccion: React.FC = () => {
       <ChangeCost
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
+        loteId={loteId}
       />
     </div>
   )

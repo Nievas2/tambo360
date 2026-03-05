@@ -12,8 +12,10 @@ export const baseKeys = {
   auth: ['auth'] as const,
   batch: ['batch'] as const,
   product: ['product'] as const,
+  cost: ['cost'] as const,
   province: ['province'] as const,
   locality: ['locality'] as const,
+  decrease: ['decrease'] as const,
 } as const
 
 // Auth related keys
@@ -39,6 +41,12 @@ export const productKeys = {
   detail: (id: string) => [...baseKeys.product, id] as const,
 }
 
+export const costKeys = {
+  all: baseKeys.cost,
+  lists: () => [...baseKeys.cost, 'list'] as const,
+  detail: (id: string) => [...baseKeys.cost, id] as const,
+}
+
 export const provinceKeys = {
   all: baseKeys.province,
   lists: () => [...baseKeys.province, 'list'] as const,
@@ -54,11 +62,20 @@ export const localityKeys = {
   detail: (id: string) => [...baseKeys.locality, id] as const,
 }
 
+export const decreaseKeys = {
+  all: baseKeys.decrease,
+  lists: () => [...baseKeys.decrease, 'list'] as const,
+  detail: (id: string) => [...baseKeys.decrease, id] as const,
+  types: () => [...baseKeys.decrease, 'types'] as const,
+}
+
 // Export all keys for easy access
 export const queryKeys = {
   auth: authKeys,
   batch: batchKeys,
   product: productKeys,
+  cost: costKeys,
   province: provinceKeys,
   locality: localityKeys,
+  decrease: decreaseKeys,
 } as const
