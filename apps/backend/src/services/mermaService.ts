@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma"
+import { prisma} from "../lib/prisma"
 import { TipoMerma } from "@prisma/client"
 
 export class MermaService {
