@@ -33,9 +33,9 @@ const Login: React.FC = () => {
   const showErrorMessage = useCallback((message?: string) => {
     toast.custom(
       () => (
-        <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
+        <div className="z-10000 w-full max-w-100 flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
           <AlertCircle
-            className="w-5 h-5 flex-shrink-0 fill-[#EF4444]"
+            className="w-5 h-5 shrink-0 fill-[#EF4444]"
             stroke="#FCE8E5"
             strokeWidth={3}
           />
@@ -49,13 +49,13 @@ const Login: React.FC = () => {
         position: 'top-center',
       }
     )
-  }, []) // Corregido: Se añadieron las dependencias vacías []
+  }, [])
 
   useEffect(() => {
     if (submitCount > 0 && Object.keys(errors).length > 0) {
       showErrorMessage()
     }
-  }, [submitCount, errors, showErrorMessage]) // Corregido: Eliminadas etiquetas extra
+  }, [submitCount, errors, showErrorMessage])
 
   useEffect(() => {
     if (apiError) {
@@ -64,12 +64,11 @@ const Login: React.FC = () => {
         'Error al iniciar sesión. Por favor, intenta de nuevo.'
       showErrorMessage(message)
     }
-  }, [apiError, showErrorMessage]) // Corregido: Eliminadas etiquetas extra
+  }, [apiError, showErrorMessage])
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       const response = await mutateAsync(data)
-      console.log(response)
       login({ token: response.data.token, user: response.data.user })
       navigate('/dashboard')
     } catch (err) {

@@ -161,8 +161,8 @@ const Produccion: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ))
-                : data?.data.length > 0 &&
-                  data?.data?.map((batch: Batch) => (
+                : data?.data.lotes.length > 0 &&
+                  data?.data?.lotes.map((batch: Batch) => (
                     <TableRow key={batch.idLote}>
                       <TableCell>
                         #{String(batch.numeroLote).padStart(3, '0')}
@@ -276,7 +276,7 @@ const Produccion: React.FC = () => {
             </TableBody>
           </Table>
 
-          {data?.data.length === 0 && (
+          {data?.data.lotes.length === 0 && (
             <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white w-full">
               <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center max-w-md w-full">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
@@ -320,6 +320,7 @@ const Produccion: React.FC = () => {
       <ChangeDecrease
         open={isChangeDecreaseOpen}
         onClose={() => setIsChangeDecreaseOpen(false)}
+        idBatch={selectedBatch?.idLote}
       />
 
       <ChangeCost
