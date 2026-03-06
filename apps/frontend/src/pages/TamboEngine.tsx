@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from '@/src/components/common/card'
+import { Card, CardContent } from '@/src/components/common/card'
 import {
   Select,
   SelectContent,
@@ -12,14 +12,16 @@ import { useAuth } from '@/src/context/AuthContext'
 import { useAlerts } from '@/src/hooks/alerts/useAlerts'
 import { Alert } from '@/src/types/alerts'
 import { Bot } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 
 const TamboEngine: React.FC = () => {
-  const { user } = useAuth() /* 
-  const { data } = useAlerts({ id: user.establecimientos[0].idEstablecimiento }) */
-  const isPending = false
+  const [range, setRange] = useState<'7' | '14' | '30'>('7')
+  const { user } = useAuth()
+  const { data, isPending } = useAlerts({
+    id: user.establecimientos[0].idEstablecimiento,
+    range: range,
+  })
 
-  const alerts = []
   return (
     <main className="flex flex-col gap-4">
       {' '}
@@ -32,7 +34,10 @@ const TamboEngine: React.FC = () => {
         comportamiento productivo sin sustituir el criterio del encargado.
       </p>
       <div>
-        <Select defaultValue="a">
+        <Select
+          onValueChange={(e) => setRange(e as '7' | '14' | '30')}
+          defaultValue={range}
+        >
           <SelectTrigger className="w-fit gap-3 pl-3 pr-2 justify-between">
             <span className="flex items-center gap-1.5">
               Fecha:
@@ -40,9 +45,9 @@ const TamboEngine: React.FC = () => {
             </span>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="a">Últimos 7 días</SelectItem>
-            <SelectItem value="b">Últimos 14 días</SelectItem>
-            <SelectItem value="c">Último mes</SelectItem>
+            <SelectItem value="7">Últimos 7 días</SelectItem>
+            <SelectItem value="14">Últimos 14 días</SelectItem>
+            <SelectItem value="30">Último mes</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -52,8 +57,8 @@ const TamboEngine: React.FC = () => {
             <TamboEngineCardSkeleton key={i} />
           ))}
 
-        {alerts.length > 0 ? (
-          alerts.map((alert: Alert) => (
+        {data?.length > 0 ? (
+          data?.map((alert: Alert) => (
             <TamboEngineCard alert={alert} key={alert.id} />
           ))
         ) : (

@@ -7,4 +7,5 @@ export interface Alert {
   nivel: string
   descripcion: string
   creado_en: string
+  visto: boolean
 }

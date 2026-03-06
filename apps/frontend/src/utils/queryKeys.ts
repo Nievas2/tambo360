@@ -20,6 +20,7 @@ export const baseKeys = {
   locality: ['locality'] as const,
   decrease: ['decrease'] as const,
   dashboard: ['dashboard'] as const,
+  alert: ['alert'] as const,
 } as const
 
 // Auth related keys
@@ -76,10 +77,12 @@ export const decreaseKeys = {
 }
 
 export const alertKeys = {
-  all: baseKeys.decrease,
-  lists: () => [...baseKeys.decrease, 'list'] as const,
-  lasts: () => [...baseKeys.decrease, 'lasts'] as const,
-  detail: (id: string) => [...baseKeys.decrease, id] as const,
+  all: baseKeys.alert,
+  lists: () => [...baseKeys.alert, 'list'] as const,
+  filters: (range: string) => [...baseKeys.alert, 'filters', range] as const,
+  lasts: () => [...baseKeys.alert, 'lasts'] as const,
+  noViewed: () => [...baseKeys.alert, 'noViewed'] as const,
+  detail: (id: string) => [...baseKeys.alert, id] as const,
 }
 
 export const dashboardKeys = {
