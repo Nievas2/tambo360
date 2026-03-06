@@ -27,10 +27,18 @@ export class TamboEngineService {
 
     static async analizarSiCorresponde(idEstablecimiento: string) {
         try {
-            // 1. Buscar todos los lotes COMPLETOS del establecimiento
+            const fechaLimite = new Date();
+            fechaLimite.setDate(fechaLimite.getDate() - 15);
+
+            // 1. Buscar todos los lotes COMPLETOS del establecimiento de los últimos 15 días
             const lotes = await prisma.loteProduccion.findMany({
-                where: { idEstablecimiento, estado: true },
-                include: { producto: true, mermas: true, costosDirectos: true, establecimiento: true }
+                where: {
+                    idEstablecimiento,
+                    estado: true,
+                    fechaProduccion: { gte: fechaLimite }
+                },
+                include: { producto: true, mermas: true, costosDirectos: true, establecimiento: true },
+                orderBy: { fechaProduccion: 'asc' } // Opcional, pero ayuda a que la IA los reciba ordenados cronológicamente
             });
 
             // 2. Verificar mínimo de lotes
