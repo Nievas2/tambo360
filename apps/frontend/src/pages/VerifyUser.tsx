@@ -21,13 +21,15 @@ const VerifyUser = () => {
           setUser(response.data.user)
           setToken(token)
         }
-      } catch (err) { console.error(err) }
+      } catch (err) {
+        console.error(err)
+      }
     }
     checkToken()
   }, [search, mutateAsync, setToken, setUser])
 
   return (
-    <div 
+    <div
       className="min-h-screen w-full flex flex-col md:flex-row bg-[#F2F1EC] relative font-inter bg-[url('/vacas_4.webp')] bg-cover bg-center bg-no-repeat"
       data-testid="verify-user-page"
     >
@@ -45,14 +47,21 @@ const VerifyUser = () => {
                 {isPending ? (
                   <div className="space-y-4" data-testid="verifying-loader">
                     <Loader2 className="w-12 h-12 text-[#0B1001] animate-spin mx-auto" />
-                    <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">Verificando...</h2>
+                    <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">
+                      Verificando...
+                    </h2>
                   </div>
                 ) : error ? (
-                  <div className="space-y-4" data-testid="verification-failed-container">
-                    <h2 className="text-4xl font-bold tracking-tight text-[#B91C1C]">Verificación fallida</h2>
-                    <Button 
-                      onClick={() => navigate('/login')} 
-                      variant="outline" 
+                  <div
+                    className="space-y-4"
+                    data-testid="verification-failed-container"
+                  >
+                    <h2 className="text-4xl font-bold tracking-tight text-[#B91C1C]">
+                      Verificación fallida
+                    </h2>
+                    <Button
+                      onClick={() => navigate('/login')}
+                      variant="outline"
                       className="border-[#D1CFCA] text-[#0B1001]"
                       data-testid="back-to-login-button"
                     >
@@ -60,11 +69,24 @@ const VerifyUser = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-6" data-testid="verification-success-container">
-                    <img src="/successIcon.svg" alt="success" className="w-20 h-20" />
-                    <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">¡Usuario validado!</h2>
-                    <Button 
-                      className="w-full h-14 bg-[#0B1001] text-white rounded-lg flex items-center justify-center gap-2" 
+                  <div
+                    className="flex flex-col items-center justify-center gap-6"
+                    data-testid="verification-success-container"
+                  >
+                    <img
+                      src="/successIcon.svg"
+                      alt="success"
+                      className="w-20 h-20"
+                    />
+                    <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">
+                      ¡Usuario validado!
+                    </h2>
+                    <p className="text-sm text-body-text text-center">
+                      Ya puedes comenzar a gestionar tu <br />
+                      producción.
+                    </p>
+                    <Button
+                      className="w-full h-14 bg-[#0B1001] text-white rounded-lg flex items-center justify-center gap-2"
                       onClick={() => navigate('/establecimiento')}
                       data-testid="create-establishment-button"
                     >
