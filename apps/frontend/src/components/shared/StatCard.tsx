@@ -36,7 +36,7 @@ export const StatCard = ({
             {/* Valor principal en gris oscuro/negro */}
             {isPending ? (
               <Skeleton className="h-8 w-[50%]" />
-            ) : title == 'Costos totales' ? (
+            ) : unit == '$ ' ? (
               <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
                 {unit} {Number(value).toLocaleString('es-AR')}
               </span>

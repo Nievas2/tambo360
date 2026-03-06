@@ -1,13 +1,6 @@
 import { Badge } from '@/src/components/common/badge'
 import { Button } from '@/src/components/common/Button'
-import { Card, CardContent } from '@/src/components/common/card'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from '@/src/components/common/empty'
+import { Card } from '@/src/components/common/card'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
@@ -149,34 +142,32 @@ export default function BatchDetails() {
           <StatCard
             icon={<Droplet />}
             title="Cantidad Producida"
-            value={batch?.data?.cantidad + ' ' + batch?.data?.unidad}
+            value={batch?.data?.cantidad}
+            unit=" L"
           />
 
           <StatCard
             icon={<Factory />}
             title="Costo de producción"
-            value={
-              '$' +
-              batch?.data?.costosDirectos
-                .reduce((total, costo) => total + Number(costo.monto), 0)
-                .toString()
-            }
+            value={batch?.data?.costosDirectos
+              .reduce((total, costo) => total + Number(costo.monto), 0)
+              .toString()}
+            unit="$ "
           />
 
           <StatCard
             icon={<TrendingDown />}
             title="Merma Registrada"
-            value={
-              batch?.data.mermas
-                ?.reduce((total, m) => {
-                  const qty =
-                    typeof m.cantidad === 'string'
-                      ? parseFloat(m.cantidad)
-                      : (m.cantidad ?? 0)
-                  return total + qty
-                }, 0)
-                .toString() + batch?.data.unidad
-            }
+            value={batch?.data.mermas
+              ?.reduce((total, m) => {
+                const qty =
+                  typeof m.cantidad === 'string'
+                    ? parseFloat(m.cantidad)
+                    : (m.cantidad ?? 0)
+                return total + qty
+              }, 0)
+              .toString()}
+            unit={' L'}
           />
         </div>
 
