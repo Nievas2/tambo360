@@ -1,5 +1,5 @@
 import { LayoutDashboard, Milk, Cpu, User } from 'lucide-react'
-import { data, Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ROUTES } from '../../constants/routes'
 import {
   Sidebar,
@@ -9,8 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../common/sidebar'
+import { useNoViewedAlerts } from '@/src/hooks/alerts/useNoViewedAlerts'
 import { useAuth } from '@/src/context/AuthContext'
-import { Button } from '@/src/components/common/Button'
 
 interface AppSidebarProps {
   forcedCollapsed?: boolean
@@ -18,7 +18,10 @@ interface AppSidebarProps {
 
 export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
   const location = useLocation()
-  const { logout } = useAuth()
+  const { user } = useAuth()
+  const { data } = useNoViewedAlerts({
+    id: user.establecimientos[0].idEstablecimiento,
+  })
   const isCollapsed = forcedCollapsed
 
   const mainMenuItems = [
@@ -92,9 +95,16 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                     />
                     {!isCollapsed && (
                       <span
-                        className={`font-semibold ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
+                        className={`font-semibold flex justify-between w-full ${isActive ? 'text-[#669213]' : 'text-gray-400'}`}
                       >
-                        {item.title}
+                        {item.title}{' '}
+                        {item.url === '/tambo-engine' &&
+                          data &&
+                          data.cantidad > 0 && (
+                            <span className="text-white bg-red-main rounded-full size-6 text-center text-[16px]">
+                              {data.cantidad}
+                            </span>
+                          )}
                       </span>
                     )}
                   </Link>

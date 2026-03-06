@@ -6,6 +6,10 @@ export const api = axios.create({
   withCredentials: true,
 })
 
+export const apiIA = axios.create({
+  baseURL: API_ENDPOINTS.BASE_IA,
+})
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -20,8 +24,3 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
-export const apiGob = axios.create({
-  baseURL: API_ENDPOINTS.GOB,
-  withCredentials: true,
-})
