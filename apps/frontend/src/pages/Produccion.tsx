@@ -2,13 +2,17 @@ import React, { useState } from 'react'
 import {
   Plus,
   Search,
-  Filter,
   Milk,
   Eye,
   DropletOff,
   BanknoteArrowUp,
   Ellipsis,
   Pencil,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+  X,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
@@ -43,16 +47,40 @@ import { Badge } from '@/src/components/common/badge'
 import { Batch } from '@/src/types/batch'
 import { useBatches } from '@/src/hooks/batch/useBatches'
 import DeleteBatch from '@/src/components/shared/dashboard/batch/DeleteBatch'
+import { useDebounce } from 'use-debounce'
 
 const Produccion: React.FC = () => {
-  const [searchValue, setSearchValue] = useState('')
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
   const [loteId, setLoteId] = useState('')
 
-  const { data, isPending } = useBatches()
+  const [nombre, setNombre] = useState('')
+  const [orden, setOrden] = useState<'asc' | 'desc'>('asc')
+  const [pagina, setPagina] = useState(1)
+
+  const [nameDebounced] = useDebounce(nombre, 300)
+
+  const { data, isPending } = useBatches({
+    filters: {
+      nombre: nameDebounced || undefined,
+      orden,
+      pagina: String(pagina),
+    },
+  })
+
+  const totalPaginas: number = data?.data?.totalPaginas ?? 1
+
+  const handleNombreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNombre(e.target.value)
+    setPagina(1)
+  }
+
+  const toggleOrden = () => {
+    setOrden((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+    setPagina(1)
+  }
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -70,7 +98,7 @@ const Produccion: React.FC = () => {
         </Button>
       </div>
 
-      <Card className="border-gray-200 shadow-sm overflow-hidden rounded-2xl bg-white gap-0">
+      <Card className="border-gray-200 shadow-sm overflow-hidden rounded-2xl bg-white gap-0 py-0">
         <CardHeader className="border-b border-gray-100 bg-white p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-3">
@@ -86,16 +114,32 @@ const Produccion: React.FC = () => {
                 <Input
                   className="pl-10 w-full md:w-60 bg-gray-50 border-gray-200 rounded-lg"
                   placeholder="Buscar lote..."
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
+                  value={nombre}
+                  onChange={handleNombreChange}
                 />
+                {nombre && (
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 group-focus-within:text-black transition-colors"
+                    onClick={() => setNombre('')}
+                  >
+                    <X className="size-4" />
+                  </button>
+                )}
               </div>
               <Button
                 variant="outline"
                 size="icon"
                 className="border-gray-200 bg-gray-50 rounded-lg"
+                onClick={toggleOrden}
+                title={
+                  orden === 'asc' ? 'Orden ascendente' : 'Orden descendente'
+                }
               >
-                <Filter className="w-4 h-4 text-gray-600" />
+                {orden === 'asc' ? (
+                  <ArrowUp className="w-4 h-4 text-gray-600" />
+                ) : (
+                  <ArrowDown className="w-4 h-4 text-gray-600" />
+                )}
               </Button>
             </div>
           </div>
@@ -105,28 +149,28 @@ const Produccion: React.FC = () => {
           <Table>
             <TableHeader className="bg-[#EAEAEA]">
               <TableRow>
-                <TableHead className="pr-4  min-w-20 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[8%] text-center font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Lote
                 </TableHead>
-                <TableHead className="w-24 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Fecha
                 </TableHead>
-                <TableHead className="w-[20%] lg:w-[25%] min-w-40 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[35%] min-w-40 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Producto
                 </TableHead>
-                <TableHead className="w-36 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[13%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Cantidad
                 </TableHead>
-                <TableHead className="w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Merma
                 </TableHead>
-                <TableHead className="w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[10%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Estado
                 </TableHead>
-                <TableHead className=" w-28 text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[9%] text-left font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Costo
                 </TableHead>
-                <TableHead className="pr-6 pl-4  w-32 text-right font-bold text-gray-400 uppercase text-xs tracking-wider">
+                <TableHead className="w-[5%] pr-6 pl-4 text-right font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Acción
                 </TableHead>
               </TableRow>
@@ -164,10 +208,9 @@ const Produccion: React.FC = () => {
                 : data?.data.lotes.length > 0 &&
                   data?.data?.lotes.map((batch: Batch) => (
                     <TableRow key={batch.idLote}>
-                      <TableCell>
+                      <TableCell className="text-center">
                         #{String(batch.numeroLote).padStart(3, '0')}
                       </TableCell>
-                      {/* avoid hydration mismatch: format date on the client or suppress warning */}
                       <TableCell suppressHydrationWarning>
                         {batch.fechaProduccion
                           .slice(0, 10)
@@ -180,7 +223,6 @@ const Produccion: React.FC = () => {
                         {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
                         {batch.unidad}
                       </TableCell>
-                      {/* calcula todas las mermas y las suma */}
                       <TableCell>
                         {batch.mermas
                           ?.reduce((total, m) => {
@@ -247,7 +289,10 @@ const Produccion: React.FC = () => {
                                 <Pencil /> Editar
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => setIsChangeDecreaseOpen(true)}
+                                onClick={() => {
+                                  setSelectedBatch(batch)
+                                  setIsChangeDecreaseOpen(true)
+                                }}
                                 disabled={batch.estado}
                               >
                                 <DropletOff /> Registrar merma
@@ -289,6 +334,38 @@ const Produccion: React.FC = () => {
                   Comienza registrando tu primer lote para ver aquí el detalle
                   de tu producción láctea.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!isPending && data?.data.lotes.length > 0 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+              <span className="text-xs text-gray-400">
+                Página {pagina} de {totalPaginas} · {data?.data.totalLotes ?? 0}{' '}
+                lotes
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 border-gray-200 bg-gray-50 rounded-lg"
+                  disabled={pagina <= 1}
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft className="w-4 h-4 text-gray-600" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 border-gray-200 bg-gray-50 rounded-lg"
+                  disabled={pagina >= totalPaginas}
+                  onClick={() =>
+                    setPagina((p) => Math.min(totalPaginas, p + 1))
+                  }
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </Button>
               </div>
             </div>
           )}

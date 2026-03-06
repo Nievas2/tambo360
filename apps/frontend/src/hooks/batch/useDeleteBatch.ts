@@ -15,15 +15,23 @@ export function useDeleteBatch() {
       return data
     },
 
-    onError: (error, _, context: { previous: unknown } | undefined) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKeys.batch.lists(), context.previous)
-      }
-      throw error
+    onError: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.batch, 'filters'],
+      })
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.current() })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.dashboard, 'graph'],
+      })
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.batch, 'filters'],
+      })
+
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.current() })
       queryClient.invalidateQueries({

@@ -74,3 +74,13 @@ export interface Batch {
   costosDirectos: Cost[]
   numeroLote: number
 }
+
+/* nombre?: string;
+        orden?: "asc" | "desc"; 
+        pagina?: number; */
+
+export interface BatchFilters {
+  nombre?: string
+  orden?: 'asc' | 'desc'
+  pagina?: string
+}
