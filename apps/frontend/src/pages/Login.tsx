@@ -31,21 +31,24 @@ const Login: React.FC = () => {
   })
 
   const showErrorMessage = useCallback((message?: string) => {
-    toast.custom(() => (
-      <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
-        <AlertCircle
-          className="w-5 h-5 flex-shrink-0 fill-[#EF4444]"
-          stroke="#FCE8E5"
-          strokeWidth={3}
-        />
-        <span className="flex-1">
-          {message || 'Revisa los campos resaltados e intenta nuevamente'}
-        </span>
-      </div>
-    ), {
-      duration: 4000,
-      position: 'top-center',
-    })
+    toast.custom(
+      () => (
+        <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
+          <AlertCircle
+            className="w-5 h-5 flex-shrink-0 fill-[#EF4444]"
+            stroke="#FCE8E5"
+            strokeWidth={3}
+          />
+          <span className="flex-1">
+            {message || 'Revisa los campos resaltados e intenta nuevamente'}
+          </span>
+        </div>
+      ),
+      {
+        duration: 4000,
+        position: 'top-center',
+      }
+    )
   }, []) // Corregido: Se añadieron las dependencias vacías []
 
   useEffect(() => {
@@ -56,7 +59,9 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (apiError) {
-      const message = apiError.response?.data?.message || 'Error al iniciar sesión. Por favor, intenta de nuevo.'
+      const message =
+        apiError.response?.data?.message ||
+        'Error al iniciar sesión. Por favor, intenta de nuevo.'
       showErrorMessage(message)
     }
   }, [apiError, showErrorMessage]) // Corregido: Eliminadas etiquetas extra
@@ -64,7 +69,8 @@ const Login: React.FC = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const response = await mutateAsync(data)
-      login({ token: response.token, user: response.user })
+      console.log(response)
+      login({ token: response.data.token, user: response.data.user })
       navigate('/dashboard')
     } catch (err) {
       console.error('Error al iniciar sesión:', err)
@@ -85,15 +91,26 @@ const Login: React.FC = () => {
                 <img src="/logotipo 1.svg" alt="tambo" className="h-6" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-[#0B1001]">Bienvenido</h1>
-                <p className="text-sm text-[#626059]">Ingresa tus credenciales para empezar a usar la plataforma.</p>
+                <h1 className="text-4xl font-bold tracking-tight text-[#0B1001]">
+                  Bienvenido
+                </h1>
+                <p className="text-sm text-[#626059]">
+                  Ingresa tus credenciales para empezar a usar la plataforma.
+                </p>
               </div>
             </div>
 
-            <form onSubmit={onSubmit} className="space-y-6" noValidate data-testid="login-form">
+            <form
+              onSubmit={onSubmit}
+              className="space-y-6"
+              noValidate
+              data-testid="login-form"
+            >
               <div className="space-y-4">
                 <div className="space-y-2 text-left">
-                  <Label className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+                  <Label
+                    className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                  >
                     Correo electrónico
                   </Label>
                   <Input
@@ -104,11 +121,17 @@ const Login: React.FC = () => {
                     disabled={isPending}
                     data-testid="email-input"
                   />
-                  {errors.correo && <p className="text-xs font-medium text-[#B91C1C]">{errors.correo.message}</p>}
+                  {errors.correo && (
+                    <p className="text-xs font-medium text-[#B91C1C]">
+                      {errors.correo.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2 text-left">
-                  <Label className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+                  <Label
+                    className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                  >
                     Contraseña
                   </Label>
                   <div className="relative">
@@ -127,14 +150,22 @@ const Login: React.FC = () => {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
                       data-testid="toggle-password-visibility"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <EyeIcon className="w-5 h-5" />
+                      )}
                     </Button>
                   </div>
-                  {errors.contraseña && <p className="text-xs font-medium text-[#B91C1C]">{errors.contraseña.message}</p>}
+                  {errors.contraseña && (
+                    <p className="text-xs font-medium text-[#B91C1C]">
+                      {errors.contraseña.message}
+                    </p>
+                  )}
                   <div className="flex justify-end pt-1">
-                    <Link 
-                      to="/auth/reset-password" 
-                      data-testid="reset-password-link" 
+                    <Link
+                      to="/auth/reset-password"
+                      data-testid="reset-password-link"
                       className="text-xs text-[#626059] hover:underline"
                     >
                       ¿Olvidaste tu contraseña?
@@ -149,13 +180,21 @@ const Login: React.FC = () => {
                 disabled={isPending}
                 data-testid="login-submit-button"
               >
-                {isPending ? 'Cargando...' : 'Iniciar sesión'} <ArrowRight className="size-5" />
+                {isPending ? 'Cargando...' : 'Iniciar sesión'}{' '}
+                <ArrowRight className="size-5" />
               </Button>
             </form>
 
             <div className="text-center pt-4 border-t border-[#F2F1EC]">
               <p className="text-sm text-[#626059]">
-                ¿No tienes una cuenta? <Link to="/register" data-testid="register-link" className="font-bold text-[#0B1001] hover:underline">Regístrate</Link>
+                ¿No tienes una cuenta?{' '}
+                <Link
+                  to="/register"
+                  data-testid="register-link"
+                  className="font-bold text-[#0B1001] hover:underline"
+                >
+                  Regístrate
+                </Link>
               </p>
             </div>
           </CardContent>
