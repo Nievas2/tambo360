@@ -25,6 +25,25 @@ export class TamboEngineService {
         }
     }
 
+    private static async _enriquecerAlertasConNumeroLote(alertas: any[]) {
+        if (!alertas || alertas.length === 0) return [];
+
+        const idsLotes = alertas.map(a => a.idLote).filter(Boolean);
+        if (idsLotes.length === 0) return alertas;
+
+        const lotesDb = await prisma.loteProduccion.findMany({
+            where: { idLote: { in: idsLotes } },
+            select: { idLote: true, numeroLote: true }
+        });
+
+        const lotesMap = new Map(lotesDb.map(l => [l.idLote, l.numeroLote]));
+
+        return alertas.map(a => ({
+            ...a,
+            numeroLote: lotesMap.get(a.idLote) || null
+        }));
+    }
+
     static async analizarSiCorresponde(idEstablecimiento: string) {
         try {
             const fechaLimite = new Date();
@@ -101,7 +120,8 @@ export class TamboEngineService {
                 throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
 
-            return await response.json();
+            const alertas = await response.json();
+            return await this._enriquecerAlertasConNumeroLote(alertas);
         } catch (error: any) {
             console.error("[TamboEngine] Error consultando alertas:", error);
             // Re-lanzamos el AppError si ya lo es, sino envolvemos en un 502 generico
@@ -119,7 +139,8 @@ export class TamboEngineService {
                 throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
 
-            return await response.json();
+            const alertas = await response.json();
+            return await this._enriquecerAlertasConNumeroLote(alertas);
         } catch (error: any) {
             console.error("[TamboEngine] Error consultando últimas alertas:", error);
             if (error instanceof AppError) throw error;
