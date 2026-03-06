@@ -91,3 +91,30 @@
  *       500:
  *         description: Error interno del servidor.
  */
+
+/**
+ * @swagger
+ * /alertas/{idEstablecimiento}/no-vistas:
+ *   get:
+ *     summary: Obtener el conteo total de alertas no vistas para un establecimiento
+ *     tags: [Alertas]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idEstablecimiento
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del establecimiento a consultar
+ *     responses:
+ *       200:
+ *         description: Conteo de alertas no vistas obtenido correctamente.
+ *       400:
+ *         description: Petición inválida (ej. falta ID).
+ *       401:
+ *         description: No autenticado.
+ *       500:
+ *         description: Error interno del servidor.
+ */

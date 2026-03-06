@@ -43,4 +43,15 @@ export class AlertController {
             next(error);
         }
     }
+    static async getAlertasNoVistasCount(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { idEstablecimiento } = req.params;
+            if (!idEstablecimiento) throw new AppError("ID del establecimiento requerido", 400);
+
+            const data = await TamboEngineService.getAlertasNoVistasCount(idEstablecimiento);
+            return res.status(200).json(ApiResponse.success(data, "Conteo de alertas no vistas obtenido correctamente"));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

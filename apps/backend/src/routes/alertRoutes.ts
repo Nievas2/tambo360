@@ -7,4 +7,6 @@ router.get("/:idEstablecimiento", AlertController.getAlertas);
 router.get("/:idEstablecimiento/ultimas", AlertController.getUltimasAlertas);
 router.put("/:idAlerta/visto", AlertController.marcarAlertaVisto);
 
+router.get("/:idEstablecimiento/no-vistas", AlertController.getAlertasNoVistasCount);
+
 export default router;

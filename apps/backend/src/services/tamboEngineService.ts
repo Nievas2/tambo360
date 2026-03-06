@@ -145,4 +145,20 @@ export class TamboEngineService {
             throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al marcar la alerta.", 502);
         }
     }
+    static async getAlertasNoVistasCount(idEstablecimiento: string) {
+        try {
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/no-vistas`, {}, 15000);
+
+            if (!response.ok) {
+                if (response.status === 404) return { cantidad: 0 };
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
+            }
+
+            return await response.json();
+        } catch (error: any) {
+            console.error("[TamboEngine] Error consultando conteo de alertas no vistas:", error);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al consultar cantidad de alertas.", 502);
+        }
+    }
 }
