@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.get("/:idEstablecimiento", AlertController.getAlertas);
 router.get("/:idEstablecimiento/ultimas", AlertController.getUltimasAlertas);
+router.put("/:idAlerta/visto", AlertController.marcarAlertaVisto);
 
 export default router;

@@ -87,9 +87,14 @@ export class TamboEngineService {
         }
     }
 
-    static async getAlertas(idEstablecimiento: string) {
+    static async getAlertas(idEstablecimiento: string, rangoDias?: number) {
         try {
-            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`, {}, 15000);
+            let url = `${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`;
+            if (rangoDias && !isNaN(rangoDias)) {
+                url += `?rango=${rangoDias}`;
+            }
+
+            const response = await this.fetchWithTimeout(url, {}, 15000);
 
             if (!response.ok) {
                 if (response.status === 404) return []; // Si no hay respuestas de IA aún, retornar array vacío
@@ -119,6 +124,25 @@ export class TamboEngineService {
             console.error("[TamboEngine] Error consultando últimas alertas:", error);
             if (error instanceof AppError) throw error;
             throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada.", 502);
+        }
+    }
+
+    static async marcarAlertaVisto(idAlerta: string) {
+        try {
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idAlerta}/visto`, {
+                method: "PUT"
+            }, 15000);
+
+            if (!response.ok) {
+                if (response.status === 404) throw new AppError("Alerta no encontrada en la IA.", 404);
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
+            }
+
+            return await response.json();
+        } catch (error: any) {
+            console.error("[TamboEngine] Error marcando alerta como vista:", error);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al marcar la alerta.", 502);
         }
     }
 }
