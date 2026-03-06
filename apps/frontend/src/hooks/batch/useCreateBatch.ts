@@ -1,6 +1,6 @@
 import { BatchData } from '@/src/types/batch'
 import { createBatch } from '@/src/utils/api/batch.api'
-import { queryKeys } from '@/src/utils/queryKeys'
+import { baseKeys, queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
@@ -23,11 +23,19 @@ export function useCreateBatch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.current() })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.dashboard, 'graph'],
+      })
     },
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.lists() })
       queryClient.invalidateQueries({ queryKey: queryKeys.batch.day() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.current() })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.dashboard, 'graph'],
+      })
     },
   })
 }

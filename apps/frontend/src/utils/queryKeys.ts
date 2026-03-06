@@ -7,6 +7,8 @@
  * - Consistent naming across the app
  */
 
+import { GraphParams } from '@/src/types/dashboard'
+
 // Base keys for each feature
 export const baseKeys = {
   auth: ['auth'] as const,
@@ -16,6 +18,7 @@ export const baseKeys = {
   province: ['province'] as const,
   locality: ['locality'] as const,
   decrease: ['decrease'] as const,
+  dashboard: ['dashboard'] as const,
 } as const
 
 // Auth related keys
@@ -69,6 +72,12 @@ export const decreaseKeys = {
   types: () => [...baseKeys.decrease, 'types'] as const,
 }
 
+export const dashboardKeys = {
+  graph: (params: GraphParams) =>
+    [...baseKeys.dashboard, 'graph', params] as const,
+  current: () => [...baseKeys.dashboard, 'current'] as const,
+}
+
 // Export all keys for easy access
 export const queryKeys = {
   auth: authKeys,
@@ -78,4 +87,5 @@ export const queryKeys = {
   province: provinceKeys,
   locality: localityKeys,
   decrease: decreaseKeys,
+  dashboard: dashboardKeys,
 } as const
