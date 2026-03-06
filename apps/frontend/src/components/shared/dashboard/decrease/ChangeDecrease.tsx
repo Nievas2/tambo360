@@ -27,7 +27,7 @@ import { Controller, useForm } from 'react-hook-form'
 interface ChangeDecreaseProps {
   open: boolean
   onClose: () => void
-  idBatch: string
+  idBatch?: string
   decrease?: Decrease
 }
 

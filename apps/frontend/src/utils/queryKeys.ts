@@ -7,6 +7,7 @@
  * - Consistent naming across the app
  */
 
+import { BatchFilters } from '@/src/types/batch'
 import { GraphParams } from '@/src/types/dashboard'
 
 // Base keys for each feature
@@ -34,6 +35,8 @@ export const authKeys = {
 export const batchKeys = {
   all: baseKeys.batch,
   lists: () => [...baseKeys.batch, 'list'] as const,
+  filters: (filters: BatchFilters) =>
+    [...baseKeys.batch, 'filters', filters] as const,
   detail: (id: string) => [...baseKeys.batch, id] as const,
   day: () => [...baseKeys.batch, 'today'] as const,
 } as const
