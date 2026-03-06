@@ -95,31 +95,36 @@
  *         name: nombre
  *         schema:
  *           type: string
- *         description: Filtrar por nombre del producto
+ *         required: false
+ *         description: Filtrar por nombre del producto (opcional, si no se pasa se listan todos los lotes)
  *       - in: query
  *         name: numeroLote
  *         schema:
  *           type: string
  *           pattern: "^[0-9]+$"
- *         description: Filtrar por número de lote
+ *         required: false
+ *         description: Filtrar por número de lote (opcional, si no se pasa se listan todos los lotes)
  *       - in: query
  *         name: fecha
  *         schema:
  *           type: string
  *           pattern: "^\\d{2}/\\d{2}/\\d{4}$"
- *         description: Filtrar por fecha de producción (dd/mm/aaaa)
+ *         required: false
+ *         description: Filtrar por fecha de producción (dd/mm/aaaa) (opcional)
  *       - in: query
  *         name: orden
  *         schema:
  *           type: string
  *           enum: [asc, desc]
- *         description: Ordenar por fecha de producción ('asc' o 'desc')
+ *         required: false
+ *         description: Ordenar por fecha de producción ('asc' o 'desc') (opcional)
  *       - in: query
  *         name: pagina
  *         schema:
  *           type: string
  *           pattern: "^[0-9]+$"
- *         description: Número de página (la primera página es 1)
+ *         required: false
+ *         description: Número de página (la primera página es 1) (opcional)
  *     responses:
  *       200:
  *         description: Lotes listados correctamente
