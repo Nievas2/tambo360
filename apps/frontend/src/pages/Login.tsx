@@ -46,20 +46,20 @@ const Login: React.FC = () => {
       duration: 4000,
       position: 'top-center',
     })
-  }, [])
+  }, []) // Corregido: Se añadieron las dependencias vacías []
 
   useEffect(() => {
     if (submitCount > 0 && Object.keys(errors).length > 0) {
       showErrorMessage()
     }
-  }, [submitCount, errors, showErrorMessage])
+  }, [submitCount, errors, showErrorMessage]) // Corregido: Eliminadas etiquetas extra
 
   useEffect(() => {
     if (apiError) {
       const message = apiError.response?.data?.message || 'Error al iniciar sesión. Por favor, intenta de nuevo.'
       showErrorMessage(message)
     }
-  }, [apiError, showErrorMessage])
+  }, [apiError, showErrorMessage]) // Corregido: Eliminadas etiquetas extra
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -90,8 +90,7 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* CLAVE: Añadimos noValidate aquí */}
-            <form onSubmit={onSubmit} className="space-y-6" noValidate>
+            <form onSubmit={onSubmit} className="space-y-6" noValidate data-testid="login-form">
               <div className="space-y-4">
                 <div className="space-y-2 text-left">
                   <Label className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
@@ -103,6 +102,7 @@ const Login: React.FC = () => {
                     {...register('correo')}
                     className={`h-14 ${errors.correo ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                     disabled={isPending}
+                    data-testid="email-input"
                   />
                   {errors.correo && <p className="text-xs font-medium text-[#B91C1C]">{errors.correo.message}</p>}
                 </div>
@@ -118,19 +118,25 @@ const Login: React.FC = () => {
                       {...register('contraseña')}
                       className={`h-14 ${errors.contraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                       disabled={isPending}
+                      data-testid="password-input"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
+                      data-testid="toggle-password-visibility"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                     </Button>
                   </div>
                   {errors.contraseña && <p className="text-xs font-medium text-[#B91C1C]">{errors.contraseña.message}</p>}
                   <div className="flex justify-end pt-1">
-                    <Link to="/auth/reset-password" className="text-xs text-[#626059] hover:underline">
+                    <Link 
+                      to="/auth/reset-password" 
+                      data-testid="reset-password-link" 
+                      className="text-xs text-[#626059] hover:underline"
+                    >
                       ¿Olvidaste tu contraseña?
                     </Link>
                   </div>
@@ -141,6 +147,7 @@ const Login: React.FC = () => {
                 type="submit"
                 className="w-full h-14 rounded-lg text-lg font-medium transition-all bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] gap-2"
                 disabled={isPending}
+                data-testid="login-submit-button"
               >
                 {isPending ? 'Cargando...' : 'Iniciar sesión'} <ArrowRight className="size-5" />
               </Button>
@@ -148,7 +155,7 @@ const Login: React.FC = () => {
 
             <div className="text-center pt-4 border-t border-[#F2F1EC]">
               <p className="text-sm text-[#626059]">
-                ¿No tienes una cuenta? <Link to="/register" className="font-bold text-[#0B1001] hover:underline">Regístrate</Link>
+                ¿No tienes una cuenta? <Link to="/register" data-testid="register-link" className="font-bold text-[#0B1001] hover:underline">Regístrate</Link>
               </p>
             </div>
           </CardContent>

@@ -106,7 +106,6 @@ const ResetPassword: React.FC = () => {
     }
   })
 
-  // Usamos rutas absolutas (empezando con /) para las imágenes por si la ruta tiene subniveles
   const backgroundImage = (step === 2 || step === 4) ? "url('/vacas_4.webp')" : "url('/vacas_3.webp')"
 
   return (
@@ -121,7 +120,7 @@ const ResetPassword: React.FC = () => {
         <Card className="w-full max-w-md border-none shadow-2xl py-8 bg-white/95 backdrop-blur-md rounded-xl">
           <CardContent className="space-y-8">
             <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold text-[#0B1001]">
+              <h1 className="text-3xl font-bold text-[#0B1001]" data-testid="reset-title">
                 {step === 1 && "Recuperar cuenta"}
                 {step === 2 && "Revisa tu mail"}
                 {step === 3 && "Nueva contraseña"}
@@ -136,8 +135,7 @@ const ResetPassword: React.FC = () => {
             </div>
 
             {step === 1 && (
-              /* AGREGAMOS noValidate PARA QUE ZOD TOME EL CONTROL */
-              <form onSubmit={handleRequestReset} className="space-y-6" noValidate>
+              <form onSubmit={handleRequestReset} className="space-y-6" noValidate data-testid="forgot-password-form">
                 <div className="space-y-2 text-left">
                   <Label className={`font-bold ${emailForm.formState.errors.email ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
                     Correo electrónico
@@ -148,22 +146,27 @@ const ResetPassword: React.FC = () => {
                     {...emailForm.register('email')}
                     className={`h-14 ${emailForm.formState.errors.email ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                     disabled={isSendingEmail}
+                    data-testid="email-input"
                   />
                   {emailForm.formState.errors.email && (
                     <p className="text-xs font-medium text-[#B91C1C]">{emailForm.formState.errors.email.message}</p>
                   )}
                 </div>
-                <Button disabled={isSendingEmail} className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2">
+                <Button 
+                  disabled={isSendingEmail} 
+                  className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2"
+                  data-testid="send-reset-link-button"
+                >
                   {isSendingEmail ? "Enviando..." : "Enviar enlace"} <ArrowRight className="w-5 h-5" />
                 </Button>
                 <div className="text-center">
-                  <Link to="/login" className="text-sm font-bold text-[#0B1001] hover:underline">Volver al inicio</Link>
+                  <Link to="/login" data-testid="back-to-login" className="text-sm font-bold text-[#0B1001] hover:underline">Volver al inicio</Link>
                 </div>
               </form>
             )}
 
             {step === 3 && (
-              <form onSubmit={onResetSubmit} className="space-y-6" noValidate>
+              <form onSubmit={onResetSubmit} className="space-y-6" noValidate data-testid="reset-password-form">
                 <div className="space-y-4 text-left">
                   <div className="space-y-2">
                     <Label className={`font-bold ${passForm.formState.errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Nueva contraseña*</Label>
@@ -173,8 +176,14 @@ const ResetPassword: React.FC = () => {
                         {...passForm.register('contraseña')}
                         className={`h-14 ${passForm.formState.errors.contraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                         disabled={isResetting}
+                        data-testid="new-password-input"
                       />
-                      <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059]">
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPass(!showPass)} 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059]"
+                        data-testid="toggle-password-visibility"
+                      >
                         {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
@@ -188,19 +197,29 @@ const ResetPassword: React.FC = () => {
                       {...passForm.register('confirmarContraseña')}
                       className={`h-14 ${passForm.formState.errors.confirmarContraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                       disabled={isResetting}
+                      data-testid="confirm-password-input"
                     />
                     {passForm.formState.errors.confirmarContraseña && <p className="text-xs font-medium text-[#B91C1C]">{passForm.formState.errors.confirmarContraseña.message as string}</p>}
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isResetting} className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2">
+                <Button 
+                  type="submit" 
+                  disabled={isResetting} 
+                  className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2"
+                  data-testid="update-password-button"
+                >
                   {isResetting ? 'Guardando...' : 'Restablecer contraseña'} <ArrowRight className="w-5 h-5" />
                 </Button>
               </form>
             )}
 
             {step === 4 && (
-              <Button onClick={() => navigate('/login')} className="w-full h-14 bg-[#0B1001] text-white rounded-lg font-bold">
+              <Button 
+                onClick={() => navigate('/login')} 
+                className="w-full h-14 bg-[#0B1001] text-white rounded-lg font-bold"
+                data-testid="go-to-login-after-reset"
+              >
                 Ir al inicio de sesión
               </Button>
             )}

@@ -27,7 +27,10 @@ const VerifyUser = () => {
   }, [search, mutateAsync, setToken, setUser])
 
   return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#F2F1EC] relative font-inter bg-[url('/vacas_4.webp')] bg-cover bg-center bg-no-repeat">
+    <div 
+      className="min-h-screen w-full flex flex-col md:flex-row bg-[#F2F1EC] relative font-inter bg-[url('/vacas_4.webp')] bg-cover bg-center bg-no-repeat"
+      data-testid="verify-user-page"
+    >
       <div className="absolute inset-0 bg-black/10 z-0" />
       <div className="hidden md:flex md:w-1/3 xl:w-1/2" />
       <div className="w-full md:w-2/3 xl:w-1/2 flex items-center justify-center md:justify-end p-4 md:p-8 z-10">
@@ -40,20 +43,31 @@ const VerifyUser = () => {
               </div>
               <section className="min-h-[40vh] flex flex-col items-center justify-center gap-6">
                 {isPending ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4" data-testid="verifying-loader">
                     <Loader2 className="w-12 h-12 text-[#0B1001] animate-spin mx-auto" />
                     <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">Verificando...</h2>
                   </div>
                 ) : error ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4" data-testid="verification-failed-container">
                     <h2 className="text-4xl font-bold tracking-tight text-[#B91C1C]">Verificación fallida</h2>
-                    <Button onClick={() => navigate('/login')} variant="outline" className="border-[#D1CFCA] text-[#0B1001]">Volver al login</Button>
+                    <Button 
+                      onClick={() => navigate('/login')} 
+                      variant="outline" 
+                      className="border-[#D1CFCA] text-[#0B1001]"
+                      data-testid="back-to-login-button"
+                    >
+                      Volver al login
+                    </Button>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-6">
+                  <div className="flex flex-col items-center justify-center gap-6" data-testid="verification-success-container">
                     <img src="/successIcon.svg" alt="success" className="w-20 h-20" />
                     <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">¡Usuario validado!</h2>
-                    <Button className="w-full h-14 bg-[#0B1001] text-white rounded-lg flex items-center justify-center gap-2" onClick={() => navigate('/establecimiento')}>
+                    <Button 
+                      className="w-full h-14 bg-[#0B1001] text-white rounded-lg flex items-center justify-center gap-2" 
+                      onClick={() => navigate('/establecimiento')}
+                      data-testid="create-establishment-button"
+                    >
                       Crear establecimiento <ArrowRight className="size-5" />
                     </Button>
                   </div>

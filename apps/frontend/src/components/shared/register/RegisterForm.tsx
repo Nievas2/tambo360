@@ -11,7 +11,6 @@ import { toast } from 'sonner'
 
 interface RegisterFormProps {
   handleNextStep: () => void
-  // Deshabilitamos ESLint para esta línea porque el nombre del parámetro es necesario
   // eslint-disable-next-line no-unused-vars
   handleAddEmail: (email: string) => void
 }
@@ -39,7 +38,6 @@ const RegisterForm = ({
   })
 
   const showErrorMessage = useCallback((message?: string) => {
-    // CORRECCIÓN: Quitamos el argumento de la función flecha del toast
     toast.custom(() => (
       <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
         <AlertCircle
@@ -82,7 +80,7 @@ const RegisterForm = ({
 
   return (
     <div className="w-full flex flex-col items-center font-inter">
-      <form onSubmit={onSubmit} className="w-full space-y-6">
+      <form onSubmit={onSubmit} className="w-full space-y-6" noValidate data-testid="register-form">
         <div className="space-y-4">
           <div className="space-y-2 text-left">
             <Label className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
@@ -93,6 +91,7 @@ const RegisterForm = ({
               {...register('nombre')}
               className={`h-14 ${errors.nombre ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
               disabled={isPending}
+              data-testid="full-name-input"
             />
             {errors.nombre && (
               <p className="text-xs font-medium text-[#B91C1C]">{errors.nombre.message}</p>
@@ -108,6 +107,7 @@ const RegisterForm = ({
               {...register('correo')}
               className={`h-14 ${errors.correo ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
               disabled={isPending}
+              data-testid="email-input"
             />
             {errors.correo && (
               <p className="text-xs font-medium text-[#B91C1C]">{errors.correo.message}</p>
@@ -125,12 +125,14 @@ const RegisterForm = ({
                 {...register('contraseña')}
                 className={`h-14 ${errors.contraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                 disabled={isPending}
+                data-testid="password-input"
               />
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
+                data-testid="toggle-password-visibility"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               </Button>
@@ -156,12 +158,14 @@ const RegisterForm = ({
                 {...register('confirmarContraseña')}
                 className={`h-14 ${errors.confirmarContraseña ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'}`}
                 disabled={isPending}
+                data-testid="confirm-password-input"
               />
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
+                data-testid="toggle-confirm-password-visibility"
               >
                 {showConfirmPassword ? <EyeOff className="size-5" /> : <EyeIcon className="size-5" />}
               </Button>
@@ -176,6 +180,7 @@ const RegisterForm = ({
           type="submit"
           className="w-full h-14 rounded-lg text-lg font-medium transition-all bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] flex items-center justify-center gap-2"
           disabled={isPending}
+          data-testid="register-submit-button"
         >
           {isPending ? 'Cargando...' : 'Siguiente'}
           <ArrowRight className="size-5" />
