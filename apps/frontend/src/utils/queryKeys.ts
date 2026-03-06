@@ -7,6 +7,9 @@
  * - Consistent naming across the app
  */
 
+import { BatchFilters } from '@/src/types/batch'
+import { GraphParams } from '@/src/types/dashboard'
+
 // Base keys for each feature
 export const baseKeys = {
   auth: ['auth'] as const,
@@ -16,6 +19,7 @@ export const baseKeys = {
   province: ['province'] as const,
   locality: ['locality'] as const,
   decrease: ['decrease'] as const,
+  dashboard: ['dashboard'] as const,
 } as const
 
 // Auth related keys
@@ -31,6 +35,8 @@ export const authKeys = {
 export const batchKeys = {
   all: baseKeys.batch,
   lists: () => [...baseKeys.batch, 'list'] as const,
+  filters: (filters: BatchFilters) =>
+    [...baseKeys.batch, 'filters', filters] as const,
   detail: (id: string) => [...baseKeys.batch, id] as const,
   day: () => [...baseKeys.batch, 'today'] as const,
 } as const
@@ -76,6 +82,12 @@ export const alertKeys = {
   detail: (id: string) => [...baseKeys.decrease, id] as const,
 }
 
+export const dashboardKeys = {
+  graph: (params: GraphParams) =>
+    [...baseKeys.dashboard, 'graph', params] as const,
+  current: () => [...baseKeys.dashboard, 'current'] as const,
+}
+
 // Export all keys for easy access
 export const queryKeys = {
   auth: authKeys,
@@ -86,4 +98,5 @@ export const queryKeys = {
   locality: localityKeys,
   decrease: decreaseKeys,
   alert: alertKeys,
+  dashboard: dashboardKeys,
 } as const

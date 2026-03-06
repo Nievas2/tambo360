@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { CrearLoteDTO } from "../schemas/batchSchema";
-import { TamboEngineService } from "./tamboEngineService";
+import { Prisma } from "@prisma/client";
 
 export class LoteService {
 
@@ -89,7 +89,7 @@ export class LoteService {
             unidad = producto.categoria === "quesos" ? "kg" : "litros";
         }
 
-        const loteActualizado = await prisma.loteProduccion.update({
+        return prisma.loteProduccion.update({
             where: { idLote },
             data: {
                 idProducto,
@@ -98,7 +98,6 @@ export class LoteService {
                 fechaProduccion: data.fechaProduccion
                     ? new Date(data.fechaProduccion)
                     : lote.fechaProduccion,
-                estado: data.estado ?? lote.estado,
             },
             include: {
                 producto: true,
@@ -106,12 +105,6 @@ export class LoteService {
                 costosDirectos: true
             }
         });
-
-        if (data.estado === true && lote.estado === false) {
-            TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
-        }
-
-        return loteActualizado;
     }
 
     static async eliminarLote(idLote: string, idUsuario: string) {
@@ -135,7 +128,12 @@ export class LoteService {
         return prisma.loteProduccion.delete({ where: { idLote } });
     }
 
-    static async listarLotes(idUsuario: string) {
+    static async listarLotes(idUsuario: string, filtros?: {
+        nombre?: string; fecha?: { inicio: Date; fin: Date }; numeroLote?: number;
+        orden?: "asc" | "desc"; pagina?: number;
+    }
+    ) {
+
         const establecimiento = await prisma.establecimiento.findFirst({
             where: { idUsuario },
         });
@@ -144,12 +142,60 @@ export class LoteService {
             throw new AppError("El usuario no tiene un establecimiento registrado", 400);
         }
 
+        const where: Prisma.LoteProduccionWhereInput = {
+            idEstablecimiento: establecimiento.idEstablecimiento,
+        };
+
+        if (filtros?.nombre) {
+            where.producto = {
+                nombre: {
+                    contains: filtros.nombre,
+                    mode: "insensitive",
+                },
+            };
+        }
+
+        if (filtros?.numeroLote !== undefined && !Number.isNaN(filtros.numeroLote)) {
+            where.numeroLote = filtros.numeroLote;
+        }
+
+        if (filtros?.fecha) {
+            where.fechaProduccion = {
+                gte: filtros.fecha.inicio,
+                lte: filtros.fecha.fin,
+            };
+        }
+
+        const pagina = filtros?.pagina && filtros.pagina > 0 ? filtros.pagina : 1;
+        const cantidadPorPagina = 20;
+
+        const totalLotes = await prisma.loteProduccion.count({ where });
+        const totalPaginas = Math.ceil(totalLotes / cantidadPorPagina);
+
+        if (pagina > totalPaginas && totalPaginas > 0) {
+            throw new AppError("La página solicitada no existe", 404);
+        }
+
         const lotes = await prisma.loteProduccion.findMany({
-            where: { idEstablecimiento: establecimiento.idEstablecimiento },
-            include: { producto: true, mermas: true, costosDirectos: true },
+            where,
+            include: {
+                producto: true,
+                mermas: true,
+                costosDirectos: true,
+            },
+            orderBy: {
+                fechaProduccion: filtros?.orden ?? "desc",
+            },
+            skip: (pagina - 1) * cantidadPorPagina,
+            take: cantidadPorPagina,
         });
 
-        return lotes;
+        return {
+            pagina,
+            totalPaginas,
+            totalLotes,
+            lotes,
+        };
     }
 
     static async obtenerLote(idLote: string, idUsuario: string) {
@@ -210,13 +256,9 @@ export class LoteService {
             throw new AppError("El lote ya está completado", 400);
         }
 
-        const loteActualizado = await prisma.loteProduccion.update({
+        return prisma.loteProduccion.update({
             where: { idLote },
             data: { estado: true },
         });
-
-        TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
-
-        return loteActualizado;
     }
 }

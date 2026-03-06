@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { LoteService } from "../services/batchService";
-import { crearLoteSchema, editarLoteSchema, idLoteParamSchema } from "../schemas/batchSchema";
+import { crearLoteSchema, editarLoteSchema, idLoteParamSchema, listarLotesSchema } from "../schemas/batchSchema";
 import { AppError } from "../utils/AppError";
 import { ApiResponse } from "../utils/ApiResponse";
 
@@ -64,9 +64,18 @@ export const listarLotes = async (req: Request, res: Response, next: NextFunctio
         const user = (req as any).user;
         if (!user) throw new AppError("Usuario no autenticado", 401);
 
-        const lotes = await LoteService.listarLotes(user.id);
+        const parsed = listarLotesSchema.safeParse(req.query);
+        if (!parsed.success) {
+            const errores = parsed.error.issues.map((e) => e.message);
+            throw new AppError(errores.join(", "), 400);
+        }
+
+        const filtros = parsed.data;
+
+        const lotes = await LoteService.listarLotes(user.id, filtros);
 
         return res.status(200).json(ApiResponse.success(lotes, "Lotes listados correctamente"));
+
     } catch (error) {
         next(error);
     }

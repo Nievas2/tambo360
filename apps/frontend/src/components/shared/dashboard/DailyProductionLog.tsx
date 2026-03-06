@@ -17,7 +17,6 @@ import { useBatchesDay } from '@/src/hooks/batch/useBatchesDay'
 const DailyProductionLog = () => {
   const [open, setOpen] = useState(false)
   const { data, error } = useBatchesDay()
-  console.log(data)
 
   return (
     <Card>
@@ -41,7 +40,7 @@ const DailyProductionLog = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {data?.data?.length > 0 && (
+        {(data?.data?.length > 0 || data?.data !== null || !error) && (
           <Table className="rounded-md border">
             <TableHeader>
               <TableRow className="border-none">
@@ -108,7 +107,7 @@ const DailyProductionLog = () => {
           </Table>
         )}
 
-        {(data?.data?.length === 0 || error) && (
+        {(data?.data?.length === 0 || data?.data === null || error) && (
           <div className="w-full h-36 flex justify-center items-center border border-dashed">
             <p className="text-center">Aún no hay producción registrada hoy</p>
           </div>

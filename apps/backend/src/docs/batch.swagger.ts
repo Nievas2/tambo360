@@ -90,6 +90,41 @@
  *     tags: [Lotes]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: nombre
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filtrar por nombre del producto (opcional, si no se pasa se listan todos los lotes)
+ *       - in: query
+ *         name: numeroLote
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9]+$"
+ *         required: false
+ *         description: Filtrar por número de lote (opcional, si no se pasa se listan todos los lotes)
+ *       - in: query
+ *         name: fecha
+ *         schema:
+ *           type: string
+ *           pattern: "^\\d{2}/\\d{2}/\\d{4}$"
+ *         required: false
+ *         description: Filtrar por fecha de producción (dd/mm/aaaa) (opcional)
+ *       - in: query
+ *         name: orden
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         required: false
+ *         description: Ordenar por fecha de producción ('asc' o 'desc') (opcional)
+ *       - in: query
+ *         name: pagina
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9]+$"
+ *         required: false
+ *         description: Número de página (la primera página es 1) (opcional)
  *     responses:
  *       200:
  *         description: Lotes listados correctamente
@@ -101,26 +136,32 @@
  *                 statusCode: { type: integer, example: 200 }
  *                 message: { type: string, example: "Lotes listados correctamente" }
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       idLote: { type: string, format: uuid }
- *                       idProducto: { type: string, format: uuid }
- *                       cantidad: { type: number }
- *                       unidad: { type: string }
- *                       fechaProduccion: { type: string, format: date-time }
- *                       estado: { type: boolean }
- *                       numeroLote: { type: integer }
- *                       producto:
+ *                   type: object
+ *                   properties:
+ *                     pagina: { type: integer, example: 1 }
+ *                     totalPaginas: { type: integer, example: 2 }
+ *                     totalLotes: { type: integer, example: 30 }
+ *                     lotes:
+ *                       type: array
+ *                       items:
  *                         type: object
  *                         properties:
- *                           nombre: { type: string }
- *                           categoria: { type: string }
- *                       mermas: { type: array, items: { type: object } }
- *                       costosDirectos: { type: array, items: { type: object } }
+ *                           idLote: { type: string, format: uuid }
+ *                           idProducto: { type: string, format: uuid }
+ *                           cantidad: { type: number }
+ *                           unidad: { type: string }
+ *                           fechaProduccion: { type: string, format: date-time }
+ *                           estado: { type: boolean }
+ *                           numeroLote: { type: integer }
+ *                           producto:
+ *                             type: object
+ *                             properties:
+ *                               nombre: { type: string }
+ *                               categoria: { type: string }
+ *                           mermas: { type: array, items: { type: object } }
+ *                           costosDirectos: { type: array, items: { type: object } }
  *       400:
- *         description: Usuario sin establecimiento
+ *         description: Error de validación o usuario sin establecimiento
  *         content:
  *           application/json:
  *             schema:

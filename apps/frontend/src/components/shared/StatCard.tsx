@@ -1,4 +1,6 @@
+import { AlertCircle } from 'lucide-react'
 import { Card, CardContent } from '../common/card'
+import { Skeleton } from '@/src/components/common/skeleton'
 
 interface StatCardProps {
   title: string
@@ -6,6 +8,8 @@ interface StatCardProps {
   trend?: { value: number; isPositive: boolean }
   description?: string
   icon?: React.ReactNode
+  unit: string
+  isPending?: boolean
 }
 
 export const StatCard = ({
@@ -14,6 +18,8 @@ export const StatCard = ({
   trend,
   description,
   icon,
+  unit,
+  isPending,
 }: StatCardProps) => {
   return (
     <Card className="border-slate-200 shadow-sm bg-white rounded-xl">
@@ -28,22 +34,34 @@ export const StatCard = ({
 
           <div className="flex flex-col gap-1">
             {/* Valor principal en gris oscuro/negro */}
-            <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
-              {value}
-            </span>
+            {isPending ? (
+              <Skeleton className="h-8 w-[50%]" />
+            ) : unit == '$ ' ? (
+              <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
+                {unit} {Number(value).toLocaleString('es-AR')}
+              </span>
+            ) : (
+              <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
+                {Number(value).toLocaleString('es-AR')} {unit}
+              </span>
+            )}
 
             <div className="flex items-center gap-1.5 mt-1">
-              {trend && (
-                <div className="flex items-center text-[13px] font-bold text-slate-600">
+              {trend ? (
+                <div className="flex items-center gap-1 text-[13px] font-bold text-slate-600">
                   {/* Flecha a la izquierda del valor, siempre en gris */}
-                  <span className="mr-1">{trend.isPositive ? '↑' : '↓'}</span>
-                  <span>{trend.value}%</span>
+                  <span>{trend.isPositive ? '↑' : '↓'}</span>
+                  <span>{trend.value?.toString().split('.')[0]}% </span>
+                  <span className="text-[12px] text-slate-400 font-medium font-inter">
+                    {description}
+                  </span>
                 </div>
+              ) : (
+                <span className="flex items-center gap-1 text-[12px] text-slate-400 font-medium font-inter">
+                  <AlertCircle className="h-4 w-4" />
+                  Sin datos suficientes
+                </span>
               )}
-              {/* Descripción complementaria */}
-              <span className="text-[12px] text-slate-400 font-medium font-inter">
-                {description}
-              </span>
             </div>
           </div>
         </div>
