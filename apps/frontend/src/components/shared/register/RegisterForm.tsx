@@ -5,15 +5,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/src/components/common/label'
 import { RegisterSchema } from '@/src/types/register'
 import { Input } from '@/src/components/common/Input'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 interface RegisterFormProps {
   handleNextStep: () => void
   // Deshabilitamos ESLint para esta línea porque el nombre del parámetro es necesario
-  // pero no se usa en este archivo (solo es parte de la firma)
   // eslint-disable-next-line no-unused-vars
-  handleAddEmail: (_email: string) => void
+  handleAddEmail: (email: string) => void
 }
 
 const RegisterForm = ({
@@ -27,7 +27,7 @@ const RegisterForm = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, submitCount },
   } = useForm({
     defaultValues: {
       correo: '',
@@ -38,7 +38,37 @@ const RegisterForm = ({
     resolver: zodResolver(RegisterSchema),
   })
 
-  const hasAnyError = Object.keys(errors).length > 0 || !!apiError
+  const showErrorMessage = useCallback((message?: string) => {
+    // CORRECCIÓN: Quitamos el argumento de la función flecha del toast
+    toast.custom(() => (
+      <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
+        <AlertCircle
+          className="w-5 h-5 flex-shrink-0 fill-[#EF4444]"
+          stroke="#FCE8E5"
+          strokeWidth={3}
+        />
+        <span className="flex-1">
+          {message || 'Revisa los campos resaltados e intenta nuevamente'}
+        </span>
+      </div>
+    ), {
+      duration: 4000,
+      position: 'top-center',
+    })
+  }, [])
+
+  useEffect(() => {
+    if (submitCount > 0 && Object.keys(errors).length > 0) {
+      showErrorMessage()
+    }
+  }, [submitCount, errors, showErrorMessage])
+
+  useEffect(() => {
+    if (apiError) {
+      const message = apiError.response?.data?.message || 'Ocurrió un error en el servidor'
+      showErrorMessage(message)
+    }
+  }, [apiError, showErrorMessage])
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -52,21 +82,8 @@ const RegisterForm = ({
 
   return (
     <div className="w-full flex flex-col items-center font-inter">
-      {/* Aviso General: fixed para que se alinee al root de la pantalla con estilos Handoff */}
-      {hasAnyError && (
-        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[400px] flex items-center justify-center gap-2 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300">
-          <AlertCircle 
-            className="w-5 h-5 fill-[#EF4444]" 
-            stroke="#FCE8E5" 
-            strokeWidth={3}
-          />
-          <span>Revisa los campos resaltados e intenta nuevamente</span>
-        </div>
-      )}
-
       <form onSubmit={onSubmit} className="w-full space-y-6">
         <div className="space-y-4">
-          {/* Nombre */}
           <div className="space-y-2 text-left">
             <Label className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
               Nombre*
@@ -82,7 +99,6 @@ const RegisterForm = ({
             )}
           </div>
 
-          {/* Email */}
           <div className="space-y-2 text-left">
             <Label className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
               Correo electrónico*
@@ -98,7 +114,6 @@ const RegisterForm = ({
             )}
           </div>
 
-          {/* Password */}
           <div className="space-y-2 text-left">
             <Label className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
               Contraseña*
@@ -130,7 +145,6 @@ const RegisterForm = ({
             )}
           </div>
 
-          {/* Confirmar Password */}
           <div className="space-y-2 text-left">
             <Label className={`font-bold ${errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
               Confirmar contraseña*
@@ -158,13 +172,6 @@ const RegisterForm = ({
           </div>
         </div>
 
-        {apiError && !Object.keys(errors).length && (
-          <div className="bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-2 rounded-lg text-xs text-center font-medium">
-            {apiError.response?.data?.message || 'Ocurrió un error en el servidor.'}
-          </div>
-        )}
-
-        {/* Botón Primario: Negro Olivo #0B1001, Texto Crema #FFFBF1, Gap 8px */}
         <Button
           type="submit"
           className="w-full h-14 rounded-lg text-lg font-medium transition-all bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] flex items-center justify-center gap-2"
