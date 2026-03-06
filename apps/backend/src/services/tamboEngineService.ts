@@ -25,12 +25,39 @@ export class TamboEngineService {
         }
     }
 
+    private static async _enriquecerAlertasConNumeroLote(alertas: any[]) {
+        if (!alertas || alertas.length === 0) return [];
+
+        const idsLotes = alertas.map(a => a.idLote).filter(Boolean);
+        if (idsLotes.length === 0) return alertas;
+
+        const lotesDb = await prisma.loteProduccion.findMany({
+            where: { idLote: { in: idsLotes } },
+            select: { idLote: true, numeroLote: true }
+        });
+
+        const lotesMap = new Map(lotesDb.map(l => [l.idLote, l.numeroLote]));
+
+        return alertas.map(a => ({
+            ...a,
+            numeroLote: lotesMap.get(a.idLote) || null
+        }));
+    }
+
     static async analizarSiCorresponde(idEstablecimiento: string) {
         try {
-            // 1. Buscar todos los lotes COMPLETOS del establecimiento
+            const fechaLimite = new Date();
+            fechaLimite.setDate(fechaLimite.getDate() - 15);
+
+            // 1. Buscar todos los lotes COMPLETOS del establecimiento de los últimos 15 días
             const lotes = await prisma.loteProduccion.findMany({
-                where: { idEstablecimiento, estado: true },
-                include: { producto: true, mermas: true, costosDirectos: true, establecimiento: true }
+                where: {
+                    idEstablecimiento,
+                    estado: true,
+                    fechaProduccion: { gte: fechaLimite }
+                },
+                include: { producto: true, mermas: true, costosDirectos: true, establecimiento: true },
+                orderBy: { fechaProduccion: 'asc' } // Opcional, pero ayuda a que la IA los reciba ordenados cronológicamente
             });
 
             // 2. Verificar mínimo de lotes
@@ -79,16 +106,22 @@ export class TamboEngineService {
         }
     }
 
-    static async getAlertas(idEstablecimiento: string) {
+    static async getAlertas(idEstablecimiento: string, rangoDias?: number) {
         try {
-            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`, {}, 15000);
+            let url = `${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}`;
+            if (rangoDias && !isNaN(rangoDias)) {
+                url += `?rango=${rangoDias}`;
+            }
+
+            const response = await this.fetchWithTimeout(url, {}, 15000);
 
             if (!response.ok) {
                 if (response.status === 404) return []; // Si no hay respuestas de IA aún, retornar array vacío
                 throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
 
-            return await response.json();
+            const alertas = await response.json();
+            return await this._enriquecerAlertasConNumeroLote(alertas);
         } catch (error: any) {
             console.error("[TamboEngine] Error consultando alertas:", error);
             // Re-lanzamos el AppError si ya lo es, sino envolvemos en un 502 generico
@@ -106,11 +139,47 @@ export class TamboEngineService {
                 throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
             }
 
-            return await response.json();
+            const alertas = await response.json();
+            return await this._enriquecerAlertasConNumeroLote(alertas);
         } catch (error: any) {
             console.error("[TamboEngine] Error consultando últimas alertas:", error);
             if (error instanceof AppError) throw error;
             throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada.", 502);
+        }
+    }
+
+    static async marcarAlertaVisto(idAlerta: string) {
+        try {
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idAlerta}/visto`, {
+                method: "PUT"
+            }, 15000);
+
+            if (!response.ok) {
+                if (response.status === 404) throw new AppError("Alerta no encontrada en la IA.", 404);
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
+            }
+
+            return await response.json();
+        } catch (error: any) {
+            console.error("[TamboEngine] Error marcando alerta como vista:", error);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al marcar la alerta.", 502);
+        }
+    }
+    static async getAlertasNoVistasCount(idEstablecimiento: string) {
+        try {
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/no-vistas`, {}, 15000);
+
+            if (!response.ok) {
+                if (response.status === 404) return { cantidad: 0 };
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
+            }
+
+            return await response.json();
+        } catch (error: any) {
+            console.error("[TamboEngine] Error consultando conteo de alertas no vistas:", error);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al consultar cantidad de alertas.", 502);
         }
     }
 }
