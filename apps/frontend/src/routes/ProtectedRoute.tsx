@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import LoadingSpinner from '@/src/components/layout/LoadingSpinner'
 import Loading from '@/src/components/layout/Loading'
 
 interface ProtectedRouteProps {
@@ -8,14 +7,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading, logout } = useAuth()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return <Loading />
   }
 
   if (!user) {
-    logout()
     return <Navigate to="/login" replace />
   }
 
