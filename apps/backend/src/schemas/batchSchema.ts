@@ -78,6 +78,39 @@ export const editarLoteSchema = z.object({
 });
 
 
+export const listarLotesSchema = z.object({
+    nombre: z
+        .string()
+        .min(1, "El nombre no puede estar vacío")
+        .optional(),
+
+    numeroLote: z
+        .string()
+        .regex(/^\d+$/, "Número de lote inválido")
+        .transform((val) => (val ? Number(val) : undefined))
+        .optional(),
+
+    fecha: z
+        .string()
+        .regex(/^\d{2}\/\d{2}\/\d{4}$/, "Formato inválido, usar dd/mm/aaaa")
+        .optional()
+        .transform((val) => {
+            if (!val) return undefined;
+            const [dd, mm, yyyy] = val.split("/").map(Number);
+            const inicio = new Date(yyyy, mm - 1, dd, 0, 0, 0, 0);
+            const fin = new Date(yyyy, mm - 1, dd, 23, 59, 59, 999);
+            return { inicio, fin };
+        }),
+
+    orden: z.enum(["asc", "desc"], "El orden debe ser 'asc' o 'desc'").optional(),
+
+    pagina: z
+        .string()
+        .regex(/^\d+$/, "Página inválida")
+        .transform((val) => (val ? Number(val) : 1))
+        .refine((val) => val > 0, "La página debe ser mayor a 0")
+        .optional(),
+});
 
 export const idLoteParamSchema = z.object({
     idLote: z.string().uuid("Id de lote inválido"),
@@ -85,3 +118,4 @@ export const idLoteParamSchema = z.object({
 
 export type CrearLoteDTO = z.infer<typeof crearLoteSchema>;
 export type EditarLoteDTO = z.infer<typeof editarLoteSchema>;
+export type ListarLotesQuery = z.infer<typeof listarLotesSchema>;
