@@ -105,7 +105,12 @@ const Produccion: React.FC = () => {
               <CardTitle className="text-lg font-bold">
                 Listado de lotes
               </CardTitle>
-              <CardDescription>Febrero 2026</CardDescription>
+              <CardDescription>
+                {new Date().toLocaleDateString('es-ES', {
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </CardDescription>
             </div>
 
             <div className="flex items-center gap-3">
