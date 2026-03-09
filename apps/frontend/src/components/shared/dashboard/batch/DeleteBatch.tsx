@@ -88,7 +88,7 @@ export const ConfirmDeleteDialog = ({
 }: ConfirmDeleteDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-10 flex flex-col items-center text-center">
+      <DialogContent className="p-10 flex flex-col items-center text-center bg-[#FFFBF1]">
         <img src="/alertIcon.svg" className="size-36" />
 
         <DialogHeader>
@@ -105,8 +105,8 @@ export const ConfirmDeleteDialog = ({
 
         <div className="flex flex-col w-full gap-3 mt-8">
           <Button
-            variant="default"
-            className="h-14 text-lg font-bold bg-black hover:bg-zinc-800"
+            variant="warning"
+            className="h-14 text-lg"
             onClick={onConfirm}
             disabled={isLoading}
           >
@@ -114,8 +114,8 @@ export const ConfirmDeleteDialog = ({
           </Button>
 
           <Button
-            variant="outline"
-            className="h-14 text-lg font-bold border-gray-300"
+            variant="ghost"
+            className="h-14 text-lg font-bold border border-black"
             onClick={onClose}
           >
             Cancelar

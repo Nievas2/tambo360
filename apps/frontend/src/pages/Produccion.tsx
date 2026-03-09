@@ -243,7 +243,8 @@ const Produccion: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={batch.estado ? 'default' : 'destructive'}
+                          className="font-bold"
+                          variant={batch.estado ? 'success' : 'destructive'}
                         >
                           {batch.estado ? 'Completo' : 'Incompleto'}
                         </Badge>
