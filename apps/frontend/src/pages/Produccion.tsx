@@ -152,7 +152,7 @@ const Produccion: React.FC = () => {
 
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-[#EAEAEA]">
+            <TableHeader className="bg-tables">
               <TableRow>
                 <TableHead className="w-[8%] text-center font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Lote

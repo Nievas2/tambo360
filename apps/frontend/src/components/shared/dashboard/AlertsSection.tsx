@@ -42,7 +42,7 @@ const AlertsSection = () => {
               <AlertCard alert={alert} key={alert.id} />
             ))
           ) : (
-            <CardContent className="bg-[#eaeaea] rounded-lg space-y-4 p-4 mx-2">
+            <CardContent className="bg-tables rounded-lg space-y-4 p-4 mx-2">
               <p className="text-[14px]">
                 Hola <b>{user.nombre.split(' ')[0]}</b>, soy TamboEngine.
               </p>

@@ -33,16 +33,20 @@ const DailyProductionLog = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+          <Button
+            variant="outline"
+            className="p-6"
+            onClick={() => setOpen(true)}
+          >
             Crear lote
-            <Plus className="ml-2 size-4" />
+            <Plus className="size-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         {(data?.data?.length > 0 || data?.data !== null || !error) && (
           <Table className="rounded-md border">
-            <TableHeader>
+            <TableHeader className="bg-tables">
               <TableRow className="border-none">
                 <TableHead className="w-18 text-sm font-light text-[#707070]">
                   Lote
