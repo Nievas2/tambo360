@@ -225,7 +225,12 @@ const Produccion: React.FC = () => {
                           .reverse()
                           .join('/')}
                       </TableCell>
-                      <TableCell>{batch.producto.nombre}</TableCell>
+                      <TableCell>
+                        <Link to={`/produccion/lote/${batch.idLote}`}>
+                          {batch.producto.nombre}
+                        </Link>
+                      </TableCell>
+
                       <TableCell className="truncate">
                         {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
                         {batch.unidad}
