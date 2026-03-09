@@ -1,6 +1,6 @@
 import { UpdateCostData } from '@/src/types/cost'
 import { updateCost } from '@/src/utils/api/cost.api'
-import { queryKeys } from '@/src/utils/queryKeys'
+import { baseKeys, queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 
@@ -39,6 +39,9 @@ export function useUpdateCost() {
       queryClient.invalidateQueries({ queryKey: queryKeys.cost.lists() })
       queryClient.invalidateQueries({
         queryKey: queryKeys.batch.detail(variables.loteId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.batch, 'filters'],
       })
     },
   })

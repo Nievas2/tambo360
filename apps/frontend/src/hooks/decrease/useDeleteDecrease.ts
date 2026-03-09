@@ -1,5 +1,5 @@
 import { deleteDecrease } from '@/src/utils/api/decrease.api'
-import { queryKeys } from '@/src/utils/queryKeys'
+import { baseKeys, queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 
@@ -18,6 +18,9 @@ export function useDeleteDecrease({ idLote }: DeleteDecreaseProps) {
       queryClient.invalidateQueries({ queryKey: queryKeys.decrease.lists() })
       queryClient.invalidateQueries({
         queryKey: queryKeys.batch.detail(idLote),
+      })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.batch, 'filters'],
       })
     },
   })

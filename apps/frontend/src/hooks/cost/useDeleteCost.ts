@@ -1,5 +1,5 @@
 import { deleteCost } from '@/src/utils/api/cost.api'
-import { queryKeys } from '@/src/utils/queryKeys'
+import { baseKeys, queryKeys } from '@/src/utils/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError, AxiosResponse } from 'axios'
 
@@ -32,6 +32,9 @@ export function useDeleteCost({ idBatch }: DeleteCostProps) {
       queryClient.invalidateQueries({ queryKey: queryKeys.cost.lists() })
       queryClient.invalidateQueries({
         queryKey: queryKeys.batch.detail(idBatch),
+      })
+      queryClient.invalidateQueries({
+        queryKey: [...baseKeys.batch, 'filters'],
       })
     },
   })
