@@ -65,7 +65,7 @@ const DeleteBatch = ({ batch, onSuccess }: DeleteBatchProps) => {
 
 export default DeleteBatch
 
-interface ConfirmDeleteDialogProps {
+export interface ConfirmDeleteDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void

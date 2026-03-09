@@ -3,12 +3,14 @@ import { Button } from '@/src/components/common/Button'
 import { Card } from '@/src/components/common/card'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
 import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
+import { ConfirmDeleteDialog } from '@/src/components/shared/dashboard/batch/DeleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
 import CostTable from '@/src/components/shared/dashboard/cost/CostTable'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import DecreaseTable from '@/src/components/shared/dashboard/decrease/DecreaseTable'
 import { StatCard } from '@/src/components/shared/StatCard'
 import { useBatch } from '@/src/hooks/batch/useBatch'
+import { useDeleteBatch } from '@/src/hooks/batch/useDeleteBatch'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -23,8 +25,19 @@ export default function BatchDetails() {
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
-  const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false) // Nuevo estado
+  const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false)
   const { data: batch, isPending, refetch } = useBatch({ id: id })
+  const { mutateAsync, isPending: isPendingDelete, error } = useDeleteBatch()
+  const [deleteDialog, setDeleteDialog] = useState(false)
+
+  const handleDelete = async () => {
+    try {
+      await mutateAsync({ id: batch.data.idLote })
+      setDeleteDialog(false)
+    } catch (error) {
+      console.error('Error al eliminar:', error)
+    }
+  }
 
   if (isPending) {
     return (
@@ -98,7 +111,7 @@ export default function BatchDetails() {
       {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-0.5 w-full">
-          <Badge variant="secondary">
+          <Badge variant={batch?.data?.estado ? 'success' : 'destructive'}>
             {batch?.data?.estado ? 'Completo' : 'Incompleto'}
           </Badge>
           <div className="flex items-center gap-2 flex-wrap">
@@ -119,19 +132,20 @@ export default function BatchDetails() {
 
         <div className="flex items-center justify-end gap-2 w-full">
           <Button
+            className="h-12 w-full max-w-36"
+            onClick={() => setIsCompleteBatchOpen(true)}
+            disabled={batch?.data?.estado}
+          >
+            Completar lote
+          </Button>
+
+          <Button
             variant="outline"
             className="h-12 w-full max-w-36"
             onClick={() => setIsChangeBatchOpen(true)}
             disabled={batch?.data?.estado}
           >
             Editar lote
-          </Button>
-          <Button
-            className="h-12 w-full max-w-36"
-            onClick={() => setIsCompleteBatchOpen(true)}
-            disabled={batch?.data?.estado}
-          >
-            Completar lote
           </Button>
         </div>
       </div>
@@ -242,7 +256,27 @@ export default function BatchDetails() {
             isPending={isPending}
           />
         </Card>
+
+        <Button
+          variant="ghost"
+          className="h-12 w-full border border-black"
+          onClick={() => setIsCompleteBatchOpen(true)}
+          disabled={batch?.data?.estado}
+        >
+          Eliminar lote
+        </Button>
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={deleteDialog}
+        onClose={() => setDeleteDialog(false)}
+        onConfirm={handleDelete}
+        isLoading={isPendingDelete}
+        title="¿Deseas eliminar este lote?"
+        description="Al eliminar este lote, toda su información dejará de estar disponible para consulta y edición. Los registros de costos y producción asociados se ocultarán del panel principal."
+        buttonText="Eliminar lote"
+        error={error?.response?.data.message}
+      />
 
       <ChangeBatch
         open={isChangeBatchOpen}
