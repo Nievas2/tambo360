@@ -26,6 +26,7 @@ import { BatchDto, BatchSchema } from '@/src/types/batch'
 import { useCreateBatch } from '@/src/hooks/batch/useCreateBatch'
 import { useUpdateBatch } from '@/src/hooks/batch/useUpdateBatch'
 import { useProducts } from '@/src/hooks/product/useProducts'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface ChangeBatchProps {
   open: boolean
@@ -120,11 +121,13 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         setId(batch.id)
         setFinished(true)
       }
-    } catch (err) {
+    } catch {
       if (batch) {
-        console.error('Error al actualizar el lote:', err)
+        showErrorMessage(error.response.data.message || 'Se perdio la conexión')
       } else {
-        console.error('Error al crear el lote:', err)
+        showErrorMessage(
+          errorUpdate.response.data.message || 'Se perdio la conexión'
+        )
       }
     }
   })
@@ -287,20 +290,6 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
               {errors.cantidad && (
                 <span className="text-xs text-red-600">
                   {errors.cantidad.message}
-                </span>
-              )}
-
-              {error && (
-                <span className="text-xs text-red-600">
-                  {error.response.data.message ||
-                    'Algo salió mal al crear el lote'}
-                </span>
-              )}
-
-              {errorUpdate && (
-                <span className="text-xs text-red-600">
-                  {errorUpdate.response.data.message ||
-                    'Algo salió mal al editar el lote'}
                 </span>
               )}
             </div>

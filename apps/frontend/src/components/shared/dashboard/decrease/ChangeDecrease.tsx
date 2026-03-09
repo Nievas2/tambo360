@@ -18,6 +18,7 @@ import {
 } from '@/src/components/common/select'
 import { useCreateDecrease } from '@/src/hooks/decrease/useCreateDecrease'
 import { useUpdateDecrease } from '@/src/hooks/decrease/useUpdateDecrease'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 import { Decrease, DecreaseSchema, TipoMerma } from '@/src/types/decrease'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
@@ -77,10 +78,20 @@ const ChangeDecrease = ({
   }, [decrease, reset])
 
   const onSubmit = handleSubmit(async (data) => {
-    if (decrease) {
-      await update({ id: decrease.idMerma, values: data })
-    } else {
-      await create({ ...data, idLote: idBatch })
+    try {
+      if (decrease) {
+        await update({ id: decrease.idMerma, values: data })
+      } else {
+        await create({ ...data, idLote: idBatch })
+      }
+    } catch {
+      if (!decrease) {
+        showErrorMessage(error.response.data.message || 'Se perdio la conexión')
+      } else {
+        showErrorMessage(
+          updateError.response.data.message || 'Se perdio la conexión'
+        )
+      }
     }
     onClose()
   })
@@ -173,18 +184,6 @@ const ChangeDecrease = ({
             {errors.observacion && (
               <span className="flex items-center gap-2 text-xs text-red-500">
                 {errors.observacion.message}
-              </span>
-            )}
-
-            {error && (
-              <span className="flex items-center gap-2 text-xs text-red-500">
-                {error.response.data.message}
-              </span>
-            )}
-
-            {updateError && (
-              <span className="flex items-center gap-2 text-xs text-red-500">
-                {updateError.response.data.message}
               </span>
             )}
           </div>

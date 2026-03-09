@@ -18,6 +18,7 @@ import {
 } from '@/src/components/common/select'
 import { useCreateCost } from '@/src/hooks/cost/useCreateCost'
 import { useUpdateCost } from '@/src/hooks/cost/useUpdateCost'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 import { Concept, Cost, UpdateCostSchema } from '@/src/types/cost'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
@@ -85,8 +86,13 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
         })
         closeDialog()
       }
-    } catch (error) {
+    } catch {
       console.error(error)
+      if (!cost) {
+        showErrorMessage(error.response.data.message)
+      } else {
+        showErrorMessage(updateError.response.data.message)
+      }
     }
   })
 
@@ -177,18 +183,6 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
             {errors.observaciones && (
               <span className="text-xs text-red-main">
                 {errors.observaciones.message}
-              </span>
-            )}
-
-            {error && (
-              <span className="text-xs text-red-main">
-                {error.response.data.message}
-              </span>
-            )}
-
-            {updateError && (
-              <span className="text-xs text-red-main">
-                {updateError.response.data.message}
               </span>
             )}
           </div>
