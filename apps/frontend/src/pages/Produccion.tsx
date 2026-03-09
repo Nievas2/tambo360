@@ -13,6 +13,7 @@ import {
   ArrowUp,
   ArrowDown,
   X,
+  CloudOff,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
@@ -62,7 +63,7 @@ const Produccion: React.FC = () => {
 
   const [nameDebounced] = useDebounce(nombre, 300)
 
-  const { data, isPending } = useBatches({
+  const { data, isPending, error } = useBatches({
     filters: {
       nombre: nameDebounced || undefined,
       orden,
@@ -91,7 +92,7 @@ const Produccion: React.FC = () => {
           </h1>
         </div>
         <Button
-          className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-6 py-6 rounded-xl transition-all shadow-sm"
+          className="flex items-center gap-2 h-12 w-40"
           onClick={() => setIsChangeBatchOpen(true)}
         >
           Registrar lote <Plus className="w-5 h-5" />
@@ -152,7 +153,7 @@ const Produccion: React.FC = () => {
 
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-[#EAEAEA]">
+            <TableHeader className="bg-tables">
               <TableRow>
                 <TableHead className="w-[8%] text-center font-bold text-gray-400 uppercase text-xs tracking-wider">
                   Lote
@@ -211,6 +212,7 @@ const Produccion: React.FC = () => {
                     </TableRow>
                   ))
                 : data?.data.lotes.length > 0 &&
+                  !error &&
                   data?.data?.lotes.map((batch: Batch) => (
                     <TableRow key={batch.idLote}>
                       <TableCell className="text-center">
@@ -223,7 +225,12 @@ const Produccion: React.FC = () => {
                           .reverse()
                           .join('/')}
                       </TableCell>
-                      <TableCell>{batch.producto.nombre}</TableCell>
+                      <TableCell>
+                        <Link to={`/produccion/lote/${batch.idLote}`}>
+                          {batch.producto.nombre}
+                        </Link>
+                      </TableCell>
+
                       <TableCell className="truncate">
                         {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
                         {batch.unidad}
@@ -341,6 +348,23 @@ const Produccion: React.FC = () => {
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Comienza registrando tu primer lote para ver aquí el detalle
                   de tu producción láctea.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="flex flex-col lg:flex-row items-center justify-center py-16 px-6 gap-12 bg-white w-full">
+              <div className="flex flex-col items-center justify-center rounded-3xl p-12 text-center max-w-md w-full">
+                <div className="w-20 h-20 bg-[#F1F5F9] rounded-md flex items-center justify-center mb-6">
+                  <CloudOff className="w-10 h-10 text-[#94A3B8]" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  No pudimos cargar los lotes
+                </h3>
+                <p className="text-sm text-[#94A3B8] leading-relaxed">
+                  Hubo un problema al conectar el <br /> servidor. Por favor,
+                  revisa tu conexión a <br /> internet e intenta nuevamente
                 </p>
               </div>
             </div>
