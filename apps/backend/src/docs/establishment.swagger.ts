@@ -162,3 +162,90 @@
  *                 data:
  *                   type: null
  */
+/**
+ * @swagger
+ * /establecimiento/editar-nombre:
+ *   patch:
+ *     summary: Editar el nombre del establecimiento
+ *     description: Permite actualizar el nombre del establecimiento del usuario autenticado.
+ *     tags: [Establecimientos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 description: Nuevo nombre del establecimiento
+ *                 example: Establecimiento Sur
+ *     responses:
+ *       200:
+ *         description: Nombre del establecimiento actualizado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Nombre del establecimiento actualizado correctamente
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     idEstablecimiento:
+ *                       type: string
+ *                       format: uuid
+ *                       example: "c2b8e8a2-4f92-4f3f-b0c5-1a2b3c4d5e6f"
+ *                     nombre:
+ *                       type: string
+ *                       example: Establecimiento Sur
+ *                     localidad:
+ *                       type: string
+ *                       example: Rafaela
+ *                     provincia:
+ *                       type: string
+ *                       example: Santa Fe
+ *                     idUsuario:
+ *                       type: string
+ *                       format: uuid
+ *                       example: "a1b2c3d4-5678-90ab-cdef-1234567890ab"
+ *       400:
+ *         description: Nombre inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: El nombre es obligatorio
+ *                 data:
+ *                   type: null
+ *       401:
+ *         description: Usuario no autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                   example: 401
+ *                 message:
+ *                   type: string
+ *                   example: Usuario no autenticado
+ *                 data:
+ *                   type: null
+ */
