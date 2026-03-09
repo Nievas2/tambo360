@@ -37,12 +37,16 @@ export const StatCard = ({
             {isPending ? (
               <Skeleton className="h-8 w-[50%]" />
             ) : unit == '$ ' ? (
-              <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
-                {unit} {Number(value).toLocaleString('es-AR')}
+              <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter line-clamp-2 leading-tight">
+                <span className="whitespace-nowrap">{unit}</span>{' '}
+                {Number(value).toLocaleString('es-AR')}
               </span>
             ) : (
-              <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter">
-                {Number(value).toLocaleString('es-AR')} {unit}
+              <span className="flex text-3xl font-bold text-slate-900 tracking-tight font-inter truncate">
+                <span className="text-3xl font-bold text-slate-900 tracking-tight font-inter truncate">
+                  {Number(value).toLocaleString('es-AR')}
+                </span>
+                <span className="whitespace-nowrap">{unit}</span>
               </span>
             )}
 

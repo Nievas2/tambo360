@@ -219,11 +219,11 @@ const Produccion: React.FC = () => {
                           .join('/')}
                       </TableCell>
                       <TableCell>{batch.producto.nombre}</TableCell>
-                      <TableCell>
+                      <TableCell className="truncate">
                         {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
                         {batch.unidad}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="truncate">
                         {batch.mermas
                           ?.reduce((total, m) => {
                             const qty =
@@ -241,7 +241,7 @@ const Produccion: React.FC = () => {
                           {batch.estado ? 'Completo' : 'Incompleto'}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="truncate">
                         {(batch.costosDirectos.length > 0 &&
                           batch.costosDirectos[0].moneda) ||
                           '$'}{' '}

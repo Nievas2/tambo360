@@ -59,7 +59,7 @@ const ComparacionHistorica = () => {
   const CHART_H = 200
   const BAR_W = 42
   const BAR_GAP = 30
-  const Y_AXIS_W = 45
+  const Y_AXIS_W = 56
   const PAD_TOP = 20
   const PAD_RIGHT = 20
   const X_LABEL_H = 30
@@ -165,12 +165,16 @@ const ComparacionHistorica = () => {
                         strokeDasharray="4 4"
                       />
                       <text
-                        x={Y_AXIS_W - 12}
+                        x={Y_AXIS_W - 8}
                         y={toY(tick) + 4}
                         textAnchor="end"
                         className="fill-slate-400 text-[10px] font-medium"
                       >
-                        {tick >= 1000 ? `${(tick / 1000).toFixed(1)}k` : tick}
+                        {tick >= 1000000
+                          ? `${(tick / 1000000).toFixed(1)}M`
+                          : tick >= 1000
+                            ? `${(tick / 1000).toFixed(0)}k`
+                            : tick}
                       </text>
                     </g>
                   ))}

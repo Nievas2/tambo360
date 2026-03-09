@@ -34,7 +34,7 @@ const Dashboard = () => {
       </div>
 
       {/* Seccion de Stats - 5 indicadores según requerimiento */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         <StatCard
           title="Queso Producido"
           value={data?.data.actual.quesos}
@@ -52,7 +52,7 @@ const Dashboard = () => {
         />
 
         <StatCard
-          title="Leche Vendida"
+          title="Leche Producida"
           value={data?.data.actual.leches}
           trend={
             data?.data.variaciones.leches !== null
