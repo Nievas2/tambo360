@@ -118,7 +118,11 @@ const DailyProductionLog = () => {
         )}
       </CardContent>
 
-      <ChangeBatch open={open} setOpen={() => setOpen(false)} />
+      <ChangeBatch
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+      />
     </Card>
   )
 }

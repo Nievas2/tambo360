@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/common/select'
+import { ConnectionErrorModal } from '@/src/components/ConnectionErrorModal'
+import { useConnectionError } from '@/src/hooks/connection/useConnectionError'
 import { useCreateCost } from '@/src/hooks/cost/useCreateCost'
 import { useUpdateCost } from '@/src/hooks/cost/useUpdateCost'
 import { useErrorMessage } from '@/src/hooks/useErrorMessage'
@@ -28,18 +30,32 @@ import { Controller, useForm } from 'react-hook-form'
 interface ChangeCostProps {
   open: boolean
   onClose: () => void
+  onOpen?: () => void
   cost?: Cost
   loteId?: string
 }
 
-const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
-  const { mutateAsync, error, isPending } = useCreateCost()
+const ChangeCost = ({
+  open,
+  onClose,
+  onOpen,
+  cost,
+  loteId,
+}: ChangeCostProps) => {
+  const { mutateAsync, isPending } = useCreateCost()
   const { showErrorMessage } = useErrorMessage()
   const {
-    mutateAsync: updateCost,
-    error: updateError,
-    isPending: isUpdatePending,
-  } = useUpdateCost()
+    showConnectionError,
+    handleSubmitWithConnectionCheck,
+    retry,
+    dismiss,
+  } = useConnectionError({
+    onServerError: showErrorMessage,
+    closeParentDialog: onClose,
+    openParentDialog: onOpen,
+  })
+  const { mutateAsync: updateCost, isPending: isUpdatePending } =
+    useUpdateCost()
   const {
     register,
     formState: { errors },
@@ -71,31 +87,20 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
     }
   }, [cost, reset])
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
+  const onSubmit = handleSubmit(
+    handleSubmitWithConnectionCheck(async (data) => {
       if (cost) {
         await updateCost({
           values: data,
           id: cost.idCostoDirecto,
           loteId: loteId!,
         })
-        closeDialog()
       } else {
-        await mutateAsync({
-          values: data,
-          id: loteId!,
-        })
-        closeDialog()
+        await mutateAsync({ values: data, id: loteId! })
       }
-    } catch {
-      console.error(error)
-      if (!cost) {
-        showErrorMessage(error.response.data.message)
-      } else {
-        showErrorMessage(updateError.response.data.message)
-      }
-    }
-  })
+      closeDialog()
+    })
+  )
 
   function closeDialog() {
     onClose()
@@ -203,6 +208,11 @@ const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
           </Button>
         </form>
       </DialogContent>
+      <ConnectionErrorModal
+        open={showConnectionError}
+        onRetry={retry}
+        onCancel={() => dismiss(reset)}
+      />
     </Dialog>
   )
 }
