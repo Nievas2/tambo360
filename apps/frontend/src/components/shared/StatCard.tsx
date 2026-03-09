@@ -47,7 +47,9 @@ export const StatCard = ({
             )}
 
             <div className="flex items-center gap-1.5 mt-1">
-              {trend ? (
+              {trend == undefined ? (
+                ''
+              ) : trend ? (
                 <div className="flex items-center gap-1 text-[13px] font-bold text-slate-600">
                   {/* Flecha a la izquierda del valor, siempre en gris */}
                   <span>{trend.isPositive ? '↑' : '↓'}</span>
