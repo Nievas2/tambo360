@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 
 // Componentes UI
 import { Card, CardContent } from '@/src/components/common/card'
@@ -15,13 +15,14 @@ import { Input } from '@/src/components/common/Input'
 // Hooks
 import { useForgotPassword } from '@/src/hooks/auth/useForgotPassword'
 import { useResetPassword } from '@/src/hooks/auth/useResetPassword'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface ApiError {
   response?: {
     data?: {
-      message?: string;
-    };
-  };
+      message?: string
+    }
+  }
 }
 
 // Esquema para validar el Email en el paso 1
@@ -30,13 +31,15 @@ const EmailSchema = z.object({
 })
 
 // Esquema para validar contraseñas en el paso 3
-const PasswordsSchema = z.object({
-  contraseña: z.string().min(8, 'Mínimo 8 caracteres'),
-  confirmarContraseña: z.string()
-}).refine((data) => data.contraseña === data.confirmarContraseña, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmarContraseña"],
-})
+const PasswordsSchema = z
+  .object({
+    contraseña: z.string().min(8, 'Mínimo 8 caracteres'),
+    confirmarContraseña: z.string(),
+  })
+  .refine((data) => data.contraseña === data.confirmarContraseña, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmarContraseña'],
+  })
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams()
@@ -44,16 +47,17 @@ const ResetPassword: React.FC = () => {
   const navigate = useNavigate()
 
   const [step, setStep] = useState(token ? 3 : 1)
-  const [userEmail, setUserEmail] = useState('') 
+  const [userEmail, setUserEmail] = useState('')
   const [showPass, setShowPass] = useState(false)
 
-  const { mutateAsync: sendEmail, isPending: isSendingEmail } = useForgotPassword()
+  const { mutateAsync: sendEmail, isPending: isSendingEmail } =
+    useForgotPassword()
   const { mutateAsync: resetPass, isPending: isResetting } = useResetPassword()
 
   // Formulario para el PASO 1 (Email)
   const emailForm = useForm({
     resolver: zodResolver(EmailSchema),
-    defaultValues: { email: '' }
+    defaultValues: { email: '' },
   })
 
   // Formulario para el PASO 3 (Contraseñas)
@@ -61,37 +65,44 @@ const ResetPassword: React.FC = () => {
     resolver: zodResolver(PasswordsSchema),
   })
 
-  const showErrorMessage = useCallback((message?: string) => {
-    toast.custom(() => (
-      <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
-        <AlertCircle className="w-5 h-5 flex-shrink-0 fill-[#EF4444]" stroke="#FCE8E5" strokeWidth={3} />
-        <span className="flex-1">{message || 'Revisa los campos resaltados e intenta nuevamente'}</span>
-      </div>
-    ), { duration: 4000, position: 'top-center' })
-  }, [])
-
   // Disparadores de Toast para ambos formularios
   useEffect(() => {
-    if (emailForm.formState.submitCount > 0 && Object.keys(emailForm.formState.errors).length > 0) {
+    if (
+      emailForm.formState.submitCount > 0 &&
+      Object.keys(emailForm.formState.errors).length > 0
+    ) {
       showErrorMessage()
     }
-  }, [emailForm.formState.submitCount, emailForm.formState.errors, showErrorMessage])
+  }, [
+    emailForm.formState.submitCount,
+    emailForm.formState.errors,
+    showErrorMessage,
+  ])
 
   useEffect(() => {
-    if (passForm.formState.submitCount > 0 && Object.keys(passForm.formState.errors).length > 0) {
+    if (
+      passForm.formState.submitCount > 0 &&
+      Object.keys(passForm.formState.errors).length > 0
+    ) {
       showErrorMessage()
     }
-  }, [passForm.formState.submitCount, passForm.formState.errors, showErrorMessage])
+  }, [
+    passForm.formState.submitCount,
+    passForm.formState.errors,
+    showErrorMessage,
+  ])
 
   const handleRequestReset = emailForm.handleSubmit(async (data) => {
     try {
       await sendEmail(data.email)
       setUserEmail(data.email)
       setStep(2)
-      toast.success("Correo enviado con éxito")
+      toast.success('Correo enviado con éxito')
     } catch (err) {
       const error = err as ApiError
-      showErrorMessage(error.response?.data?.message || "Error al enviar el correo")
+      showErrorMessage(
+        error.response?.data?.message || 'Error al enviar el correo'
+      )
     }
   })
 
@@ -102,11 +113,14 @@ const ResetPassword: React.FC = () => {
       setStep(4)
     } catch (err) {
       const error = err as ApiError
-      showErrorMessage(error.response?.data?.message || "Error al restablecer la contraseña")
+      showErrorMessage(
+        error.response?.data?.message || 'Error al restablecer la contraseña'
+      )
     }
   })
 
-  const backgroundImage = (step === 2 || step === 4) ? "url('/vacas_4.webp')" : "url('/vacas_3.webp')"
+  const backgroundImage =
+    step === 2 || step === 4 ? "url('/vacas_4.webp')" : "url('/vacas_3.webp')"
 
   return (
     <div
@@ -120,24 +134,35 @@ const ResetPassword: React.FC = () => {
         <Card className="w-full max-w-md border-none shadow-2xl py-8 bg-white/95 backdrop-blur-md rounded-xl">
           <CardContent className="space-y-8">
             <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold text-[#0B1001]" data-testid="reset-title">
-                {step === 1 && "Recuperar cuenta"}
-                {step === 2 && "Revisa tu mail"}
-                {step === 3 && "Nueva contraseña"}
-                {step === 4 && "¡Todo listo!"}
+              <h1
+                className="text-3xl font-bold text-[#0B1001]"
+                data-testid="reset-title"
+              >
+                {step === 1 && 'Recuperar cuenta'}
+                {step === 2 && 'Revisa tu mail'}
+                {step === 3 && 'Nueva contraseña'}
+                {step === 4 && '¡Todo listo!'}
               </h1>
               <p className="text-sm text-[#626059]">
-                {step === 1 && "Te enviaremos un enlace para restablecer tu contraseña."}
+                {step === 1 &&
+                  'Te enviaremos un enlace para restablecer tu contraseña.'}
                 {step === 2 && `Hemos enviado instrucciones a ${userEmail}`}
-                {step === 3 && "Ingresa tu nueva clave de acceso."}
-                {step === 4 && "Tu contraseña ha sido actualizada con éxito."}
+                {step === 3 && 'Ingresa tu nueva clave de acceso.'}
+                {step === 4 && 'Tu contraseña ha sido actualizada con éxito.'}
               </p>
             </div>
 
             {step === 1 && (
-              <form onSubmit={handleRequestReset} className="space-y-6" noValidate data-testid="forgot-password-form">
+              <form
+                onSubmit={handleRequestReset}
+                className="space-y-6"
+                noValidate
+                data-testid="forgot-password-form"
+              >
                 <div className="space-y-2 text-left">
-                  <Label className={`font-bold ${emailForm.formState.errors.email ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+                  <Label
+                    className={`font-bold ${emailForm.formState.errors.email ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                  >
                     Correo electrónico
                   </Label>
                   <Input
@@ -149,27 +174,45 @@ const ResetPassword: React.FC = () => {
                     data-testid="email-input"
                   />
                   {emailForm.formState.errors.email && (
-                    <p className="text-xs font-medium text-[#B91C1C]">{emailForm.formState.errors.email.message}</p>
+                    <p className="text-xs font-medium text-[#B91C1C]">
+                      {emailForm.formState.errors.email.message}
+                    </p>
                   )}
                 </div>
-                <Button 
-                  disabled={isSendingEmail} 
+                <Button
+                  disabled={isSendingEmail}
                   className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2"
                   data-testid="send-reset-link-button"
                 >
-                  {isSendingEmail ? "Enviando..." : "Enviar enlace"} <ArrowRight className="w-5 h-5" />
+                  {isSendingEmail ? 'Enviando...' : 'Enviar enlace'}{' '}
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
                 <div className="text-center">
-                  <Link to="/login" data-testid="back-to-login" className="text-sm font-bold text-[#0B1001] hover:underline">Volver al inicio</Link>
+                  <Link
+                    to="/login"
+                    data-testid="back-to-login"
+                    className="text-sm font-bold text-[#0B1001] hover:underline"
+                  >
+                    Volver al inicio
+                  </Link>
                 </div>
               </form>
             )}
 
             {step === 3 && (
-              <form onSubmit={onResetSubmit} className="space-y-6" noValidate data-testid="reset-password-form">
+              <form
+                onSubmit={onResetSubmit}
+                className="space-y-6"
+                noValidate
+                data-testid="reset-password-form"
+              >
                 <div className="space-y-4 text-left">
                   <div className="space-y-2">
-                    <Label className={`font-bold ${passForm.formState.errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Nueva contraseña*</Label>
+                    <Label
+                      className={`font-bold ${passForm.formState.errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                    >
+                      Nueva contraseña*
+                    </Label>
                     <div className="relative">
                       <Input
                         type={showPass ? 'text' : 'password'}
@@ -178,20 +221,32 @@ const ResetPassword: React.FC = () => {
                         disabled={isResetting}
                         data-testid="new-password-input"
                       />
-                      <button 
-                        type="button" 
-                        onClick={() => setShowPass(!showPass)} 
+                      <button
+                        type="button"
+                        onClick={() => setShowPass(!showPass)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059]"
                         data-testid="toggle-password-visibility"
                       >
-                        {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPass ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
-                    {passForm.formState.errors.contraseña && <p className="text-xs font-medium text-[#B91C1C]">{passForm.formState.errors.contraseña.message as string}</p>}
+                    {passForm.formState.errors.contraseña && (
+                      <p className="text-xs font-medium text-[#B91C1C]">
+                        {passForm.formState.errors.contraseña.message as string}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={`font-bold ${passForm.formState.errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Confirmar contraseña*</Label>
+                    <Label
+                      className={`font-bold ${passForm.formState.errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                    >
+                      Confirmar contraseña*
+                    </Label>
                     <Input
                       type="password"
                       {...passForm.register('confirmarContraseña')}
@@ -199,24 +254,32 @@ const ResetPassword: React.FC = () => {
                       disabled={isResetting}
                       data-testid="confirm-password-input"
                     />
-                    {passForm.formState.errors.confirmarContraseña && <p className="text-xs font-medium text-[#B91C1C]">{passForm.formState.errors.confirmarContraseña.message as string}</p>}
+                    {passForm.formState.errors.confirmarContraseña && (
+                      <p className="text-xs font-medium text-[#B91C1C]">
+                        {
+                          passForm.formState.errors.confirmarContraseña
+                            .message as string
+                        }
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  disabled={isResetting} 
+                <Button
+                  type="submit"
+                  disabled={isResetting}
                   className="w-full h-14 bg-[#0B1001] hover:bg-[#2F3427] text-white rounded-lg font-bold flex gap-2"
                   data-testid="update-password-button"
                 >
-                  {isResetting ? 'Guardando...' : 'Restablecer contraseña'} <ArrowRight className="w-5 h-5" />
+                  {isResetting ? 'Guardando...' : 'Restablecer contraseña'}{' '}
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
               </form>
             )}
 
             {step === 4 && (
-              <Button 
-                onClick={() => navigate('/login')} 
+              <Button
+                onClick={() => navigate('/login')}
                 className="w-full h-14 bg-[#0B1001] text-white rounded-lg font-bold"
                 data-testid="go-to-login-after-reset"
               >

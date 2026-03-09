@@ -7,11 +7,10 @@ import { useLocality } from '@/src/hooks/ubication/useLocality'
 import { useProvince } from '@/src/hooks/ubication/useProvince'
 import { EstablishmentSchema } from '@/src/types/establishment'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, AlertCircle } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
-import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import {
   Combobox,
@@ -21,6 +20,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from '@/src/components/common/combobox'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 
 const Establishment = () => {
   const [searchProvince, setSearchProvince] = useState('')
@@ -50,15 +50,6 @@ const Establishment = () => {
     resolver: zodResolver(EstablishmentSchema),
   })
 
-  const showErrorMessage = useCallback((message?: string) => {
-    toast.custom(() => (
-      <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
-        <AlertCircle className="w-5 h-5 flex-shrink-0 fill-[#EF4444]" stroke="#FCE8E5" strokeWidth={3} />
-        <span className="flex-1">{message || 'Revisa los campos resaltados e intenta nuevamente'}</span>
-      </div>
-    ), { duration: 4000, position: 'top-center' })
-  }, [])
-
   useEffect(() => {
     if (submitCount > 0 && Object.keys(errors).length > 0) {
       showErrorMessage()
@@ -67,9 +58,9 @@ const Establishment = () => {
 
   useEffect(() => {
     if (createEstablishmentError) {
-      let message = 'Error al crear el establecimiento';
+      let message = 'Error al crear el establecimiento'
       if (createEstablishmentError instanceof AxiosError) {
-        message = createEstablishmentError.response?.data?.message || message;
+        message = createEstablishmentError.response?.data?.message || message
       }
       showErrorMessage(message)
     }
@@ -98,55 +89,90 @@ const Establishment = () => {
                 <img src="/logotipo 1.svg" alt="tambo" className="h-6 mt-1" />
               </div>
               <div className="space-y-4 w-full">
-                <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">Crear establecimiento</h2>
-                <p className="text-sm text-[#626059]">Ingresá la información básica de tu establecimiento para comenzar a gestionar la producción.</p>
-                <form 
-                  className="space-y-5 pt-4 text-left" 
-                  onSubmit={onSubmit} 
-                  noValidate 
+                <h2 className="text-4xl font-bold tracking-tight text-[#0B1001]">
+                  Crear establecimiento
+                </h2>
+                <p className="text-sm text-[#626059]">
+                  Ingresá la información básica de tu establecimiento para
+                  comenzar a gestionar la producción.
+                </p>
+                <form
+                  className="space-y-5 pt-4 text-left"
+                  onSubmit={onSubmit}
+                  noValidate
                   data-testid="establishment-form"
                 >
                   <div className="space-y-2">
-                    <Label className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Nombre del establecimiento*</Label>
-                    <Input 
-                      placeholder="Ingrese el nombre" 
-                      {...register('nombre')} 
-                      className={`${errors.nombre ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'} h-14`} 
-                      disabled={isPending} 
+                    <Label
+                      className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                    >
+                      Nombre del establecimiento*
+                    </Label>
+                    <Input
+                      placeholder="Ingrese el nombre"
+                      {...register('nombre')}
+                      className={`${errors.nombre ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'border-[#D1CFCA] bg-[#F9F9F7]'} h-14`}
+                      disabled={isPending}
                       data-testid="establishment-name-input"
                     />
-                    {errors.nombre && <p className="text-xs font-medium text-[#B91C1C]">{errors.nombre.message}</p>}
+                    {errors.nombre && (
+                      <p className="text-xs font-medium text-[#B91C1C]">
+                        {errors.nombre.message}
+                      </p>
+                    )}
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label className={`font-bold ${errors.provincia ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Provincia*</Label>
-                    <Combobox 
+                    <Label
+                      className={`font-bold ${errors.provincia ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                    >
+                      Provincia*
+                    </Label>
+                    <Combobox
                       onValueChange={(id: string) => {
-                        const selectedProv = province?.provincias.find((p) => p.id === id)
+                        const selectedProv = province?.provincias.find(
+                          (p) => p.id === id
+                        )
                         if (selectedProv) {
-                          setIdProvince(id); setSelectedProvinceName(selectedProv.nombre);
-                          setSearchProvince(selectedProv.nombre); setValue('provincia', selectedProv.nombre);
-                          setSelectedLocalityName(''); setSearchLocality(''); setValue('localidad', '');
+                          setIdProvince(id)
+                          setSelectedProvinceName(selectedProv.nombre)
+                          setSearchProvince(selectedProv.nombre)
+                          setValue('provincia', selectedProv.nombre)
+                          setSelectedLocalityName('')
+                          setSearchLocality('')
+                          setValue('localidad', '')
                         }
                       }}
                     >
-                      <ComboboxInput 
-                        className={`h-14 w-full ${errors.provincia ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'bg-[#F9F9F7] border-[#D1CFCA]'}`} 
-                        placeholder="Seleccione una provincia" 
-                        value={searchProvince} 
+                      <ComboboxInput
+                        className={`h-14 w-full ${errors.provincia ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'bg-[#F9F9F7] border-[#D1CFCA]'}`}
+                        placeholder="Seleccione una provincia"
+                        value={searchProvince}
                         onChange={(e) => {
-                          const val = e.target.value; setSearchProvince(val);
-                          if (val !== selectedProvinceName) { setIdProvince(''); setSelectedProvinceName(''); setValue('provincia', ''); }
-                        }} 
+                          const val = e.target.value
+                          setSearchProvince(val)
+                          if (val !== selectedProvinceName) {
+                            setIdProvince('')
+                            setSelectedProvinceName('')
+                            setValue('provincia', '')
+                          }
+                        }}
                         data-testid="province-combobox-input"
                       />
-                      <ComboboxContent className="bg-white border-[#D1CFCA] z-[100]" data-testid="province-combobox-content">
-                        {!province?.provincias.length && <ComboboxEmpty>No se encontraron provincias</ComboboxEmpty>}
+                      <ComboboxContent
+                        className="bg-white border-[#D1CFCA] z-100"
+                        data-testid="province-combobox-content"
+                      >
+                        {!province?.provincias.length && (
+                          <ComboboxEmpty>
+                            No se encontraron provincias
+                          </ComboboxEmpty>
+                        )}
                         <ComboboxList>
                           {province?.provincias.map((item) => (
-                            <ComboboxItem 
-                              key={item.id} 
-                              value={item.id} 
+                            <ComboboxItem
+                              key={item.id}
+                              value={item.id}
                               className="hover:bg-[#0B1001]/5"
                               data-testid={`province-option-${item.id}`}
                             >
@@ -156,36 +182,65 @@ const Establishment = () => {
                         </ComboboxList>
                       </ComboboxContent>
                     </Combobox>
-                    {errors.provincia && <p className="text-xs font-medium text-[#B91C1C]">{errors.provincia.message}</p>}
+                    {errors.provincia && (
+                      <p className="text-xs font-medium text-[#B91C1C]">
+                        {errors.provincia.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label className={`font-bold ${errors.localidad ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>Localidad*</Label>
-                    <Combobox 
-                      disabled={!idProvince} 
+                    <Label
+                      className={`font-bold ${errors.localidad ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+                    >
+                      Localidad*
+                    </Label>
+                    <Combobox
+                      disabled={!idProvince}
                       onValueChange={(id) => {
-                        const selectedLoc = locality?.municipios.find((l) => l.id === id)
-                        if (selectedLoc) { setSelectedLocalityName(selectedLoc.nombre); setSearchLocality(selectedLoc.nombre); setValue('localidad', selectedLoc.nombre); }
+                        const selectedLoc = locality?.municipios.find(
+                          (l) => l.id === id
+                        )
+                        if (selectedLoc) {
+                          setSelectedLocalityName(selectedLoc.nombre)
+                          setSearchLocality(selectedLoc.nombre)
+                          setValue('localidad', selectedLoc.nombre)
+                        }
                       }}
                     >
-                      <ComboboxInput 
-                        className={`h-14 w-full ${errors.localidad ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'bg-[#F9F9F7] border-[#D1CFCA]'}`} 
-                        placeholder={idProvince ? 'Seleccione una localidad' : 'Primero seleccione una provincia'} 
-                        value={searchLocality} 
+                      <ComboboxInput
+                        className={`h-14 w-full ${errors.localidad ? 'border-[#F87171] bg-[#FCE8E5]/30' : 'bg-[#F9F9F7] border-[#D1CFCA]'}`}
+                        placeholder={
+                          idProvince
+                            ? 'Seleccione una localidad'
+                            : 'Primero seleccione una provincia'
+                        }
+                        value={searchLocality}
                         onChange={(e) => {
-                          const val = e.target.value; setSearchLocality(val);
-                          if (val !== selectedLocalityName) { setSelectedLocalityName(''); setValue('localidad', ''); }
-                        }} 
-                        disabled={!idProvince} 
+                          const val = e.target.value
+                          setSearchLocality(val)
+                          if (val !== selectedLocalityName) {
+                            setSelectedLocalityName('')
+                            setValue('localidad', '')
+                          }
+                        }}
+                        disabled={!idProvince}
                         data-testid="locality-combobox-input"
                       />
-                      <ComboboxContent className="bg-white border-[#D1CFCA] z-[100]" data-testid="locality-combobox-content">
-                        {!locality?.municipios.length && <ComboboxEmpty>No se encontraron localidades</ComboboxEmpty>}
+                      <ComboboxContent
+                        className="bg-white border-[#D1CFCA] z-100"
+                        data-testid="locality-combobox-content"
+                      >
+                        {!locality?.municipios.length && (
+                          <ComboboxEmpty>
+                            No se encontraron localidades
+                          </ComboboxEmpty>
+                        )}
                         <ComboboxList>
                           {locality?.municipios.map((item) => (
-                            <ComboboxItem 
-                              key={item.id} 
-                              value={item.id} 
+                            <ComboboxItem
+                              key={item.id}
+                              value={item.id}
                               className="hover:bg-[#0B1001]/5"
                               data-testid={`locality-option-${item.id}`}
                             >
@@ -195,12 +250,16 @@ const Establishment = () => {
                         </ComboboxList>
                       </ComboboxContent>
                     </Combobox>
-                    {errors.localidad && <p className="text-xs font-medium text-[#B91C1C]">{errors.localidad.message}</p>}
+                    {errors.localidad && (
+                      <p className="text-xs font-medium text-[#B91C1C]">
+                        {errors.localidad.message}
+                      </p>
+                    )}
                   </div>
 
-                  <Button 
-                    className="w-full h-14 mt-6 bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] rounded-lg text-lg font-medium transition-all gap-2" 
-                    type="submit" 
+                  <Button
+                    className="w-full h-14 mt-6 bg-[#0B1001] hover:bg-[#2F3427] text-[#FFFBF1] rounded-lg text-lg font-medium transition-all gap-2"
+                    type="submit"
                     disabled={isPending}
                     data-testid="establishment-submit-button"
                   >

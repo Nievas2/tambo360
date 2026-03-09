@@ -242,7 +242,9 @@ const Produccion: React.FC = () => {
                           batch.unidad}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={batch.estado ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={batch.estado ? 'default' : 'destructive'}
+                        >
                           {batch.estado ? 'Completo' : 'Incompleto'}
                         </Badge>
                       </TableCell>

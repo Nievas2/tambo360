@@ -1,13 +1,13 @@
-import { ArrowRight, EyeOff, EyeIcon, AlertCircle } from 'lucide-react'
+import { ArrowRight, EyeOff, EyeIcon } from 'lucide-react'
 import { useRegister } from '@/src/hooks/auth/useRegister'
 import { Button } from '@/src/components/common/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@/src/components/common/label'
 import { RegisterSchema } from '@/src/types/register'
 import { Input } from '@/src/components/common/Input'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { showErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface RegisterFormProps {
   handleNextStep: () => void
@@ -37,24 +37,6 @@ const RegisterForm = ({
     resolver: zodResolver(RegisterSchema),
   })
 
-  const showErrorMessage = useCallback((message?: string) => {
-    toast.custom(() => (
-      <div className="z-[10000] w-full max-w-[400px] flex items-center justify-center gap-3 bg-[#FCE8E5] border border-[#F87171] text-[#B91C1C] px-4 py-3 rounded-lg text-sm font-semibold shadow-lg animate-in fade-in slide-in-from-top-5 duration-300 pointer-events-auto">
-        <AlertCircle
-          className="w-5 h-5 flex-shrink-0 fill-[#EF4444]"
-          stroke="#FCE8E5"
-          strokeWidth={3}
-        />
-        <span className="flex-1">
-          {message || 'Revisa los campos resaltados e intenta nuevamente'}
-        </span>
-      </div>
-    ), {
-      duration: 4000,
-      position: 'top-center',
-    })
-  }, [])
-
   useEffect(() => {
     if (submitCount > 0 && Object.keys(errors).length > 0) {
       showErrorMessage()
@@ -63,7 +45,8 @@ const RegisterForm = ({
 
   useEffect(() => {
     if (apiError) {
-      const message = apiError.response?.data?.message || 'Ocurrió un error en el servidor'
+      const message =
+        apiError.response?.data?.message || 'Ocurrió un error en el servidor'
       showErrorMessage(message)
     }
   }, [apiError, showErrorMessage])
@@ -80,10 +63,17 @@ const RegisterForm = ({
 
   return (
     <div className="w-full flex flex-col items-center font-inter">
-      <form onSubmit={onSubmit} className="w-full space-y-6" noValidate data-testid="register-form">
+      <form
+        onSubmit={onSubmit}
+        className="w-full space-y-6"
+        noValidate
+        data-testid="register-form"
+      >
         <div className="space-y-4">
           <div className="space-y-2 text-left">
-            <Label className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+            <Label
+              className={`font-bold ${errors.nombre ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+            >
               Nombre*
             </Label>
             <Input
@@ -94,12 +84,16 @@ const RegisterForm = ({
               data-testid="full-name-input"
             />
             {errors.nombre && (
-              <p className="text-xs font-medium text-[#B91C1C]">{errors.nombre.message}</p>
+              <p className="text-xs font-medium text-[#B91C1C]">
+                {errors.nombre.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-2 text-left">
-            <Label className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+            <Label
+              className={`font-bold ${errors.correo ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+            >
               Correo electrónico*
             </Label>
             <Input
@@ -110,12 +104,16 @@ const RegisterForm = ({
               data-testid="email-input"
             />
             {errors.correo && (
-              <p className="text-xs font-medium text-[#B91C1C]">{errors.correo.message}</p>
+              <p className="text-xs font-medium text-[#B91C1C]">
+                {errors.correo.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-2 text-left">
-            <Label className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+            <Label
+              className={`font-bold ${errors.contraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+            >
               Contraseña*
             </Label>
             <div className="relative">
@@ -134,21 +132,30 @@ const RegisterForm = ({
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
                 data-testid="toggle-password-visibility"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
               </Button>
             </div>
             {!errors.contraseña && (
               <p className="text-[10px] text-[#626059]">
-                Requisitos: 8 caracteres, mayúscula, minúscula y carácter especial.
+                Requisitos: 8 caracteres, mayúscula, minúscula y carácter
+                especial.
               </p>
             )}
             {errors.contraseña && (
-              <p className="text-xs font-medium text-[#B91C1C]">{errors.contraseña.message}</p>
+              <p className="text-xs font-medium text-[#B91C1C]">
+                {errors.contraseña.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-2 text-left">
-            <Label className={`font-bold ${errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}>
+            <Label
+              className={`font-bold ${errors.confirmarContraseña ? 'text-[#B91C1C]' : 'text-[#0B1001]'}`}
+            >
               Confirmar contraseña*
             </Label>
             <div className="relative">
@@ -167,11 +174,17 @@ const RegisterForm = ({
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#626059] hover:bg-transparent h-auto p-0"
                 data-testid="toggle-confirm-password-visibility"
               >
-                {showConfirmPassword ? <EyeOff className="size-5" /> : <EyeIcon className="size-5" />}
+                {showConfirmPassword ? (
+                  <EyeOff className="size-5" />
+                ) : (
+                  <EyeIcon className="size-5" />
+                )}
               </Button>
             </div>
             {errors.confirmarContraseña && (
-              <p className="text-xs font-medium text-[#B91C1C]">{errors.confirmarContraseña.message}</p>
+              <p className="text-xs font-medium text-[#B91C1C]">
+                {errors.confirmarContraseña.message}
+              </p>
             )}
           </div>
         </div>
@@ -190,4 +203,4 @@ const RegisterForm = ({
   )
 }
 
-export default RegisterForm;
+export default RegisterForm
