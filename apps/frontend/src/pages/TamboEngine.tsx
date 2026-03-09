@@ -75,7 +75,7 @@ const TamboEngine: React.FC = () => {
               </h2>
 
               <p className="text-md text-body-text leading-relaxed">
-                TamboEngine necesita al menos 5 lotes <br /> registrados para
+                TamboEngine necesita al menos 15 lotes <br /> registrados para
                 empezar a identificar patrones y <br /> desvíos en tu produccion
               </p>
             </CardContent>
