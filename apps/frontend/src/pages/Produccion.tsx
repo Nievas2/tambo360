@@ -63,9 +63,11 @@ const Produccion: React.FC = () => {
 
   const [nameDebounced] = useDebounce(nombre, 300)
 
+  const searchFilter = nameDebounced?.replace(/^0+/, '')
+
   const { data, isPending, error } = useBatches({
     filters: {
-      nombre: nameDebounced || undefined,
+      nombre: searchFilter || undefined,
       orden,
       pagina: String(pagina),
     },
