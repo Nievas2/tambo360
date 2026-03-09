@@ -128,9 +128,7 @@ const CostTable = ({
                     <TableCell>
                       $ {Number(cost.monto).toLocaleString('es-AR')}
                     </TableCell>
-                    <TableCell>
-                      {cost.observaciones || 'Sin observaciones'}
-                    </TableCell>
+                    <TableCell>{cost.observaciones || '-'}</TableCell>
                     <TableCell className="text-center mr-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
