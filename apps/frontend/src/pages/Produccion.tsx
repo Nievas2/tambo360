@@ -407,10 +407,8 @@ const Produccion: React.FC = () => {
       {/* Modales para registrar merma, costo y lote */}
       <ChangeBatch
         open={isChangeBatchOpen}
-        setOpen={() => {
-          setIsChangeBatchOpen(false)
-          setSelectedBatch(null)
-        }}
+        onClose={() => setIsChangeBatchOpen(false)}
+        onOpen={() => setIsChangeBatchOpen(true)}
         batch={
           selectedBatch
             ? {
@@ -429,12 +427,14 @@ const Produccion: React.FC = () => {
       <ChangeDecrease
         open={isChangeDecreaseOpen}
         onClose={() => setIsChangeDecreaseOpen(false)}
+        onOpen={() => setIsChangeDecreaseOpen(true)}
         idBatch={selectedBatch?.idLote}
       />
 
       <ChangeCost
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
+        onOpen={() => setIsChangeCostOpen(true)}
         loteId={loteId}
       />
     </div>

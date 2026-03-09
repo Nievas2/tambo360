@@ -27,20 +27,32 @@ import { useCreateBatch } from '@/src/hooks/batch/useCreateBatch'
 import { useUpdateBatch } from '@/src/hooks/batch/useUpdateBatch'
 import { useProducts } from '@/src/hooks/product/useProducts'
 import { useErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useConnectionError } from '@/src/hooks/connection/useConnectionError'
+import { ConnectionErrorModal } from '@/src/components/ConnectionErrorModal'
 
 interface ChangeBatchProps {
   open: boolean
-  setOpen: () => void
+  onClose: () => void
+  onOpen?: () => void
   batch?: BatchDto
 }
-const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
+const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
   const [id, setId] = useState('')
   const [finished, setFinished] = useState(false)
-  const { mutateAsync, error } = useCreateBatch()
-  const { mutateAsync: mutateAsyncUpdate, error: errorUpdate } =
-    useUpdateBatch()
+  const { mutateAsync } = useCreateBatch()
+  const { mutateAsync: mutateAsyncUpdate } = useUpdateBatch()
   const { data } = useProducts()
   const { showErrorMessage } = useErrorMessage()
+  const {
+    showConnectionError,
+    handleSubmitWithConnectionCheck,
+    retry,
+    dismiss,
+  } = useConnectionError({
+    onServerError: showErrorMessage,
+    closeParentDialog: onClose,
+    openParentDialog: onOpen,
+  })
   const { pathname } = useLocation()
 
   const {
@@ -85,8 +97,8 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
     }
   }, [batch, reset, setValue])
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
+  const onSubmit = handleSubmit(
+    handleSubmitWithConnectionCheck(async (data) => {
       if (!batch) {
         const date = new Date(data.fechaProduccion)
         const fechaProduccion = [
@@ -94,12 +106,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           String(date.getUTCMonth() + 1).padStart(2, '0'),
           date.getUTCFullYear(),
         ].join('/')
-
-        const values = {
-          ...data,
-          fechaProduccion,
-        }
-        const response = await mutateAsync(values)
+        const response = await mutateAsync({ ...data, fechaProduccion })
         setId(response.idLote)
         setFinished(true)
       } else {
@@ -109,36 +116,22 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           String(date.getUTCMonth() + 1).padStart(2, '0'),
           date.getUTCFullYear(),
         ].join('/')
-
-        const values = {
-          ...data,
-          fechaProduccion,
-        }
         await mutateAsyncUpdate({
           id: batch.id,
-          values: values,
+          values: { ...data, fechaProduccion },
         })
-
         setId(batch.id)
         setFinished(true)
       }
-    } catch {
-      if (batch) {
-        showErrorMessage(error.response.data.message || 'Se perdio la conexión')
-      } else {
-        showErrorMessage(
-          errorUpdate.response.data.message || 'Se perdio la conexión'
-        )
-      }
-    }
-  })
+    })
+  )
 
   return (
     <Dialog
       open={open}
       onOpenChange={() => {
         setFinished(false)
-        setOpen()
+        onClose()
         reset()
       }}
     >
@@ -146,7 +139,11 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
         <DialogContent className="space-y-6">
           <DialogHeader>
             <DialogTitle className="text-[32px] font-bold text-black flex justify-center">
-              <img src="/successIcon.svg" alt="success" />
+              <img
+                src="/successIcon.svg"
+                alt="success"
+                className="w-36 aspect-square"
+              />
             </DialogTitle>
 
             <DialogTitle className="text-[32px] font-bold text-black flex justify-center text-center">
@@ -187,7 +184,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
                 variant="default"
                 className="flex items-center justify-center w-full h-14 text-xl font-bold"
                 onClick={() => {
-                  setOpen()
+                  onClose()
                   setFinished(false)
                 }}
               >
@@ -210,7 +207,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           </div>
 
           <DialogFooter className="flex flex-row justify-center sm:justify-center items-center text-center">
-            <Button variant="ghost" onClick={() => setOpen()}>
+            <Button variant="ghost" onClick={() => onClose()}>
               <Grid className="size-5" />
               <span className="underline">Volver al dashboard</span>
             </Button>
@@ -312,6 +309,11 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
           </form>
         </DialogContent>
       )}
+      <ConnectionErrorModal
+        open={showConnectionError}
+        onRetry={retry}
+        onCancel={() => dismiss(reset)}
+      />
     </Dialog>
   )
 }

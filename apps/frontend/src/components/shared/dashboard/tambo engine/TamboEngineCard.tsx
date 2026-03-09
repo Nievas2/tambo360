@@ -1,4 +1,4 @@
-import Robot from '@/public/Robot'
+import Robot from '@/src/components/shared/Robot'
 import { Button } from '@/src/components/common/Button'
 import { Card, CardContent } from '@/src/components/common/card'
 import { useViewedAlert } from '@/src/hooks/alerts/useViewedAlert'
