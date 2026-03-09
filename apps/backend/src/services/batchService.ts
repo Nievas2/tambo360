@@ -147,23 +147,37 @@ export class LoteService {
         };
 
         if (filtros?.nombre) {
-            where.producto = {
-                nombre: {
-                    contains: filtros.nombre,
-                    mode: "insensitive",
-                },
-            };
-        }
+            const valor = filtros.nombre;
+            const esNumero = !Number.isNaN(Number(valor));
 
-        if (filtros?.numeroLote !== undefined && !Number.isNaN(filtros.numeroLote)) {
+            if (esNumero) {
+                // Buscar lotes cuyo numeroLote empiece con el número
+                const lotesNumero = await prisma.$queryRaw<{ idLote: string }[]>`
+                SELECT "idLote"
+                FROM "LoteProduccion"
+                WHERE CAST("numeroLote" AS TEXT) LIKE ${valor + "%"}
+                AND "idEstablecimiento" = ${establecimiento.idEstablecimiento}
+            `;
+                const ids = lotesNumero.map((l) => l.idLote);
+
+                if (ids.length > 0) {
+                    where.idLote = { in: ids };
+                } else {
+
+                    where.idLote = { equals: "0" };
+                }
+            } else {
+
+                where.producto = {
+                    nombre: {
+                        contains: valor,
+                        mode: "insensitive",
+                    },
+                };
+            }
+        } else if (filtros?.numeroLote !== undefined && !Number.isNaN(filtros.numeroLote)) {
+
             where.numeroLote = filtros.numeroLote;
-        }
-
-        if (filtros?.fecha) {
-            where.fechaProduccion = {
-                gte: filtros.fecha.inicio,
-                lte: filtros.fecha.fin,
-            };
         }
 
         const pagina = filtros?.pagina && filtros.pagina > 0 ? filtros.pagina : 1;
@@ -183,9 +197,10 @@ export class LoteService {
                 mermas: true,
                 costosDirectos: true,
             },
-            orderBy: {
-                fechaProduccion: filtros?.orden ?? "desc",
-            },
+            orderBy: [
+                { numeroLote: filtros?.orden ?? "asc" },
+                { fechaProduccion: filtros?.orden ?? "desc" },
+            ],
             skip: (pagina - 1) * cantidadPorPagina,
             take: cantidadPorPagina,
         });
@@ -196,6 +211,7 @@ export class LoteService {
             totalLotes,
             lotes,
         };
+
     }
 
     static async obtenerLote(idLote: string, idUsuario: string) {
