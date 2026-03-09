@@ -17,7 +17,6 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        // Archivos a pre-cachear en la primera visita
         includeAssets: ['favicon.svg', 'offline.html'],
         manifest: {
           name: 'Tambo360',
@@ -37,21 +36,30 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          // Sube el límite a 3MB para cubrir el bundle actual
           maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-          navigateFallback: '/offline.html',
-          navigateFallbackDenylist: [/^\/api\//],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
               handler: 'CacheFirst',
               options: {
                 cacheName: 'google-fonts',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365,
-                },
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              },
+            },
+            {
+              urlPattern: ({ request }) => request.mode === 'navigate',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'navigation',
+                networkTimeoutSeconds: 5,
+                plugins: [
+                  {
+                    handlerDidError: async () => {
+                      return caches.match('/offline.html')
+                    },
+                  },
+                ],
               },
             },
           ],
@@ -70,11 +78,7 @@ export default defineConfig(({ mode }) => {
           manualChunks: {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
             'vendor-query': ['@tanstack/react-query'],
-            'vendor-ui': [
-              '@radix-ui/react-dialog',
-              '@radix-ui/react-slot',
-              'lucide-react',
-            ],
+            'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-slot', 'lucide-react'],
             'vendor-form': ['react-hook-form', '@hookform/resolvers', 'zod'],
           },
         },
