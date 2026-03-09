@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/common/select'
+import { ConnectionErrorModal } from '@/src/components/ConnectionErrorModal'
+import { useConnectionError } from '@/src/hooks/connection/useConnectionError'
 import { useCreateDecrease } from '@/src/hooks/decrease/useCreateDecrease'
 import { useUpdateDecrease } from '@/src/hooks/decrease/useUpdateDecrease'
 import { useErrorMessage } from '@/src/hooks/useErrorMessage'
@@ -28,6 +30,7 @@ import { Controller, useForm } from 'react-hook-form'
 interface ChangeDecreaseProps {
   open: boolean
   onClose: () => void
+  onOpen?: () => void
   idBatch?: string
   decrease?: Decrease
 }
@@ -35,16 +38,25 @@ interface ChangeDecreaseProps {
 const ChangeDecrease = ({
   open,
   onClose,
+  onOpen,
   decrease,
   idBatch,
 }: ChangeDecreaseProps) => {
-  const { mutateAsync: create, isPending, error } = useCreateDecrease()
+  const { mutateAsync: create, isPending } = useCreateDecrease()
   const { showErrorMessage } = useErrorMessage()
   const {
-    mutateAsync: update,
-    isPending: isPendingUpdate,
-    error: updateError,
-  } = useUpdateDecrease({ idLote: idBatch })
+    showConnectionError,
+    handleSubmitWithConnectionCheck,
+    retry,
+    dismiss,
+  } = useConnectionError({
+    onServerError: showErrorMessage,
+    closeParentDialog: onClose,
+    openParentDialog: onOpen,
+  })
+  const { mutateAsync: update, isPending: isPendingUpdate } = useUpdateDecrease(
+    { idLote: idBatch }
+  )
 
   const {
     register,
@@ -78,24 +90,16 @@ const ChangeDecrease = ({
     }
   }, [decrease, reset])
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
+  const onSubmit = handleSubmit(
+    handleSubmitWithConnectionCheck(async (data) => {
       if (decrease) {
         await update({ id: decrease.idMerma, values: data })
       } else {
         await create({ ...data, idLote: idBatch })
       }
-    } catch {
-      if (!decrease) {
-        showErrorMessage(error.response.data.message || 'Se perdio la conexión')
-      } else {
-        showErrorMessage(
-          updateError.response.data.message || 'Se perdio la conexión'
-        )
-      }
-    }
-    onClose()
-  })
+      onClose()
+    })
+  )
 
   return (
     <Dialog
@@ -203,6 +207,11 @@ const ChangeDecrease = ({
           </Button>
         </form>
       </DialogContent>
+      <ConnectionErrorModal
+        open={showConnectionError}
+        onRetry={retry}
+        onCancel={() => dismiss(reset)}
+      />
     </Dialog>
   )
 }

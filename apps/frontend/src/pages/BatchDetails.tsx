@@ -280,7 +280,8 @@ export default function BatchDetails() {
 
       <ChangeBatch
         open={isChangeBatchOpen}
-        setOpen={() => setIsChangeBatchOpen(false)}
+        onOpen={() => setIsChangeBatchOpen(true)}
+        onClose={() => setIsChangeBatchOpen(false)}
         batch={
           batch?.data != undefined
             ? {
