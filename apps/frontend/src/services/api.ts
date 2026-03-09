@@ -6,10 +6,6 @@ export const api = axios.create({
   withCredentials: true,
 })
 
-export const apiIA = axios.create({
-  baseURL: API_ENDPOINTS.BASE_IA,
-})
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {

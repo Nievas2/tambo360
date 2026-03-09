@@ -1,12 +1,13 @@
-import { apiIA } from '@/src/services/api'
+import { api } from '@/src/services/api'
 
 export const getAlerts = (id: string, range: string) =>
-  apiIA.get(`/${id}`, {
+  api.get(`/alertas/${id}`, {
     params: { range },
   })
 
-export const getLastsAlerts = (id: string) => apiIA.get(`/${id}/ultimas`)
+export const getLastsAlerts = (id: string) => api.get(`/alertas/${id}/ultimas`)
 
-export const changeViewedAlert = (id: string) => apiIA.put(`/${id}/visto`)
+export const changeViewedAlert = (id: string) => api.put(`/alertas/${id}/visto`)
 
-export const getNoViewedAlerts = (id: string) => apiIA.get(`/${id}/no-vistas`)
+export const getNoViewedAlerts = (id: string) =>
+  api.get(`/alertas/${id}/no-vistas`)

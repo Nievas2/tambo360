@@ -52,13 +52,12 @@ const TamboEngine: React.FC = () => {
         </Select>
       </div>
       <div className="flex flex-col gap-4">
-        {isPending &&
+        {isPending ? (
           Array.from({ length: 3 }).map((_, i) => (
             <TamboEngineCardSkeleton key={i} />
-          ))}
-
-        {data?.length > 0 ? (
-          data?.map((alert: Alert) => (
+          ))
+        ) : data?.data.length > 0 ? (
+          data?.data.map((alert: Alert) => (
             <TamboEngineCard alert={alert} key={alert.id} />
           ))
         ) : (

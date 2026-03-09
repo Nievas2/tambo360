@@ -77,7 +77,7 @@ const TamboEngineCard = ({ alert }: TamboEngineCardProps) => {
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <Package className="h-4 w-4" />
                 <span>
-                  L-001 — Producto:{' '}
+                  {alert.numeroLote} — Producto:{' '}
                   <span className="font-semibold text-slate-700">
                     {alert.producto}
                   </span>

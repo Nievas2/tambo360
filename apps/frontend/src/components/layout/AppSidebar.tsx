@@ -99,10 +99,9 @@ export function AppSidebar({ forcedCollapsed }: AppSidebarProps) {
                       >
                         {item.title}{' '}
                         {item.url === '/tambo-engine' &&
-                          data &&
-                          data.cantidad > 0 && (
+                          data?.data.cantidad > 0 && (
                             <span className="text-white bg-red-main rounded-full size-6 text-center text-[16px]">
-                              {data.cantidad}
+                              {data.data.cantidad}
                             </span>
                           )}
                       </span>

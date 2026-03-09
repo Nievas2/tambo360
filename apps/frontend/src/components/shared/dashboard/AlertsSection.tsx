@@ -37,12 +37,12 @@ const AlertsSection = () => {
               <AlertCardSkeleton />
               <AlertCardSkeleton />
             </>
-          ) : data?.length > 0 ? (
-            data?.map((alert: Alert) => (
+          ) : data?.data.length > 0 ? (
+            data?.data.map((alert: Alert) => (
               <AlertCard alert={alert} key={alert.id} />
             ))
           ) : (
-            <CardContent className="bg-[#eaeaea] rounded-lg space-y-4 p-4">
+            <CardContent className="bg-[#eaeaea] rounded-lg space-y-4 p-4 mx-2">
               <p className="text-[14px]">
                 Hola <b>{user.nombre.split(' ')[0]}</b>, soy TamboEngine.
               </p>

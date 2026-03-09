@@ -8,4 +8,5 @@ export interface Alert {
   descripcion: string
   creado_en: string
   visto: boolean
+  numeroLote: string
 }
