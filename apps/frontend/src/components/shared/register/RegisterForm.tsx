@@ -7,7 +7,7 @@ import { RegisterSchema } from '@/src/types/register'
 import { Input } from '@/src/components/common/Input'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface RegisterFormProps {
   handleNextStep: () => void
@@ -22,6 +22,7 @@ const RegisterForm = ({
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { mutateAsync, isPending, error: apiError } = useRegister()
+  const { showErrorMessage } = useErrorMessage()
 
   const {
     register,

@@ -15,7 +15,7 @@ import { Input } from '@/src/components/common/Input'
 // Hooks
 import { useForgotPassword } from '@/src/hooks/auth/useForgotPassword'
 import { useResetPassword } from '@/src/hooks/auth/useResetPassword'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface ApiError {
   response?: {
@@ -45,6 +45,7 @@ const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const navigate = useNavigate()
+  const { showErrorMessage } = useErrorMessage()
 
   const [step, setStep] = useState(token ? 3 : 1)
   const [userEmail, setUserEmail] = useState('')

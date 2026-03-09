@@ -18,7 +18,7 @@ import {
 } from '@/src/components/common/select'
 import { useCreateCost } from '@/src/hooks/cost/useCreateCost'
 import { useUpdateCost } from '@/src/hooks/cost/useUpdateCost'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 import { Concept, Cost, UpdateCostSchema } from '@/src/types/cost'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
@@ -34,6 +34,7 @@ interface ChangeCostProps {
 
 const ChangeCost = ({ open, onClose, cost, loteId }: ChangeCostProps) => {
   const { mutateAsync, error, isPending } = useCreateCost()
+  const { showErrorMessage } = useErrorMessage()
   const {
     mutateAsync: updateCost,
     error: updateError,

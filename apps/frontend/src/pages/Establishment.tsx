@@ -20,7 +20,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from '@/src/components/common/combobox'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 
 const Establishment = () => {
   const [searchProvince, setSearchProvince] = useState('')
@@ -33,6 +33,7 @@ const Establishment = () => {
 
   const { data: province } = useProvince({ name: searchP })
   const { data: locality } = useLocality({ id: idProvince, search: searchL })
+  const { showErrorMessage } = useErrorMessage()
 
   const {
     mutateAsync: createEstablishment,

@@ -18,7 +18,7 @@ import {
 } from '@/src/components/common/select'
 import { useCreateDecrease } from '@/src/hooks/decrease/useCreateDecrease'
 import { useUpdateDecrease } from '@/src/hooks/decrease/useUpdateDecrease'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 import { Decrease, DecreaseSchema, TipoMerma } from '@/src/types/decrease'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
@@ -39,6 +39,7 @@ const ChangeDecrease = ({
   idBatch,
 }: ChangeDecreaseProps) => {
   const { mutateAsync: create, isPending, error } = useCreateDecrease()
+  const { showErrorMessage } = useErrorMessage()
   const {
     mutateAsync: update,
     isPending: isPendingUpdate,

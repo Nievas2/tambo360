@@ -10,11 +10,12 @@ import { EyeIcon, ArrowRight, EyeOff } from 'lucide-react'
 import { LoginSchema } from '@/src/types/login'
 import { useForm } from 'react-hook-form'
 import React, { useState, useEffect } from 'react'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
   const { mutateAsync, isPending, error: apiError } = useLogin()
+  const { showErrorMessage } = useErrorMessage()
   const navigate = useNavigate()
   const { login } = useAuth()
 

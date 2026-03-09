@@ -26,7 +26,7 @@ import { BatchDto, BatchSchema } from '@/src/types/batch'
 import { useCreateBatch } from '@/src/hooks/batch/useCreateBatch'
 import { useUpdateBatch } from '@/src/hooks/batch/useUpdateBatch'
 import { useProducts } from '@/src/hooks/product/useProducts'
-import { showErrorMessage } from '@/src/hooks/useErrorMessage'
+import { useErrorMessage } from '@/src/hooks/useErrorMessage'
 
 interface ChangeBatchProps {
   open: boolean
@@ -40,6 +40,7 @@ const ChangeBatch = ({ open, setOpen, batch }: ChangeBatchProps) => {
   const { mutateAsync: mutateAsyncUpdate, error: errorUpdate } =
     useUpdateBatch()
   const { data } = useProducts()
+  const { showErrorMessage } = useErrorMessage()
   const { pathname } = useLocation()
 
   const {
