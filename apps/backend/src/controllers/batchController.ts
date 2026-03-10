@@ -4,6 +4,7 @@ import { crearLoteSchema, editarLoteSchema, idLoteParamSchema, listarLotesSchema
 import { AppError } from "../utils/AppError";
 import { ApiResponse } from "../utils/ApiResponse";
 
+
 export const crearLote = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const parsed = crearLoteSchema.safeParse(req.body);
@@ -97,7 +98,10 @@ export const obtenerLote = async (req: Request, res: Response, next: NextFunctio
 
         const lote = await LoteService.obtenerLote(idLote, user.id);
 
-        return res.status(200).json(ApiResponse.success(lote, "Lote obtenido correctamente"));
+        return res.status(200).json(
+            ApiResponse.success(lote, "Lote obtenido correctamente")
+        );
+
     } catch (error) {
         next(error);
     }

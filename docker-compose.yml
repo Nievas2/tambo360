@@ -20,6 +20,8 @@ services:
       target: development
     ports:
       - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
@@ -79,6 +81,7 @@ services:
 
 volumes:
   postgres_data:
+
 
 networks:
   default:

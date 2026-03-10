@@ -4,6 +4,7 @@ import { CrearLoteDTO } from "../schemas/batchSchema";
 import { Prisma } from "@prisma/client";
 import { TamboEngineService } from "./tamboEngineService";
 
+
 export class LoteService {
 
     static async crearLote(idUsuario: string, data: CrearLoteDTO) {
@@ -234,7 +235,15 @@ export class LoteService {
             throw new AppError("No tiene permisos para ver este lote", 403);
         }
 
-        return lote;
+        const alertas = await TamboEngineService.getAlertasPorLote(
+            lote.establecimiento.idEstablecimiento,
+            idLote
+        );
+
+        return {
+            ...lote,
+            alertas
+        };
     }
 
     static async listarProduccionDelDia(idUsuario: string) {
