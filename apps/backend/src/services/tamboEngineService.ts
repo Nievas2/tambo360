@@ -178,4 +178,21 @@ export class TamboEngineService {
             throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada al consultar cantidad de alertas.", 502);
         }
     }
+    static async getAlertasPorLote(idEstablecimiento: string, idLote: string) {
+        try {
+            const response = await this.fetchWithTimeout(`${IA_URL}/api/v1/tambo/alertas/${idEstablecimiento}/lote/${idLote}`, {}, 15000);
+
+            if (!response.ok) {
+                if (response.status === 404) return [];
+                throw new AppError(`Error interno en la IA (Status: ${response.status})`, response.status);
+            }
+
+            const alertas = await response.json();
+            return await this._enriquecerAlertasConNumeroLote(alertas);
+        } catch (error: any) {
+            console.error(`[TamboEngine] Error consultando alertas del lote ${idLote}:`, error);
+            if (error instanceof AppError) throw error;
+            throw new AppError("El servicio de Inteligencia Artificial devolvió una respuesta inesperada.", 502);
+        }
+    }
 }
