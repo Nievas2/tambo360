@@ -115,6 +115,42 @@
  *         description: Petición inválida (ej. falta ID).
  *       401:
  *         description: No autenticado.
+ *       404:
+ *         description: Alerta no encontrada.
+ *       500:
+ *         description: Error interno del servidor.
+ */
+
+/**
+ * @swagger
+ * /alertas/{idEstablecimiento}/lote/{idLote}:
+ *   get:
+ *     summary: Obtener todas las alertas asociadas a un lote en particular
+ *     tags: [Alertas]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idEstablecimiento
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del establecimiento
+ *       - in: path
+ *         name: idLote
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID del lote
+ *     responses:
+ *       200:
+ *         description: Lista de alertas para ese lote obtenida correctamente.
+ *       400:
+ *         description: Petición inválida (ej. falta ID).
+ *       401:
+ *         description: No autenticado.
  *       500:
  *         description: Error interno del servidor.
  */

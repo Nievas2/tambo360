@@ -54,4 +54,16 @@ export class AlertController {
             next(error);
         }
     }
+    static async getAlertasPorLote(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { idEstablecimiento, idLote } = req.params;
+            if (!idEstablecimiento) throw new AppError("ID del establecimiento requerido", 400);
+            if (!idLote) throw new AppError("ID del lote requerido", 400);
+
+            const alertas = await TamboEngineService.getAlertasPorLote(idEstablecimiento, idLote);
+            return res.status(200).json(ApiResponse.success(alertas, "Alertas del lote obtenidas correctamente"));
+        } catch (error) {
+            next(error);
+        }
+    }
 }

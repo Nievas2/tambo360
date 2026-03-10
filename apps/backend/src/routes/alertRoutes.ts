@@ -9,4 +9,6 @@ router.put("/:idAlerta/visto", AlertController.marcarAlertaVisto);
 
 router.get("/:idEstablecimiento/no-vistas", AlertController.getAlertasNoVistasCount);
 
+router.get("/:idEstablecimiento/lote/:idLote", AlertController.getAlertasPorLote);
+
 export default router;
