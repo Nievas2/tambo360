@@ -16,6 +16,7 @@ const Dashboard = () => {
       ? ((data?.data.actual.mermas || 0) / totalProduccion) * 100
       : 0
 
+  console.log(porcentajeMermas)
   return (
     <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6">
@@ -64,16 +65,12 @@ const Dashboard = () => {
 
         <StatCard
           title="Mermas Totales"
-          value={porcentajeMermas.toFixed(1)}
+          value={porcentajeMermas.toFixed(2)}
           unit="%"
-          trend={
-            data?.data.variaciones.mermas != null
-              ? {
-                  value: data.data.variaciones.mermas,
-                  isPositive: data.data.variaciones.mermas <= 0,
-                }
-              : null
-          }
+          trend={{
+            value: data?.data.variaciones.mermas,
+            isPositive: data?.data.variaciones.mermas <= 0,
+          }}
           description={`vs ${data?.data.mesPrevio}`}
           isPending={isPending}
         />

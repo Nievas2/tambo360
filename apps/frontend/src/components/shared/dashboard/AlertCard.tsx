@@ -33,7 +33,7 @@ const AlertCard = ({ alert }: AlertCardProps) => {
           </span>
 
           <span className="flex gap-2 text-xs">
-            <Package className="size-3" /> L-003, L006
+            <Package className="size-3" /> {alert.numeroLote}
           </span>
         </CardDescription>
       </CardHeader>

@@ -21,6 +21,7 @@ export const StatCard = ({
   unit,
   isPending,
 }: StatCardProps) => {
+  console.log(value)
   return (
     <Card
       className={`${trend === null ? 'border-slate-200' : 'border-[#D7ECAF] text-green-main'} shadow-sm bg-white rounded-xl`}
