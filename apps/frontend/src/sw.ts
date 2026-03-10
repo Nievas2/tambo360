@@ -7,21 +7,26 @@ declare let self: ServiceWorkerGlobalScope
 
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
+const OFFLINE_URL = '/offline.html'
 
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('offline-html-cache').then((cache) => {
+      return cache.add(OFFLINE_URL)
+    })
+  )
+})
 // Manejador para la navegación
 const networkOnly = new NetworkOnly()
 
-const navigationRoute = new NavigationRoute(async (params) => {
+const navigationRoute = new NavigationRoute(async ({ event }) => {
   try {
-    // Intentamos ir a la red
-    return await networkOnly.handle(params)
+    return await fetch(event.request)
   } catch (error) {
-    // Si falla (estamos offline), devolvemos el archivo físico offline.html
-    // Esto evita que React Router se ejecute.
-    const cache = await caches.open('offline-html-cache') // O el nombre de tu cache de precache
-    const cachedResponse = await caches.match('/offline.html')
+    const cache = await caches.open('offline-html-cache')
+    const cachedResponse = await cache.match('/offline.html')
 
-    return cachedResponse || Response.error()
+    return cachedResponse
   }
 })
 

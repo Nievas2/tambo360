@@ -42,6 +42,9 @@ export default defineConfig(({ mode }) => {
           maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         },
+        workbox: {
+          navigateFallback: '/offline.html',
+        },
       }),
     ],
     define: {},
