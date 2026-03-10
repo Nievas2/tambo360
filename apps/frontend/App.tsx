@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 import AppRoutes from './src/routes/AppRoutes'
 import Loading from '@/src/components/layout/Loading'
 import { Toaster } from 'sonner'
-import { OfflineScreen } from '@/src/components/OfflineScreen'
 
 const queryClient = new QueryClient()
 
@@ -26,23 +25,6 @@ const AppContent: React.FC = () => {
 }
 
 export const App: React.FC = () => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }, [])
-
-  if (!isOnline) {
-    return <OfflineScreen />
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

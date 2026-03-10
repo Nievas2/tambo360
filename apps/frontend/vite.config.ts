@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'sw.ts',
-        includeAssets: ['favicon.svg'],
+        includeAssets: ['favicon.svg', 'offline.html'],
         manifest: {
           name: 'Tambo360',
           short_name: 'Tambo360',

@@ -21,6 +21,15 @@
         }
       }
     </script>
+
+    <script>
+      if (
+        !navigator.onLine &&
+        !window.location.pathname.includes('offline.html')
+      ) {
+        window.location.href = '/offline.html'
+      }
+    </script>
     <link rel="stylesheet" href="/index.css" />
   </head>
   <body>
