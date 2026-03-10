@@ -19,7 +19,7 @@ const AlertCard = ({ alert }: AlertCardProps) => {
     <Card className="bg-alert-bg mx-4 rounded-lg gap-4">
       <CardHeader className="space-y-1">
         <CardTitle className="font-bold text-[16px]">
-          {alert.producto} {alert.categoria}
+          Merma superior al promedio en {alert.producto}
         </CardTitle>
         <CardDescription className="flex justify-between items-center">
           <span className="flex gap-2 text-xs">
