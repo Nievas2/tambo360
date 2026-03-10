@@ -11,25 +11,6 @@ const queryClient = new QueryClient()
 
 const AppContent: React.FC = () => {
   const { loading } = useAuth()
-  const [isOnline, setIsOnline] = useState(navigator.onLine)
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
-
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
-
-    return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }, [])
-
-  // Si no hay internet, cortamos todo y mostramos tu pantalla de inmediato
-  if (!isOnline) {
-    return <OfflineScreen />
-  }
 
   if (loading) {
     return <Loading />
@@ -45,6 +26,23 @@ const AppContent: React.FC = () => {
 }
 
 export const App: React.FC = () => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  if (!isOnline) {
+    return <OfflineScreen />
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -53,5 +51,3 @@ export const App: React.FC = () => {
     </QueryClientProvider>
   )
 }
-
-export default App

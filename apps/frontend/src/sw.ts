@@ -29,5 +29,6 @@ registerRoute(
   })
 )
 
-// Navegación — Modo SPA: Siempre devuelve tu index.html instantáneamente
-registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')))
+const handler = createHandlerBoundToURL('/index.html')
+const navigationRoute = new NavigationRoute(handler)
+registerRoute(navigationRoute)
