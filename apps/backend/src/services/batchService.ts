@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/AppError";
 import { CrearLoteDTO } from "../schemas/batchSchema";
 import { Prisma } from "@prisma/client";
+import { TamboEngineService } from "./tamboEngineService";
 
 export class LoteService {
 
@@ -50,6 +51,11 @@ export class LoteService {
                 }
             }
         });
+
+        // Disparar en background el análisis de IA si se creó como completado
+        if (lote.estado) {
+            TamboEngineService.analizarSiCorresponde(establecimiento.idEstablecimiento);
+        }
 
         return lote;
     }
@@ -272,9 +278,14 @@ export class LoteService {
             throw new AppError("El lote ya está completado", 400);
         }
 
-        return prisma.loteProduccion.update({
+        const loteActualizado = await prisma.loteProduccion.update({
             where: { idLote },
             data: { estado: true },
         });
+
+        // Disparar en background el análisis de IA al completarse
+        TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
+
+        return loteActualizado;
     }
 }
