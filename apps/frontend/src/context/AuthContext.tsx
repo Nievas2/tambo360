@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { AuthState, User } from '../types'
 import Cookies from 'js-cookie'
 import { api } from '@/src/services/api'
+import { useLogout } from '@/src/hooks/auth/useLogout'
 
 interface AuthContextType extends AuthState {
   setToken: (token: string | null) => void
@@ -21,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { mutateAsync } = useLogout()
 
   const isAuthenticated = !!user
 
@@ -32,17 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(res.data.data)
       } else {
         setUser(null)
-        setToken(null)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       setUser(null)
-      setToken(null)
     } finally {
       setLoading(false)
     }
   }
-
   useEffect(() => {
     fetchSession()
   }, [])
@@ -53,12 +51,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null)
   }
 
-  const logout = () => {
-    Cookies.remove('user')
-    Cookies.remove('token')
-    setUser(null)
-    setToken(null)
-    setError(null)
+  const logout = async () => {
+    try {
+      setUser(null)
+      setToken(null)
+      setError(null)
+      await mutateAsync()
+      Cookies.remove('token')
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (

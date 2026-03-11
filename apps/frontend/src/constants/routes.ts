@@ -3,6 +3,7 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  RESET_PASSWORD: '/auth/reset-password',
 
   // Rutas Privadas (Dashboard y Operaciones)
   DASHBOARD: '/dashboard',
@@ -15,6 +16,7 @@ export const ROUTES = {
 
 export const API_ENDPOINTS = {
   BASE: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  BASE_IA: import.meta.env.VITE_API_IA_URL || 'http://localhost:3000/ia',
   AUTH: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',

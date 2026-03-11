@@ -1,3 +1,4 @@
+import { Alert } from '@/src/types/alerts'
 import { Cost } from '@/src/types/cost'
 import { Decrease } from '@/src/types/decrease'
 import { Product } from '@/src/types/product'
@@ -72,5 +73,16 @@ export interface Batch {
   producto: Product
   mermas: Decrease[]
   costosDirectos: Cost[]
+  alertas?: Alert[]
   numeroLote: number
+}
+
+/* nombre?: string;
+        orden?: "asc" | "desc"; 
+        pagina?: number; */
+
+export interface BatchFilters {
+  nombre?: string
+  orden?: 'asc' | 'desc'
+  pagina?: string
 }

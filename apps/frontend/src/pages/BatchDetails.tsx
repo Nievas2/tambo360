@@ -1,38 +1,64 @@
 import { Badge } from '@/src/components/common/badge'
 import { Button } from '@/src/components/common/Button'
-import { Card, CardContent } from '@/src/components/common/card'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from '@/src/components/common/empty'
+import { Card } from '@/src/components/common/card'
 import ChangeBatch from '@/src/components/shared/dashboard/batch/ChangeBatch'
+import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
+import { ConfirmDeleteDialog } from '@/src/components/shared/dashboard/batch/DeleteBatch'
 import ChangeCost from '@/src/components/shared/dashboard/cost/ChangeCost'
+import CostTable from '@/src/components/shared/dashboard/cost/CostTable'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
+import DecreaseTable from '@/src/components/shared/dashboard/decrease/DecreaseTable'
 import { StatCard } from '@/src/components/shared/StatCard'
+import { AlertCardBatch } from '@/src/components/shared/dashboard/batch/AlertCardBatch'
 import { useBatch } from '@/src/hooks/batch/useBatch'
+import { useDeleteBatch } from '@/src/hooks/batch/useDeleteBatch'
+import { Alert } from '@/src/types/alerts'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export default function BatchDetails() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const id = pathname.split('/')[3]
 
   if (!id) {
     return <p>Falta el identificador del lote</p>
   }
+
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
-  const { data: batch, isLoading } = useBatch({ id: id })
+  const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false)
+  const { data: batch, isPending, refetch } = useBatch({ id: id })
+  const { mutateAsync, isPending: isPendingDelete, error } = useDeleteBatch()
+  const [deleteDialog, setDeleteDialog] = useState(false)
 
-  if (isLoading) {
+  // Once data finishes loading, scroll to the section indicated by the hash
+  useEffect(() => {
+    if (isPending || !hash) return
+
+    const target = hash.replace('#', '')
+    const timeout = setTimeout(() => {
+      document
+        .getElementById(target)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [isPending, hash])
+
+  const handleDelete = async () => {
+    try {
+      await mutateAsync({ id: batch.data.idLote })
+      setDeleteDialog(false)
+    } catch (error) {
+      console.error('Error al eliminar:', error)
+    }
+  }
+
+  if (isPending) {
     return (
       <div className="min-h-screen space-y-6 animate-pulse">
-        {/* Header skeleton */}
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 w-full">
             <div className="h-5 w-20 bg-gray-200 rounded-full" />
@@ -46,7 +72,6 @@ export default function BatchDetails() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* Stats grid skeleton */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -60,48 +85,39 @@ export default function BatchDetails() {
             ))}
           </div>
 
-          {/* Mermas card skeleton */}
-          <div className="border rounded-xl bg-white py-2">
-            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
-              <div className="h-5 w-36 bg-gray-200 rounded" />
-              <div className="flex gap-2">
-                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
-                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
-              </div>
-            </div>
-            <div className="p-4 flex flex-col gap-3">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
-              ))}
-            </div>
+          <div className="flex flex-col gap-2">
+            <div className="h-16 w-full bg-gray-100 rounded-2xl" />
           </div>
 
-          {/* Costos card skeleton */}
-          <div className="border rounded-xl bg-white py-2">
-            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
-              <div className="h-5 w-36 bg-gray-200 rounded" />
-              <div className="flex gap-2">
-                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
-                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+          {[0, 1].map((i) => (
+            <div key={i} className="border rounded-xl bg-white py-2">
+              <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
+                <div className="h-5 w-36 bg-gray-200 rounded" />
+                <div className="flex gap-2">
+                  <div className="h-10 w-10 bg-gray-200 rounded-lg" />
+                  <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+                </div>
+              </div>
+              <div className="p-4 flex flex-col gap-3">
+                {Array.from({ length: 2 }).map((_, j) => (
+                  <div key={j} className="h-12 w-full bg-gray-100 rounded-lg" />
+                ))}
               </div>
             </div>
-            <div className="p-4 flex flex-col gap-3">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     )
   }
+
+  const alertas: Alert[] = batch?.data?.alertas ?? []
 
   return (
     <div className="min-h-screen space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-0.5 w-full">
-          <Badge variant="secondary">
+          <Badge variant={batch?.data?.estado ? 'success' : 'destructive'}>
             {batch?.data?.estado ? 'Completo' : 'Incompleto'}
           </Badge>
           <div className="flex items-center gap-2 flex-wrap">
@@ -122,36 +138,41 @@ export default function BatchDetails() {
 
         <div className="flex items-center justify-end gap-2 w-full">
           <Button
+            className="h-12 w-full max-w-36"
+            onClick={() => setIsCompleteBatchOpen(true)}
+            disabled={batch?.data?.estado}
+          >
+            Completar lote
+          </Button>
+
+          <Button
             variant="outline"
             className="h-12 w-full max-w-36"
             onClick={() => setIsChangeBatchOpen(true)}
+            disabled={batch?.data?.estado}
           >
             Editar lote
           </Button>
-          <Button className="h-12 w-full max-w-36">Completar lote</Button>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        {/* Stats grid */}
+        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <StatCard
             icon={<Droplet />}
             title="Cantidad Producida"
             value={batch?.data?.cantidad}
+            unit=" L"
           />
-
           <StatCard
             icon={<Factory />}
             title="Costo de producción"
-            value={
-              '$' +
-              batch?.data?.costosDirectos
-                .reduce((total, costo) => total + costo.monto, 0)
-                .toString()
-            }
+            value={batch?.data?.costosDirectos
+              .reduce((total, costo) => total + Number(costo.monto), 0)
+              .toString()}
+            unit="$ "
           />
-
           <StatCard
             icon={<TrendingDown />}
             title="Merma Registrada"
@@ -164,118 +185,87 @@ export default function BatchDetails() {
                 return total + qty
               }, 0)
               .toString()}
+            unit=" L"
           />
         </div>
 
-        {/* TamboEngine notice */}
-        {/* <Card>
-          <CardContent className="flex items-center gap-3">
-            <div className="bg-[#CACACA] rounded-sm p-2">
-              <img src="/robot.svg" className="size-6" alt="robot" />
-            </div>
+        {/* TamboEngine Alerts */}
+        {alertas.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {alertas.map((alert) => (
+              <AlertCardBatch key={alert.id} alert={alert} />
+            ))}
+          </div>
+        )}
 
-            <div className="flex flex-col gap-0.5 w-full">
-              <p className="text-sm font-bold">
-                TamboEngine: No se han detectado desviaciones en este lote.
-              </p>
-              <p className="text-xs text-gray-400">
-                El rendimiento se mantiene dentro del promedio histórico.
-              </p>
-            </div>
-
-            <Button variant="outline" className="h-12">
-              Ver Análisis
-              <ArrowRight className="size-5" />
-            </Button>
-          </CardContent>
-        </Card> */}
-
-        <Card className="py-2">
-          <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex gap-1">
-              <p className="text-md font-bold">Historial de mermas</p>
-            </div>
+        {/* Mermas — id="mermas" is the scroll target */}
+        <Card className="py-2" id="mermas">
+          <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-md font-bold">Historial de mermas</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
               </Button>
-
               <Button
-                className="w-52"
                 onClick={() => setIsChangeDecreaseOpen(true)}
+                disabled={batch?.data?.estado}
               >
                 Agregar merma
               </Button>
             </div>
           </div>
-
-          <CardContent className="p-0">
-            {batch?.data?.mermas.length === 0 && (
-              <Empty className="w-full gap-4">
-                <EmptyHeader>
-                  <EmptyTitle className="font-bold">
-                    Sin mermas registradas
-                  </EmptyTitle>
-                </EmptyHeader>
-                <EmptyContent className="w-full max-w-xl">
-                  <EmptyDescription className="w-full">
-                    No se han reportado pérdidas ni ajustes para este lote hasta
-                    el momento.
-                  </EmptyDescription>
-                  <Button onClick={() => setIsChangeDecreaseOpen(true)}>
-                    Registrar Merma
-                  </Button>
-                </EmptyContent>
-              </Empty>
-            )}
-          </CardContent>
+          <DecreaseTable batch={batch?.data} isPending={isPending} />
         </Card>
 
-        <Card className="py-2">
-          <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex gap-1">
-              <p className="text-md font-bold">Historial de costos</p>
-            </div>
+        {/* Costos — id="costos" is the scroll target */}
+        <Card className="py-2" id="costos">
+          <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-md font-bold">Historial de costos</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
               </Button>
-
               <Button
-                className="w-52"
                 onClick={() => setIsChangeCostOpen(true)}
+                disabled={batch?.data?.estado}
               >
                 Agregar costo
               </Button>
             </div>
           </div>
-
-          <CardContent className="p-0">
-            {batch?.data?.costosDirectos.length === 0 && (
-              <Empty className="w-full gap-4">
-                <EmptyHeader>
-                  <EmptyTitle className="font-bold">
-                    Sin costos registrados
-                  </EmptyTitle>
-                </EmptyHeader>
-                <EmptyContent className="w-full max-w-xl">
-                  <EmptyDescription className="w-full">
-                    No se han reportado pérdidas ni ajustes para este lote hasta
-                    el momento.
-                  </EmptyDescription>
-                  <Button onClick={() => setIsChangeCostOpen(true)}>
-                    Registrar costo
-                  </Button>
-                </EmptyContent>
-              </Empty>
-            )}
-          </CardContent>
+          <CostTable
+            changeCost={() => setIsChangeCostOpen(true)}
+            batch={batch?.data}
+            disabled={batch?.data?.estado}
+            isPending={isPending}
+          />
         </Card>
+
+        <Button
+          variant="ghost"
+          className="h-12 w-full border border-black"
+          onClick={() => setDeleteDialog(true)}
+          disabled={batch?.data?.estado}
+        >
+          Eliminar lote
+        </Button>
       </div>
+
+      <ConfirmDeleteDialog
+        isOpen={deleteDialog}
+        onClose={() => setDeleteDialog(false)}
+        onConfirm={handleDelete}
+        isLoading={isPendingDelete}
+        title="¿Deseas eliminar este lote?"
+        description="Al eliminar este lote, toda su información dejará de estar disponible para consulta y edición. Los registros de costos y producción asociados se ocultarán del panel principal."
+        buttonText="Eliminar lote"
+        error={error?.response?.data.message}
+      />
 
       <ChangeBatch
         open={isChangeBatchOpen}
-        setOpen={() => setIsChangeBatchOpen(false)}
+        onOpen={() => setIsChangeBatchOpen(true)}
+        onClose={() => setIsChangeBatchOpen(false)}
         batch={
           batch?.data != undefined
             ? {
@@ -286,7 +276,6 @@ export default function BatchDetails() {
                     ? parseFloat(batch.data.cantidad)
                     : Number(batch.data.cantidad ?? 0),
                 fechaProduccion: batch.data.fechaProduccion,
-                unidad: batch.data.unidad as 'kg' | 'litros',
               }
             : undefined
         }
@@ -295,11 +284,20 @@ export default function BatchDetails() {
       <ChangeDecrease
         open={isChangeDecreaseOpen}
         onClose={() => setIsChangeDecreaseOpen(false)}
+        idBatch={batch.data.idLote}
       />
 
       <ChangeCost
         open={isChangeCostOpen}
         onClose={() => setIsChangeCostOpen(false)}
+        loteId={batch?.data.idLote}
+      />
+
+      <CompleteBatch
+        open={isCompleteBatchOpen}
+        onClose={() => setIsCompleteBatchOpen(false)}
+        batchId={id}
+        refetch={refetch}
       />
     </div>
   )

@@ -17,7 +17,6 @@ import { useBatchesDay } from '@/src/hooks/batch/useBatchesDay'
 const DailyProductionLog = () => {
   const [open, setOpen] = useState(false)
   const { data, error } = useBatchesDay()
-  console.log(data)
 
   return (
     <Card>
@@ -34,16 +33,20 @@ const DailyProductionLog = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+          <Button
+            variant="outline"
+            className="p-6"
+            onClick={() => setOpen(true)}
+          >
             Crear lote
-            <Plus className="ml-2 size-4" />
+            <Plus className="size-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        {data?.data?.length > 0 && (
+        {(data?.data?.length > 0 || data?.data !== null || !error) && (
           <Table className="rounded-md border">
-            <TableHeader>
+            <TableHeader className="bg-tables">
               <TableRow className="border-none">
                 <TableHead className="w-18 text-sm font-light text-[#707070]">
                   Lote
@@ -108,14 +111,18 @@ const DailyProductionLog = () => {
           </Table>
         )}
 
-        {(data?.data?.length === 0 || error) && (
+        {(data?.data?.length === 0 || data?.data === null || error) && (
           <div className="w-full h-36 flex justify-center items-center border border-dashed">
             <p className="text-center">Aún no hay producción registrada hoy</p>
           </div>
         )}
       </CardContent>
 
-      <ChangeBatch open={open} setOpen={() => setOpen(false)} />
+      <ChangeBatch
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+      />
     </Card>
   )
 }

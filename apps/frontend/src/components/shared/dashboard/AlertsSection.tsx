@@ -6,35 +6,60 @@ import {
   CardTitle,
 } from '@/src/components/common/card'
 import AlertCard from '@/src/components/shared/dashboard/AlertCard'
+import { AlertCardSkeleton } from '@/src/components/shared/dashboard/tambo engine/skeletons/AlertCardSkeleton'
 import { useAuth } from '@/src/context/AuthContext'
-import { CircleAlert } from 'lucide-react'
+import { useLastsAlerts } from '@/src/hooks/alerts/useLastsAlerts'
+import { Alert } from '@/src/types/alerts'
+import { ShieldAlert } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const AlertsSection = () => {
   const { user } = useAuth()
+  const { data, isPending } = useLastsAlerts({
+    id: user.establecimientos[0].idEstablecimiento,
+  })
+
   return (
-    <Card className="w-full md:max-w-72 max-w-none">
-      <CardHeader className="flex items-center justify-between w-full">
-        <CardTitle className="flex items-center gap-2 font-bold">
-          <CircleAlert /> Alertas
-        </CardTitle>
+    <Card className="w-full max-w-none">
+      <CardContent className="space-y-6 px-0">
+        <CardHeader className="flex items-center justify-between w-full">
+          <CardTitle className="flex items-center gap-2 font-bold">
+            <ShieldAlert
+              className={`w-6 text-white ${data?.data.lenght > 0 ? ' fill-red-main' : 'fill-black'}`}
+            />{' '}
+            Alertas
+          </CardTitle>
 
-        <Button variant="ghost" size="sm">
-          Ver todas
-        </Button>
-      </CardHeader>
+          {data?.data.length > 0 && (
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/tambo-engine">Ver todas</Link>
+            </Button>
+          )}
+        </CardHeader>
 
-      {/* Cuando no hay alertas */}
-      <CardContent className="bg-[#eaeaea] rounded-lg space-y-4 mx-4 p-4">
-        <p className="text-[14px]">
-          Hola <b>{user.nombre.split(' ')[0]}</b>, soy TamboEngine.
-        </p>
-        <p className="text-[14px]">
-          Analizare tu producción en búsqueda de anomalías, tendencias de mermas
-          y oportunidades de optimización una vez que comiences a cargar datos.
-        </p>
+        <section className="flex flex-col gap-4">
+          {isPending ? (
+            <>
+              <AlertCardSkeleton />
+              <AlertCardSkeleton />
+            </>
+          ) : data?.data.length > 0 ? (
+            data?.data.map((alert: Alert) => (
+              <AlertCard alert={alert} key={alert.id} />
+            ))
+          ) : (
+            <CardContent className="bg-tables rounded-lg space-y-4 p-4 mx-4">
+              <p className="text-[14px]">
+                Hola <b>{user.nombre.split(' ')[0]}</b>, soy TamboEngine.
+              </p>
+              <p className="text-[14px]">
+                Analizare tu producción en búsqueda de desvíos una vez que
+                comiences a cargar datos
+              </p>
+            </CardContent>
+          )}
+        </section>
       </CardContent>
-
-      <AlertCard />
     </Card>
   )
 }

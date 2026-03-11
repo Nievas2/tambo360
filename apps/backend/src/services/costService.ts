@@ -1,66 +1,142 @@
-type CostoEntrada = {
-    loteId: number;
-    concepto: string;
-    monto: number;
-    moneda: string;
-    fecha: string;
-};
+import { prisma } from "../lib/prisma";
+import { CrearCostoDTO, ActualizarCostoDTO } from "../schemas/costShema";
+import { AppError } from "../utils/AppError";
 
-type Costo = CostoEntrada & {
-    id: number;
-};
 
 class ServicioCostos {
-    private costos: Costo[] = [];
-    private idActual: number = 1;
 
-    // Crear costo
-    async crear(data: CostoEntrada): Promise<Costo> {
-        const nuevoCosto: Costo = {
-            id: this.idActual++,
-            ...data,
-        };
+    async crear(idUsuario: string, data: CrearCostoDTO) {
 
-        this.costos.push(nuevoCosto);
-        return nuevoCosto;
-    }
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote: data.loteId },
+            include: { establecimiento: true },
+        });
 
-    // Obtener por id
-    obtenerPorId(id: number): Costo | undefined {
-        return this.costos.find(c => c.id === id);
-    }
-
-    // Obtener por lote
-    obtenerPorLote(loteId: number): Costo[] {
-        return this.costos.filter(c => c.loteId === loteId);
-    }
-
-    // Actualizar
-    async actualizar(id: number, data: CostoEntrada): Promise<Costo> {
-        const existente = this.costos.find(c => c.id === id);
-
-        if (!existente) {
-            throw new Error("Costo no encontrado");
+        if (!lote) {
+            throw new AppError("Lote no encontrado", 404);
         }
 
-        existente.loteId = data.loteId;
-        existente.concepto = data.concepto;
-        existente.monto = data.monto;
-        existente.moneda = data.moneda;
-        existente.fecha = data.fecha;
-
-        return existente;
-    }
-
-    // Eliminar
-    async eliminar(id: number): Promise<void> {
-        const index = this.costos.findIndex(c => c.id === id);
-
-        if (index === -1) {
-            throw new Error("Costo no encontrado");
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos sobre este lote", 403);
         }
 
-        this.costos.splice(index, 1);
+        if (lote.estado) {
+            throw new AppError("No se pueden agregar costos a un lote terminado", 400);
+        }
+
+        return prisma.costosDirecto.create({
+            data: {
+                idLote: data.loteId,
+                concepto: data.concepto,
+                monto: data.monto,
+                observaciones: data.observaciones,
+            },
+        });
+    }
+
+    async obtenerPorId(id: string, idUsuario: string) {
+        const costo = await prisma.costosDirecto.findUnique({
+            where: { idCostoDirecto: id },
+            include: {
+                lote: {
+                    include: {
+                        establecimiento: true
+                    }
+                }
+            }
+        });
+
+        if (!costo) {
+            throw new AppError("Costo no encontrado", 404);
+        }
+
+        if (costo.lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para ver este costo", 403);
+        }
+
+        return costo;
+    }
+
+    async obtenerPorLote(loteId: string, idUsuario: string) {
+        const lote = await prisma.loteProduccion.findUnique({
+            where: { idLote: loteId },
+            include: {
+                establecimiento: true
+            }
+        });
+
+        if (!lote) {
+            throw new AppError("Lote no encontrado", 404);
+        }
+
+        if (lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para ver los costos de este lote", 403);
+        }
+
+        return prisma.costosDirecto.findMany({
+            where: { idLote: loteId },
+            orderBy: { fechaCreacion: "desc" },
+        });
+    }
+
+    async actualizar(id: string, idUsuario: string, data: ActualizarCostoDTO) {
+        const costo = await prisma.costosDirecto.findUnique({
+            where: { idCostoDirecto: id },
+            include: {
+                lote: {
+                    include: {
+                        establecimiento: true
+                    }
+                }
+            }
+        });
+
+        if (!costo) {
+            throw new AppError("Costo no encontrado", 404);
+        }
+
+        if (costo.lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para actualizar este costo", 403);
+        }
+
+        if (costo.lote.estado) {
+            throw new AppError("No se pueden modificar costos de un lote terminado", 400);
+        }
+
+
+        return prisma.costosDirecto.update({
+            where: { idCostoDirecto: id },
+            data,
+        });
+    }
+
+    async eliminar(id: string, idUsuario: string) {
+        const costo = await prisma.costosDirecto.findUnique({
+            where: { idCostoDirecto: id },
+            include: {
+                lote: {
+                    include: {
+                        establecimiento: true
+                    }
+                }
+            }
+        });
+
+        if (!costo) {
+            throw new AppError("Costo no encontrado", 404);
+        }
+
+        if (costo.lote.establecimiento.idUsuario !== idUsuario) {
+            throw new AppError("No tiene permisos para eliminar este costo", 403);
+        }
+
+        if (costo.lote.estado) {
+            throw new AppError("No se pueden eliminar costos de un lote terminado", 400);
+        }
+
+        await prisma.costosDirecto.delete({
+            where: { idCostoDirecto: id },
+        });
     }
 }
 

@@ -2,14 +2,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { registerUser } from '@/src/utils/api/auth.api'
 import { RegisterData } from '@/src/types/register'
 import { queryKeys } from '@/src/utils/queryKeys'
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
 import { User } from '@/src/types'
 
 export function useRegister() {
   const queryClient = useQueryClient()
 
   return useMutation<
-    AxiosResponse<{ user: User }>,
+    { user: User },
     AxiosError<{ message: string }>,
     RegisterData
   >({

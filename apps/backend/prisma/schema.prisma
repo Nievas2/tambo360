@@ -28,6 +28,20 @@ enum TipoToken {
   recuperacion
 }
 
+enum TipoMerma {
+  Natural
+  Tecnica
+  Administrativa
+  Danio
+}
+
+enum ConceptoCosto {
+  insumos_basicos
+  leche_cruda
+  cuajo_y_fermentos
+  refrigeracion
+}
+
 model Usuario {
   idUsuario        String            @id @default(uuid())
   correo           String            @unique
@@ -74,9 +88,9 @@ model LoteProduccion {
 
 model Merma {
   idMerma       String         @id @default(uuid())
-  descripcion   String
+  tipo          TipoMerma
+  observacion   String?
   cantidad      Decimal
-  unidad        Unidad
   fechaCreacion DateTime       @default(now())
   idLote        String
   lote          LoteProduccion @relation(fields: [idLote], references: [idLote])
@@ -84,9 +98,9 @@ model Merma {
 
 model CostosDirecto {
   idCostoDirecto String         @id @default(uuid())
-  concepto       String
-  monto          Decimal        @db.Decimal(10, 2)
-  moneda         Moneda
+  concepto       ConceptoCosto
+  monto          Decimal        @db.Decimal(13, 2)
+  observaciones  String?        @default("")
   fechaCreacion  DateTime       @default(now())
   idLote         String
   lote           LoteProduccion @relation(fields: [idLote], references: [idLote])

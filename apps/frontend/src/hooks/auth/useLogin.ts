@@ -12,7 +12,7 @@ export function useLogin() {
     AxiosError<{ message: string }>,
     LoginData
   >({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: LoginData) => {
       const { data } = await loginUser(values)
       return data
     },

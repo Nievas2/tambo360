@@ -52,6 +52,24 @@ class EstablishmentsService {
 
         return establecimiento;
     }
+
+    async actualizarNombre(idUsuario: string, nombre: string) {
+
+        const establecimiento = await prisma.establecimiento.findFirst({
+            where: { idUsuario }
+        });
+
+        if (!establecimiento) {
+            throw new AppError("Establecimiento no encontrado", 404);
+        }
+
+        const actualizado = await prisma.establecimiento.update({
+            where: { idEstablecimiento: establecimiento.idEstablecimiento },
+            data: { nombre }
+        });
+
+        return actualizado;
+    }
 }
 
 export default new EstablishmentsService();

@@ -80,6 +80,7 @@ services:
 volumes:
   postgres_data:
 
+
 networks:
   default:
     name: example-auth-network
