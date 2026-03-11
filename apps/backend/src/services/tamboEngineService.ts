@@ -66,6 +66,7 @@ export class TamboEngineService {
                 periodo: new Date().toLocaleString("es-AR", { month: "long", year: "numeric" }),
                 lotes: lotes.map(l => ({
                     idLote: l.idLote,
+                    numeroLote: l.numeroLote,
                     fechaProduccion: l.fechaProduccion.toISOString().split("T")[0],
                     producto: l.producto.nombre,
                     categoria: l.producto.categoria,
