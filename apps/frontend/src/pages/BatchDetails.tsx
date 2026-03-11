@@ -9,8 +9,10 @@ import CostTable from '@/src/components/shared/dashboard/cost/CostTable'
 import ChangeDecrease from '@/src/components/shared/dashboard/decrease/ChangeDecrease'
 import DecreaseTable from '@/src/components/shared/dashboard/decrease/DecreaseTable'
 import { StatCard } from '@/src/components/shared/StatCard'
+import { AlertCardBatch } from '@/src/components/shared/dashboard/batch/AlertCardBatch'
 import { useBatch } from '@/src/hooks/batch/useBatch'
 import { useDeleteBatch } from '@/src/hooks/batch/useDeleteBatch'
+import { Alert } from '@/src/types/alerts'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -70,6 +72,13 @@ export default function BatchDetails() {
             ))}
           </div>
 
+          {/* Alerts skeleton */}
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 1 }).map((_, i) => (
+              <div key={i} className="h-16 w-full bg-gray-100 rounded-2xl" />
+            ))}
+          </div>
+
           {/* Mermas card skeleton */}
           <div className="border rounded-xl bg-white py-2">
             <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
@@ -105,6 +114,8 @@ export default function BatchDetails() {
       </div>
     )
   }
+
+  const alertas: Alert[] = batch?.data?.alertas ?? []
 
   return (
     <div className="min-h-screen space-y-6">
@@ -185,28 +196,14 @@ export default function BatchDetails() {
           />
         </div>
 
-        {/* TamboEngine notice */}
-        {/* <Card>
-          <CardContent className="flex items-center gap-3">
-            <div className="bg-[#CACACA] rounded-sm p-2">
-              <img src="/robot.svg" className="size-6" alt="robot" />
-            </div>
-
-            <div className="flex flex-col gap-0.5 w-full">
-              <p className="text-sm font-bold">
-                TamboEngine: No se han detectado desviaciones en este lote.
-              </p>
-              <p className="text-xs text-gray-400">
-                El rendimiento se mantiene dentro del promedio histórico.
-              </p>
-            </div>
-
-            <Button variant="outline" className="h-12">
-              Ver Análisis
-              <ArrowRight className="size-5" />
-            </Button>
-          </CardContent>
-        </Card> */}
+        {/* TamboEngine Alerts */}
+        {alertas.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {alertas.map((alert) => (
+              <AlertCardBatch key={alert.id} alert={alert} />
+            ))}
+          </div>
+        )}
 
         <Card className="py-2">
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">

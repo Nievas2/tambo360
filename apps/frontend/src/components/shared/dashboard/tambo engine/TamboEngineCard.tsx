@@ -4,18 +4,39 @@ import { Card, CardContent } from '@/src/components/common/card'
 import { useViewedAlert } from '@/src/hooks/alerts/useViewedAlert'
 import { Alert } from '@/src/types/alerts'
 import { Clock, Package, ArrowDown, ArrowUp, ShieldAlert } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 interface TamboEngineCardProps {
   alert: Alert
 }
+
 const TamboEngineCard = ({ alert }: TamboEngineCardProps) => {
   const [showDetails, setShowDetails] = useState(false)
-
   const { mutate } = useViewedAlert()
+  const { hash } = useLocation()
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const targetId = hash.replace('#', '')
+    if (targetId !== alert.id) return
+
+    setShowDetails(true)
+
+    if (!alert.visto) mutate(alert.id)
+
+    const timeout = setTimeout(() => {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [hash, alert.id])
+
   return (
     <Card
+      ref={cardRef}
       className={`overflow-hidden relative ${!alert.visto && 'border border-red-main'}`}
+      id={alert.id}
     >
       <CardContent className="flex flex-col items-start gap-4">
         <section className="flex flex-row gap-4 w-full">
