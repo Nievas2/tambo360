@@ -37,7 +37,7 @@ const ALERT_CONFIG: Record<string, AlertConfig> = {
     iconBg: 'bg-green-main',
     border: 'border-green-main',
     buttonBorder: 'border-green-main text-black hover:bg-green-100',
-    title: 'TamboEngine: Desvió bajo',
+    title: 'TamboEngine: Desvio bajo',
     description:
       'Se ha detectado una leve variación en los parámetros de producción',
   },
