@@ -14,6 +14,7 @@ import {
   ArrowDown,
   X,
   CloudOff,
+  PackageCheck,
 } from 'lucide-react'
 import { Button } from '@/src/components/common/Button'
 import { Input } from '@/src/components/common/Input'
@@ -50,12 +51,14 @@ import { useBatches } from '@/src/hooks/batch/useBatches'
 import DeleteBatch from '@/src/components/shared/dashboard/batch/DeleteBatch'
 import { useDebounce } from 'use-debounce'
 import { HighlightMatch } from '@/src/components/shared/dashboard/batch/HighlightMatch'
+import CompleteBatch from '@/src/components/shared/dashboard/batch/CompleteBatch'
 
 const Produccion: React.FC = () => {
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
+  const [isCompleteBatchOpen, setIsCompleteBatchOpen] = useState(false)
   const [loteId, setLoteId] = useState('')
 
   const [nombre, setNombre] = useState('')
@@ -66,7 +69,7 @@ const Produccion: React.FC = () => {
 
   const searchFilter = nameDebounced?.replace(/^0+/, '')
 
-  const { data, isPending, error } = useBatches({
+  const { data, isPending, error, refetch } = useBatches({
     filters: {
       nombre: searchFilter || undefined,
       orden,
@@ -86,7 +89,6 @@ const Produccion: React.FC = () => {
     setPagina(1)
   }
 
-  // The query used for highlighting — strip leading zeros to match numero lote display
   const highlightQuery = nombre.replace(/^0+/, '')
 
   return (
@@ -266,12 +268,25 @@ const Produccion: React.FC = () => {
                           </Link>
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            className="font-bold"
-                            variant={batch.estado ? 'success' : 'destructive'}
+                          <Button
+                            variant="ghost"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              if (batch.estado) return
+                              setSelectedBatch(batch)
+                              setIsCompleteBatchOpen(true)
+                            }}
+                            size="xs"
+                            disabled={batch.estado}
+                            asChild
                           >
-                            {batch.estado ? 'Completo' : 'Incompleto'}
-                          </Badge>
+                            <Badge
+                              className="font-bold"
+                              variant={batch.estado ? 'success' : 'destructive'}
+                            >
+                              {batch.estado ? 'Completo' : 'Incompleto'}
+                            </Badge>
+                          </Button>
                         </TableCell>
                         <TableCell className="truncate">
                           <Link to={`/produccion/lote/${batch.idLote}/#costos`}>
@@ -309,6 +324,15 @@ const Produccion: React.FC = () => {
                               </DropdownMenuGroup>
                               <DropdownMenuSeparator />
                               <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedBatch(batch)
+                                    setIsCompleteBatchOpen(true)
+                                  }}
+                                  disabled={batch.estado}
+                                >
+                                  <PackageCheck /> Completar
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
                                     setSelectedBatch(batch)
@@ -456,6 +480,13 @@ const Produccion: React.FC = () => {
         onClose={() => setIsChangeCostOpen(false)}
         onOpen={() => setIsChangeCostOpen(true)}
         loteId={loteId}
+      />
+
+      <CompleteBatch
+        open={isCompleteBatchOpen}
+        onClose={() => setIsCompleteBatchOpen(false)}
+        batchId={selectedBatch?.idLote}
+        refetch={refetch}
       />
     </div>
   )

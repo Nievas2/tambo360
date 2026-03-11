@@ -124,7 +124,11 @@ const CompleteBatch = ({
         )}
       </Dialog>
 
-      <ChangeBatch open={openAddBatch} setOpen={() => setOpenAddBatch(false)} />
+      <ChangeBatch
+        open={openAddBatch}
+        onClose={() => setOpenAddBatch(false)}
+        onOpen={() => setOpenAddBatch(true)}
+      />
     </>
   )
 }
