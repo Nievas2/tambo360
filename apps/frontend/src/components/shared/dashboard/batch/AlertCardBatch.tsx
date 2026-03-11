@@ -19,7 +19,7 @@ const ALERT_CONFIG: Record<string, AlertConfig> = {
     iconBg: 'bg-red-main',
     border: 'border-red-main',
     buttonBorder: 'border-red-main text-black hover:bg-red-100',
-    title: 'TamboEngine: Desvió alto',
+    title: 'TamboEngine: Desvio alto',
     description:
       'Se ha detectado una anomalía crítica que requiere acción inmediata',
   },
@@ -28,7 +28,7 @@ const ALERT_CONFIG: Record<string, AlertConfig> = {
     iconBg: 'bg-orange-alert',
     border: 'border-orange-alert',
     buttonBorder: 'border-orange-alert text-black hover:bg-yellow-100',
-    title: 'TamboEngine: Desvió moderado',
+    title: 'TamboEngine: Desvio moderado',
     description:
       'Se ha detectado una desviación moderada que requiere seguimiento',
   },
@@ -37,7 +37,7 @@ const ALERT_CONFIG: Record<string, AlertConfig> = {
     iconBg: 'bg-green-main',
     border: 'border-green-main',
     buttonBorder: 'border-green-main text-black hover:bg-green-100',
-    title: 'TamboEngine: Desvió bajo',
+    title: 'TamboEngine: Desvio bajo',
     description:
       'Se ha detectado una leve variación en los parámetros de producción',
   },

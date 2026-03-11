@@ -32,6 +32,7 @@ const TamboEngineCard = ({ alert }: TamboEngineCardProps) => {
     return () => clearTimeout(timeout)
   }, [hash, alert.id])
 
+  const loteDisplay = `#${String(alert.numeroLote).padStart(3, '0')}`
   return (
     <Card
       ref={cardRef}
@@ -98,7 +99,7 @@ const TamboEngineCard = ({ alert }: TamboEngineCardProps) => {
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <Package className="h-4 w-4" />
                 <span>
-                  {alert.numeroLote} — Producto:{' '}
+                  {loteDisplay} — Producto:{' '}
                   <span className="font-semibold text-slate-700">
                     {alert.producto}
                   </span>

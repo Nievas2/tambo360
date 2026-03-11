@@ -15,6 +15,7 @@ interface AlertCardProps {
   alert: Alert
 }
 const AlertCard = ({ alert }: AlertCardProps) => {
+  const loteDisplay = `#${String(alert.numeroLote).padStart(3, '0')}`
   return (
     <Card className="bg-alert-bg mx-4 rounded-lg gap-4">
       <CardHeader className="space-y-1">
@@ -33,7 +34,7 @@ const AlertCard = ({ alert }: AlertCardProps) => {
           </span>
 
           <span className="flex gap-2 text-xs">
-            <Package className="size-3" /> {alert.numeroLote}
+            <Package className="size-3" /> {loteDisplay}
           </span>
         </CardDescription>
       </CardHeader>
