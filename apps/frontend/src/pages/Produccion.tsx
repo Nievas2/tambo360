@@ -238,17 +238,19 @@ const Produccion: React.FC = () => {
                         {batch.unidad}
                       </TableCell>
                       <TableCell className="truncate">
-                        {batch.mermas
-                          ?.reduce((total, m) => {
-                            const qty =
-                              typeof m.cantidad === 'string'
-                                ? parseFloat(m.cantidad)
-                                : (m.cantidad ?? 0)
-                            return total + qty
-                          }, 0)
-                          .toLocaleString('es-AR') +
-                          ' ' +
-                          batch.unidad}
+                        <Link to={`/produccion/lote/${batch.idLote}/#mermas`}>
+                          {batch.mermas
+                            ?.reduce((total, m) => {
+                              const qty =
+                                typeof m.cantidad === 'string'
+                                  ? parseFloat(m.cantidad)
+                                  : (m.cantidad ?? 0)
+                              return total + qty
+                            }, 0)
+                            .toLocaleString('es-AR') +
+                            ' ' +
+                            batch.unidad}
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -259,18 +261,20 @@ const Produccion: React.FC = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="truncate">
-                        {(batch.costosDirectos.length > 0 &&
-                          batch.costosDirectos[0].moneda) ||
-                          '$'}{' '}
-                        {batch.costosDirectos
-                          ?.reduce((total, m) => {
-                            const qty =
-                              typeof m.monto === 'string'
-                                ? parseFloat(m.monto)
-                                : (m.monto ?? 0)
-                            return total + qty
-                          }, 0)
-                          .toLocaleString('es-AR')}
+                        <Link to={`/produccion/lote/${batch.idLote}/#costos`}>
+                          {(batch.costosDirectos.length > 0 &&
+                            batch.costosDirectos[0].moneda) ||
+                            '$'}{' '}
+                          {batch.costosDirectos
+                            ?.reduce((total, m) => {
+                              const qty =
+                                typeof m.monto === 'string'
+                                  ? parseFloat(m.monto)
+                                  : (m.monto ?? 0)
+                              return total + qty
+                            }, 0)
+                            .toLocaleString('es-AR')}
+                        </Link>
                       </TableCell>
                       <TableCell className="text-center mr-2">
                         <DropdownMenu>

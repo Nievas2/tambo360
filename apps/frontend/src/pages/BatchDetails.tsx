@@ -14,16 +14,17 @@ import { useBatch } from '@/src/hooks/batch/useBatch'
 import { useDeleteBatch } from '@/src/hooks/batch/useDeleteBatch'
 import { Alert } from '@/src/types/alerts'
 import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export default function BatchDetails() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const id = pathname.split('/')[3]
 
   if (!id) {
     return <p>Falta el identificador del lote</p>
   }
+
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
   const [isChangeCostOpen, setIsChangeCostOpen] = useState(false)
   const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
@@ -31,6 +32,20 @@ export default function BatchDetails() {
   const { data: batch, isPending, refetch } = useBatch({ id: id })
   const { mutateAsync, isPending: isPendingDelete, error } = useDeleteBatch()
   const [deleteDialog, setDeleteDialog] = useState(false)
+
+  // Once data finishes loading, scroll to the section indicated by the hash
+  useEffect(() => {
+    if (isPending || !hash) return
+
+    const target = hash.replace('#', '')
+    const timeout = setTimeout(() => {
+      document
+        .getElementById(target)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [isPending, hash])
 
   const handleDelete = async () => {
     try {
@@ -44,7 +59,6 @@ export default function BatchDetails() {
   if (isPending) {
     return (
       <div className="min-h-screen space-y-6 animate-pulse">
-        {/* Header skeleton */}
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 w-full">
             <div className="h-5 w-20 bg-gray-200 rounded-full" />
@@ -58,7 +72,6 @@ export default function BatchDetails() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* Stats grid skeleton */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -72,44 +85,26 @@ export default function BatchDetails() {
             ))}
           </div>
 
-          {/* Alerts skeleton */}
           <div className="flex flex-col gap-2">
-            {Array.from({ length: 1 }).map((_, i) => (
-              <div key={i} className="h-16 w-full bg-gray-100 rounded-2xl" />
-            ))}
+            <div className="h-16 w-full bg-gray-100 rounded-2xl" />
           </div>
 
-          {/* Mermas card skeleton */}
-          <div className="border rounded-xl bg-white py-2">
-            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
-              <div className="h-5 w-36 bg-gray-200 rounded" />
-              <div className="flex gap-2">
-                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
-                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+          {[0, 1].map((i) => (
+            <div key={i} className="border rounded-xl bg-white py-2">
+              <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
+                <div className="h-5 w-36 bg-gray-200 rounded" />
+                <div className="flex gap-2">
+                  <div className="h-10 w-10 bg-gray-200 rounded-lg" />
+                  <div className="h-10 w-36 bg-gray-200 rounded-lg" />
+                </div>
+              </div>
+              <div className="p-4 flex flex-col gap-3">
+                {Array.from({ length: 2 }).map((_, j) => (
+                  <div key={j} className="h-12 w-full bg-gray-100 rounded-lg" />
+                ))}
               </div>
             </div>
-            <div className="p-4 flex flex-col gap-3">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
-              ))}
-            </div>
-          </div>
-
-          {/* Costos card skeleton */}
-          <div className="border rounded-xl bg-white py-2">
-            <div className="border-b border-gray-100 px-4 py-2 flex items-center justify-between">
-              <div className="h-5 w-36 bg-gray-200 rounded" />
-              <div className="flex gap-2">
-                <div className="h-10 w-10 bg-gray-200 rounded-lg" />
-                <div className="h-10 w-36 bg-gray-200 rounded-lg" />
-              </div>
-            </div>
-            <div className="p-4 flex flex-col gap-3">
-              {Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     )
@@ -162,7 +157,7 @@ export default function BatchDetails() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {/* Stats grid */}
+        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <StatCard
             icon={<Droplet />}
@@ -170,7 +165,6 @@ export default function BatchDetails() {
             value={batch?.data?.cantidad}
             unit=" L"
           />
-
           <StatCard
             icon={<Factory />}
             title="Costo de producción"
@@ -179,7 +173,6 @@ export default function BatchDetails() {
               .toString()}
             unit="$ "
           />
-
           <StatCard
             icon={<TrendingDown />}
             title="Merma Registrada"
@@ -192,7 +185,7 @@ export default function BatchDetails() {
                 return total + qty
               }, 0)
               .toString()}
-            unit={' L'}
+            unit=" L"
           />
         </div>
 
@@ -205,16 +198,14 @@ export default function BatchDetails() {
           </div>
         )}
 
-        <Card className="py-2">
+        {/* Mermas — id="mermas" is the scroll target */}
+        <Card className="py-2" id="mermas">
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex gap-1">
-              <p className="text-md font-bold">Historial de mermas</p>
-            </div>
+            <p className="text-md font-bold">Historial de mermas</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
               </Button>
-
               <Button
                 onClick={() => setIsChangeDecreaseOpen(true)}
                 disabled={batch?.data?.estado}
@@ -223,20 +214,17 @@ export default function BatchDetails() {
               </Button>
             </div>
           </div>
-
           <DecreaseTable batch={batch?.data} isPending={isPending} />
         </Card>
 
-        <Card className="py-2">
+        {/* Costos — id="costos" is the scroll target */}
+        <Card className="py-2" id="costos">
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex gap-1">
-              <p className="text-md font-bold">Historial de costos</p>
-            </div>
+            <p className="text-md font-bold">Historial de costos</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
               </Button>
-
               <Button
                 onClick={() => setIsChangeCostOpen(true)}
                 disabled={batch?.data?.estado}
@@ -245,7 +233,6 @@ export default function BatchDetails() {
               </Button>
             </div>
           </div>
-
           <CostTable
             changeCost={() => setIsChangeCostOpen(true)}
             batch={batch?.data}
@@ -257,7 +244,7 @@ export default function BatchDetails() {
         <Button
           variant="ghost"
           className="h-12 w-full border border-black"
-          onClick={() => setIsCompleteBatchOpen(true)}
+          onClick={() => setDeleteDialog(true)}
           disabled={batch?.data?.estado}
         >
           Eliminar lote
