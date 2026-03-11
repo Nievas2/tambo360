@@ -49,6 +49,7 @@ import { Batch } from '@/src/types/batch'
 import { useBatches } from '@/src/hooks/batch/useBatches'
 import DeleteBatch from '@/src/components/shared/dashboard/batch/DeleteBatch'
 import { useDebounce } from 'use-debounce'
+import { HighlightMatch } from '@/src/components/shared/dashboard/batch/HighlightMatch'
 
 const Produccion: React.FC = () => {
   const [isChangeDecreaseOpen, setIsChangeDecreaseOpen] = useState(false)
@@ -84,6 +85,9 @@ const Produccion: React.FC = () => {
     setOrden((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     setPagina(1)
   }
+
+  // The query used for highlighting — strip leading zeros to match numero lote display
+  const highlightQuery = nombre.replace(/^0+/, '')
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500">
@@ -215,130 +219,140 @@ const Produccion: React.FC = () => {
                   ))
                 : data?.data.lotes.length > 0 &&
                   !error &&
-                  data?.data?.lotes.map((batch: Batch) => (
-                    <TableRow key={batch.idLote}>
-                      <TableCell className="text-center">
-                        #{String(batch.numeroLote).padStart(3, '0')}
-                      </TableCell>
-                      <TableCell suppressHydrationWarning>
-                        {batch.fechaProduccion
-                          .slice(0, 10)
-                          .split('-')
-                          .reverse()
-                          .join('/')}
-                      </TableCell>
-                      <TableCell>
-                        <Link to={`/produccion/lote/${batch.idLote}`}>
-                          {batch.producto.nombre}
-                        </Link>
-                      </TableCell>
+                  data?.data?.lotes.map((batch: Batch) => {
+                    const loteDisplay = `#${String(batch.numeroLote).padStart(3, '0')}`
 
-                      <TableCell className="truncate">
-                        {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
-                        {batch.unidad}
-                      </TableCell>
-                      <TableCell className="truncate">
-                        <Link to={`/produccion/lote/${batch.idLote}/#mermas`}>
-                          {batch.mermas
-                            ?.reduce((total, m) => {
-                              const qty =
-                                typeof m.cantidad === 'string'
-                                  ? parseFloat(m.cantidad)
-                                  : (m.cantidad ?? 0)
-                              return total + qty
-                            }, 0)
-                            .toLocaleString('es-AR') +
-                            ' ' +
-                            batch.unidad}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className="font-bold"
-                          variant={batch.estado ? 'success' : 'destructive'}
-                        >
-                          {batch.estado ? 'Completo' : 'Incompleto'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="truncate">
-                        <Link to={`/produccion/lote/${batch.idLote}/#costos`}>
-                          {(batch.costosDirectos.length > 0 &&
-                            batch.costosDirectos[0].moneda) ||
-                            '$'}{' '}
-                          {batch.costosDirectos
-                            ?.reduce((total, m) => {
-                              const qty =
-                                typeof m.monto === 'string'
-                                  ? parseFloat(m.monto)
-                                  : (m.monto ?? 0)
-                              return total + qty
-                            }, 0)
-                            .toLocaleString('es-AR')}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-center mr-2">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Ellipsis />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuGroup>
-                              <DropdownMenuItem>
-                                <Link
-                                  to={`/produccion/lote/${batch.idLote}`}
-                                  className="flex items-center gap-2"
+                    return (
+                      <TableRow key={batch.idLote}>
+                        <TableCell className="text-center">
+                          <HighlightMatch
+                            text={loteDisplay}
+                            query={highlightQuery}
+                          />
+                        </TableCell>
+                        <TableCell suppressHydrationWarning>
+                          {batch.fechaProduccion
+                            .slice(0, 10)
+                            .split('-')
+                            .reverse()
+                            .join('/')}
+                        </TableCell>
+                        <TableCell>
+                          <Link to={`/produccion/lote/${batch.idLote}`}>
+                            <HighlightMatch
+                              text={batch.producto.nombre}
+                              query={highlightQuery}
+                            />
+                          </Link>
+                        </TableCell>
+
+                        <TableCell className="truncate">
+                          {Number(batch.cantidad).toLocaleString('es-AR')}{' '}
+                          {batch.unidad}
+                        </TableCell>
+                        <TableCell className="truncate">
+                          <Link to={`/produccion/lote/${batch.idLote}/#mermas`}>
+                            {batch.mermas
+                              ?.reduce((total, m) => {
+                                const qty =
+                                  typeof m.cantidad === 'string'
+                                    ? parseFloat(m.cantidad)
+                                    : (m.cantidad ?? 0)
+                                return total + qty
+                              }, 0)
+                              .toLocaleString('es-AR') +
+                              ' ' +
+                              batch.unidad}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className="font-bold"
+                            variant={batch.estado ? 'success' : 'destructive'}
+                          >
+                            {batch.estado ? 'Completo' : 'Incompleto'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="truncate">
+                          <Link to={`/produccion/lote/${batch.idLote}/#costos`}>
+                            {(batch.costosDirectos.length > 0 &&
+                              batch.costosDirectos[0].moneda) ||
+                              '$'}{' '}
+                            {batch.costosDirectos
+                              ?.reduce((total, m) => {
+                                const qty =
+                                  typeof m.monto === 'string'
+                                    ? parseFloat(m.monto)
+                                    : (m.monto ?? 0)
+                                return total + qty
+                              }, 0)
+                              .toLocaleString('es-AR')}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-center mr-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Ellipsis />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                  <Link
+                                    to={`/produccion/lote/${batch.idLote}`}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Eye /> Ver Detalles
+                                  </Link>
+                                </DropdownMenuItem>
+                              </DropdownMenuGroup>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuGroup>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedBatch(batch)
+                                    setIsChangeBatchOpen(true)
+                                  }}
+                                  disabled={
+                                    batch.costosDirectos.length > 0 ||
+                                    batch.mermas.length > 0 ||
+                                    batch.estado
+                                  }
                                 >
-                                  <Eye /> Ver Detalles
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedBatch(batch)
-                                  setIsChangeBatchOpen(true)
-                                }}
-                                disabled={
-                                  batch.costosDirectos.length > 0 ||
-                                  batch.mermas.length > 0 ||
-                                  batch.estado
-                                }
-                              >
-                                <Pencil /> Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedBatch(batch)
-                                  setIsChangeDecreaseOpen(true)
-                                }}
-                                disabled={batch.estado}
-                              >
-                                <DropletOff /> Registrar merma
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setLoteId(batch.idLote)
-                                  setIsChangeCostOpen(true)
-                                }}
-                                disabled={batch.estado}
-                              >
-                                <BanknoteArrowUp /> Registrar costo
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
+                                  <Pencil /> Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedBatch(batch)
+                                    setIsChangeDecreaseOpen(true)
+                                  }}
+                                  disabled={batch.estado}
+                                >
+                                  <DropletOff /> Registrar merma
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setLoteId(batch.idLote)
+                                    setIsChangeCostOpen(true)
+                                  }}
+                                  disabled={batch.estado}
+                                >
+                                  <BanknoteArrowUp /> Registrar costo
+                                </DropdownMenuItem>
+                              </DropdownMenuGroup>
 
-                            <DropdownMenuSeparator />
+                              <DropdownMenuSeparator />
 
-                            <DropdownMenuGroup>
-                              <DeleteBatch batch={batch} />
-                            </DropdownMenuGroup>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                              <DropdownMenuGroup>
+                                <DeleteBatch batch={batch} />
+                              </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
             </TableBody>
           </Table>
 
