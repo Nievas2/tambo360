@@ -92,7 +92,10 @@ const Produccion: React.FC = () => {
   const highlightQuery = nombre.replace(/^0+/, '')
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500">
+    <div
+      className="flex flex-col gap-8 animate-in fade-in duration-500"
+      id="top"
+    >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -427,7 +430,12 @@ const Produccion: React.FC = () => {
                   size="icon"
                   className="w-8 h-8 border-gray-200 bg-gray-50 rounded-lg"
                   disabled={pagina <= 1}
-                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  onClick={() => {
+                    setPagina((p) => Math.max(1, p - 1))
+                    document
+                      .getElementById('top')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }}
                 >
                   <ChevronLeft className="w-4 h-4 text-gray-600" />
                 </Button>
@@ -436,9 +444,12 @@ const Produccion: React.FC = () => {
                   size="icon"
                   className="w-8 h-8 border-gray-200 bg-gray-50 rounded-lg"
                   disabled={pagina >= totalPaginas}
-                  onClick={() =>
+                  onClick={() => {
                     setPagina((p) => Math.min(totalPaginas, p + 1))
-                  }
+                    document
+                      .getElementById('top')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }}
                 >
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </Button>
