@@ -212,11 +212,23 @@ export class LoteService {
             take: cantidadPorPagina,
         });
 
+        const lotesConAlertas = await Promise.all(lotes.map(async (lote) => {
+            const alertas = await TamboEngineService.getAlertasPorLote(
+                establecimiento.idEstablecimiento,
+                lote.idLote
+            );
+            return {
+                ...lote,
+                tieneAlertas: alertas.length > 0,
+                alertas: alertas
+            };
+        }));
+
         return {
             pagina,
             totalPaginas,
             totalLotes,
-            lotes,
+            lotes: lotesConAlertas,
         };
 
     }
