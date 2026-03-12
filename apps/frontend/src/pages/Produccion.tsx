@@ -62,7 +62,7 @@ const Produccion: React.FC = () => {
   const [loteId, setLoteId] = useState('')
 
   const [nombre, setNombre] = useState('')
-  const [orden, setOrden] = useState<'asc' | 'desc'>('asc')
+  const [orden, setOrden] = useState<'asc' | 'desc'>('desc')
   const [pagina, setPagina] = useState(1)
 
   const [nameDebounced] = useDebounce(nombre, 300)
