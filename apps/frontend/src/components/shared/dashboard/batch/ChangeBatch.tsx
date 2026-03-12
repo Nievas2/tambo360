@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/src/components/common/select'
 import { AlertCircle, ArrowRight, Grid } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,7 +53,6 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
     closeParentDialog: onClose,
     openParentDialog: onOpen,
   })
-  const { pathname } = useLocation()
 
   const {
     register,
@@ -174,29 +173,16 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
           </DialogHeader>
 
           <div className="p-4 space-y-4">
-            {pathname === '/produccion' ? (
-              <Button
-                variant="default"
-                className="flex items-center justify-center w-full h-14 text-xl font-bold"
-                asChild
-              >
-                <Link to={`/produccion/lote/${id}`} className="block">
-                  Ir al detalle del lote
-                  <ArrowRight className="ml-2 size-6" />
-                </Link>
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                className="flex items-center justify-center w-full h-14 text-xl font-bold"
-                onClick={() => {
-                  onClose()
-                  setFinished(false)
-                }}
-              >
-                Ver detalle del lote <ArrowRight className="ml-2 size-6" />
-              </Button>
-            )}
+            <Button
+              variant="default"
+              className="flex items-center justify-center w-full h-14 text-xl font-bold"
+              asChild
+            >
+              <Link to={`/produccion/lote/${id}`} className="block">
+                Ir al detalle del lote
+                <ArrowRight className="ml-2 size-6" />
+              </Link>
+            </Button>
 
             {!batch && (
               <Button
