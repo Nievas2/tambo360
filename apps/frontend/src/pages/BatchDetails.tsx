@@ -13,7 +13,7 @@ import { AlertCardBatch } from '@/src/components/shared/dashboard/batch/AlertCar
 import { useBatch } from '@/src/hooks/batch/useBatch'
 import { useDeleteBatch } from '@/src/hooks/batch/useDeleteBatch'
 import { Alert } from '@/src/types/alerts'
-import { Droplet, Factory, ListFilter, TrendingDown } from 'lucide-react'
+import { Droplet, Factory, TrendingDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -198,9 +198,9 @@ export default function BatchDetails() {
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <p className="text-md font-bold">Historial de mermas</p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="h-10">
+              {/*  <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
-              </Button>
+              </Button> */}
               <Button
                 onClick={() => setIsChangeDecreaseOpen(true)}
                 disabled={batch?.data?.estado}
@@ -216,9 +216,9 @@ export default function BatchDetails() {
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <p className="text-md font-bold">Historial de costos</p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="h-10">
+              {/*               <Button variant="outline" className="h-10">
                 <ListFilter className="size-4" />
-              </Button>
+              </Button> */}
               <Button
                 onClick={() => setIsChangeCostOpen(true)}
                 disabled={batch?.data?.estado}
