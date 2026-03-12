@@ -62,7 +62,7 @@ const Produccion: React.FC = () => {
   const [loteId, setLoteId] = useState('')
 
   const [nombre, setNombre] = useState('')
-  const [orden, setOrden] = useState<'asc' | 'desc'>('asc')
+  const [orden, setOrden] = useState<'asc' | 'desc'>('desc')
   const [pagina, setPagina] = useState(1)
 
   const [nameDebounced] = useDebounce(nombre, 300)
@@ -417,7 +417,6 @@ const Produccion: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination */}
           {!isPending && data?.data.lotes.length > 0 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
               <span className="text-xs text-gray-400">
@@ -459,10 +458,12 @@ const Produccion: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Modales para registrar merma, costo y lote */}
       <ChangeBatch
         open={isChangeBatchOpen}
-        onClose={() => setIsChangeBatchOpen(false)}
+        onClose={() => {
+          setIsChangeBatchOpen(false)
+          setSelectedBatch(null)
+        }}
         onOpen={() => setIsChangeBatchOpen(true)}
         batch={
           selectedBatch
@@ -495,7 +496,10 @@ const Produccion: React.FC = () => {
 
       <CompleteBatch
         open={isCompleteBatchOpen}
-        onClose={() => setIsCompleteBatchOpen(false)}
+        onClose={() => {
+          setIsCompleteBatchOpen(false)
+          setSelectedBatch(null)
+        }}
         batchId={selectedBatch?.idLote}
         refetch={refetch}
       />

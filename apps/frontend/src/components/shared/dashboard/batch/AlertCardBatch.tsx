@@ -55,18 +55,15 @@ export function AlertCardBatch({ alert }: AlertCardBatchProps) {
     <div
       className={`flex items-center gap-4 rounded-2xl border px-4 py-4 ${config.bg} ${config.border}`}
     >
-      {/* Icon */}
       <div className={`shrink-0 rounded-xl p-5 ${config.iconBg}`}>
         <Robot size={32} className="fill-white" />
       </div>
 
-      {/* Text */}
       <div className="flex flex-col gap-0.5 flex-1 min-w-0">
         <p className="text-sm font-bold text-gray-900">{config.title}</p>
         <p className="text-sm text-gray-500 truncate">{config.description}</p>
       </div>
 
-      {/* Button */}
       <Button
         variant="ghost"
         className={`h-12 shrink-0 border ${config.buttonBorder}`}

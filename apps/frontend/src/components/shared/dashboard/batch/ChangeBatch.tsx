@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/src/components/common/select'
 import { AlertCircle, ArrowRight, Grid } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,7 +53,6 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
     closeParentDialog: onClose,
     openParentDialog: onOpen,
   })
-  const { pathname } = useLocation()
 
   const {
     register,
@@ -129,10 +128,16 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
   return (
     <Dialog
       open={open}
-      onOpenChange={() => {
-        setFinished(false)
-        onClose()
-        reset()
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          setFinished(false)
+          reset({
+            idProducto: '',
+            cantidad: '',
+            fechaProduccion: '',
+          })
+          onClose()
+        }
       }}
     >
       {finished ? (
@@ -168,29 +173,16 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
           </DialogHeader>
 
           <div className="p-4 space-y-4">
-            {pathname === '/produccion' ? (
-              <Button
-                variant="default"
-                className="flex items-center justify-center w-full h-14 text-xl font-bold"
-                asChild
-              >
-                <Link to={`/produccion/lote/${id}`} className="block">
-                  Ir al detalle del lote
-                  <ArrowRight className="ml-2 size-6" />
-                </Link>
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                className="flex items-center justify-center w-full h-14 text-xl font-bold"
-                onClick={() => {
-                  onClose()
-                  setFinished(false)
-                }}
-              >
-                Ver detalle del lote <ArrowRight className="ml-2 size-6" />
-              </Button>
-            )}
+            <Button
+              variant="default"
+              className="flex items-center justify-center w-full h-14 text-xl font-bold"
+              asChild
+            >
+              <Link to={`/produccion/lote/${id}`} className="block">
+                Ir al detalle del lote
+                <ArrowRight className="ml-2 size-6" />
+              </Link>
+            </Button>
 
             {!batch && (
               <Button
@@ -229,7 +221,7 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
 
           <form className="space-y-6" onSubmit={onSubmit}>
             <div className="space-y-4">
-              <Label className="font-bold">Fecha de producción</Label>
+              <Label className="font-bold">Fecha de producción *</Label>
               <Input
                 type="date"
                 placeholder="dd/mm/aaaa"
@@ -244,7 +236,7 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
             </div>
 
             <div className="space-y-4">
-              <Label className="font-bold">Tipo de producción</Label>
+              <Label className="font-bold">Tipo de producción *</Label>
               <Select
                 defaultValue={batch ? batch.idProducto : ''}
                 onValueChange={(e) => setValue('idProducto', e)}
@@ -276,7 +268,7 @@ const ChangeBatch = ({ open, onClose, onOpen, batch }: ChangeBatchProps) => {
 
             <div className="space-y-4">
               <Label className="font-bold">
-                Unidad de medida (Kg / Litros)
+                Cantidad producida (Kg / Litros) *
               </Label>
               <Input
                 type="text"

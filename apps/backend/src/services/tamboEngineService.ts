@@ -44,7 +44,7 @@ export class TamboEngineService {
         }));
     }
 
-    static async analizarSiCorresponde(idEstablecimiento: string) {
+    static async analizarSiCorresponde(idEstablecimiento: string, idLoteTrigger?: string) {
         try {
             // 1. Buscar todos los lotes COMPLETOS del establecimiento (sin filtro de fecha)
             const lotes = await prisma.loteProduccion.findMany({
@@ -56,15 +56,25 @@ export class TamboEngineService {
                 orderBy: { fechaProduccion: 'asc' } // Opcional, pero ayuda a que la IA los reciba ordenados cronológicamente
             });
 
-            // 2. Verificar mínimo de lotes
+            // 2. Verificar mínimo de lotes y determinar qué lotes enviar
             if (lotes.length < MINIMO_LOTES) return;
+
+            // Si hay exactamente 15, enviamos los 15 (análisis inicial)
+            // Si hay más de 15, enviamos SOLO el lote que disparó el evento (análisis progresivo)
+            const lotesAEnviar = lotes.length === MINIMO_LOTES 
+                ? lotes 
+                : (idLoteTrigger 
+                    ? lotes.filter(l => l.idLote === idLoteTrigger)
+                    : [lotes[lotes.length - 1]]);
+
+            if (lotesAEnviar.length === 0) return;
 
             // 3. Armar el payload para el servicio de IA
             const payload = {
                 idEstablecimiento,
-                nombreEstablecimiento: lotes[0].establecimiento?.nombre || idEstablecimiento,
+                nombreEstablecimiento: lotesAEnviar[0].establecimiento?.nombre || idEstablecimiento,
                 periodo: new Date().toLocaleString("es-AR", { month: "long", year: "numeric" }),
-                lotes: lotes.map(l => ({
+                lotes: lotesAEnviar.map(l => ({
                     idLote: l.idLote,
                     numeroLote: l.numeroLote,
                     fechaProduccion: l.fechaProduccion.toISOString().split("T")[0],

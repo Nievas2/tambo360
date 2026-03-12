@@ -6,13 +6,11 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 
-// Componentes UI
 import { Card, CardContent } from '@/src/components/common/card'
 import { Button } from '@/src/components/common/Button'
 import { Label } from '@/src/components/common/label'
 import { Input } from '@/src/components/common/Input'
 
-// Hooks
 import { useForgotPassword } from '@/src/hooks/auth/useForgotPassword'
 import { useResetPassword } from '@/src/hooks/auth/useResetPassword'
 import { useErrorMessage } from '@/src/hooks/useErrorMessage'
@@ -25,12 +23,10 @@ interface ApiError {
   }
 }
 
-// Esquema para validar el Email en el paso 1
 const EmailSchema = z.object({
   email: z.string().email('Ingresa un correo electrónico válido'),
 })
 
-// Esquema para validar contraseñas en el paso 3
 const PasswordsSchema = z
   .object({
     contraseña: z.string().min(8, 'Mínimo 8 caracteres'),
@@ -55,18 +51,15 @@ const ResetPassword: React.FC = () => {
     useForgotPassword()
   const { mutateAsync: resetPass, isPending: isResetting } = useResetPassword()
 
-  // Formulario para el PASO 1 (Email)
   const emailForm = useForm({
     resolver: zodResolver(EmailSchema),
     defaultValues: { email: '' },
   })
 
-  // Formulario para el PASO 3 (Contraseñas)
   const passForm = useForm({
     resolver: zodResolver(PasswordsSchema),
   })
 
-  // Disparadores de Toast para ambos formularios
   useEffect(() => {
     if (
       emailForm.formState.submitCount > 0 &&

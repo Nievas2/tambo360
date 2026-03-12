@@ -37,12 +37,7 @@ interface CostTableProps {
   disabled: boolean
   isPending: boolean
 }
-const CostTable = ({
-  batch,
-  changeCost,
-  disabled,
-  isPending,
-}: CostTableProps) => {
+const CostTable = ({ batch, changeCost, isPending }: CostTableProps) => {
   const [open, setOpen] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const [cost, setCost] = useState<Cost | undefined>(undefined)
@@ -68,7 +63,10 @@ const CostTable = ({
               No se han reportado pérdidas ni ajustes para este lote hasta el
               momento.
             </EmptyDescription>
-            <Button onClick={() => changeCost()} disabled={disabled}>
+            <Button
+              onClick={() => changeCost()}
+              disabled={batch?.estado || isPending}
+            >
               Registrar costo
             </Button>
           </EmptyContent>
@@ -132,7 +130,11 @@ const CostTable = ({
                     <TableCell className="text-center mr-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={batch?.estado || isPending}
+                          >
                             <Ellipsis />
                           </Button>
                         </DropdownMenuTrigger>
@@ -144,7 +146,7 @@ const CostTable = ({
                                 setOpen(true)
                                 setCost(cost)
                               }}
-                              disabled={isPending}
+                              disabled={isPending || batch?.estado}
                             >
                               <Pencil className="size-4" /> Editar
                             </DropdownMenuItem>
@@ -158,7 +160,7 @@ const CostTable = ({
                                 setIdDelete(cost.idCostoDirecto)
                                 setOpenDelete(true)
                               }}
-                              disabled={isPending}
+                              disabled={isPending || batch?.estado}
                             >
                               <Trash className="size-4" /> Eliminar
                             </DropdownMenuItem>

@@ -31,31 +31,28 @@ const LayoutContent = () => {
 
   return (
     <div className="flex h-screen w-full bg-[#F8FAFC] overflow-hidden">
-      {/* Overlay para móvil */}
       {isMobile && showMobileMenu && (
         <div
-          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={() => setShowMobileMenu(false)}
         />
       )}
 
-      {/* Sidebar - Controlamos el ancho exacto aquí */}
       <div
-        className={`h-full z-[70] transition-all duration-300 ease-in-out shrink-0 bg-white border-r border-gray-200
+        className={`h-full z-70 transition-all duration-300 ease-in-out shrink-0 bg-white border-r border-gray-200
           ${isMobile ? 'fixed left-0 top-0 shadow-2xl' : 'relative'}
           ${isMobile && !showMobileMenu ? '-translate-x-full' : 'translate-x-0'}
-          ${!isMobile ? (isCollapsed ? 'w-[80px]' : 'w-[280px]') : 'w-[280px]'}
+          ${!isMobile ? (isCollapsed ? 'w-20' : 'w-70') : 'w-70'}
         `}
       >
         <AppSidebar forcedCollapsed={!isMobile && isCollapsed} />
       </div>
 
-      {/* Contenedor Principal - Ocupa el 100% del espacio sobrante */}
-      <div className="flex flex-col flex-grow min-w-0 h-full">
+      <div className="flex flex-col grow min-w-0 h-full">
         <Navbar onMenuClick={handleToggleMenu} />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-400 mx-auto">
             <Outlet />
           </div>
         </main>
