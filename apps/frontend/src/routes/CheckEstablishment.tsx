@@ -6,7 +6,6 @@ interface CheckEstablishmentProps {
   children: React.ReactNode
 }
 
-// src/routes/CheckEstablishment.tsx
 const CheckEstablishment = ({ children }: CheckEstablishmentProps) => {
   const { user, loading } = useAuth()
 

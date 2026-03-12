@@ -105,7 +105,6 @@ const ComparacionHistorica = () => {
             </div>
 
             <div className="flex gap-2 w-full sm:w-auto">
-              {/* Selector de Producto */}
               <Select
                 value={params.producto}
                 onValueChange={(v: 'quesos' | 'leches') =>
@@ -121,7 +120,6 @@ const ComparacionHistorica = () => {
                 </SelectContent>
               </Select>
 
-              {/* Selector de Métrica */}
               <Select
                 value={params.metrica}
                 onValueChange={(v: 'cantidad' | 'mermas' | 'costos') =>

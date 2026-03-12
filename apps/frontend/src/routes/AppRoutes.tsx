@@ -8,8 +8,7 @@ import Register from '../pages/Register'
 import Produccion from '../pages/Produccion'
 import TamboEngine from '../pages/TamboEngine'
 import Perfil from '../pages/Perfil'
-import ResetPassword from '../pages/ResetPassword' // <--- Importación añadida
-
+import ResetPassword from '../pages/ResetPassword'
 import { ROUTES } from '../constants/routes'
 import LoadingSpinner from '../components/layout/LoadingSpinner'
 import Layout from '../components/layout/Layout'
@@ -25,7 +24,6 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* RUTAS PÚBLICAS: Envolvemos el Outlet con PublicRoute */}
       <Route
         element={
           <PublicRoute>
@@ -35,22 +33,13 @@ export const AppRoutes = () => {
       >
         <Route path={ROUTES.LOGIN} element={<Login />} />
         <Route path={ROUTES.REGISTER} element={<Register />} />
-        {/* Nueva ruta añadida aquí */}
         <Route path="/auth/reset-password" element={<ResetPassword />} />
       </Route>
 
       <Route path={'/auth/verify'} element={<VerifyUser />} />
 
-      <Route
-        path={'/establecimiento'}
-        element={
-          
-            <Establishment />
-          
-        }
-      />
+      <Route path={'/establecimiento'} element={<Establishment />} />
 
-      {/* RUTAS PROTEGIDAS: Envolvemos el Layout con ProtectedRoute */}
       <Route
         element={
           <ProtectedRoute>
@@ -60,7 +49,6 @@ export const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        {/* El path "/" solo debe servir para redireccionar, sin capturar subrutas */}
         <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
@@ -70,7 +58,6 @@ export const AppRoutes = () => {
         <Route path="/perfil" element={<Perfil />} />
       </Route>
 
-      {/* Catch-all para redirigir cualquier ruta no encontrada */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

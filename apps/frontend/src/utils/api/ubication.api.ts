@@ -1,4 +1,3 @@
-// Importamos el JSON (asegúrate de que la ruta sea la correcta en tu proyecto)
 import provincesData from '@/src/utils/assets/ubications/provinces.json'
 import localitiesData from '@/src/utils/assets/ubications/localities.json'
 
@@ -22,17 +21,10 @@ export const getProvinces = (name: string = '') => {
   return Promise.resolve({ data: { provincias: filtered } })
 }
 
-/**
- * Obtiene y filtra localidades desde el JSON local
- * @param id ID de la provincia (ej: "06")
- * @param search Término de búsqueda para el nombre de la localidad
- */
 export const getLocalities = (id: string, search: string = '') => {
   const query = removeAccents(search.toLowerCase().trim())
 
-  // 1. Primero filtramos por ID de provincia para reducir el universo de búsqueda
-  // 2. Luego filtramos por coincidencia de nombre (sin acentos)
-  const filtered = localitiesData // O "localidades", según la raíz de tu JSON
+  const filtered = localitiesData
     .filter((loc) => loc.provincia.id === id)
     .filter((loc) => removeAccents(loc.nombre.toLowerCase()).includes(query))
     .map((loc) => ({

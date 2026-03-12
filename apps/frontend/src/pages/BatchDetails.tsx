@@ -33,7 +33,6 @@ export default function BatchDetails() {
   const { mutateAsync, isPending: isPendingDelete, error } = useDeleteBatch()
   const [deleteDialog, setDeleteDialog] = useState(false)
 
-  // Once data finishes loading, scroll to the section indicated by the hash
   useEffect(() => {
     if (isPending || !hash) return
 
@@ -114,7 +113,6 @@ export default function BatchDetails() {
 
   return (
     <div className="min-h-screen space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-0.5 w-full">
           <Badge variant={batch?.data?.estado ? 'success' : 'destructive'}>
@@ -157,7 +155,6 @@ export default function BatchDetails() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <StatCard
             icon={<Droplet />}
@@ -189,7 +186,6 @@ export default function BatchDetails() {
           />
         </div>
 
-        {/* TamboEngine Alerts */}
         {alertas.length > 0 && (
           <div className="flex flex-col gap-2">
             {alertas.map((alert) => (
@@ -198,7 +194,6 @@ export default function BatchDetails() {
           </div>
         )}
 
-        {/* Mermas — id="mermas" is the scroll target */}
         <Card className="py-2" id="mermas">
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <p className="text-md font-bold">Historial de mermas</p>
@@ -217,7 +212,6 @@ export default function BatchDetails() {
           <DecreaseTable batch={batch?.data} isPending={isPending} />
         </Card>
 
-        {/* Costos — id="costos" is the scroll target */}
         <Card className="py-2" id="costos">
           <div className="px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
             <p className="text-md font-bold">Historial de costos</p>

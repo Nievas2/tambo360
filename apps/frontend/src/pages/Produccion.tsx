@@ -417,7 +417,6 @@ const Produccion: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination */}
           {!isPending && data?.data.lotes.length > 0 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
               <span className="text-xs text-gray-400">
@@ -459,7 +458,6 @@ const Produccion: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Modales para registrar merma, costo y lote */}
       <ChangeBatch
         open={isChangeBatchOpen}
         onClose={() => {

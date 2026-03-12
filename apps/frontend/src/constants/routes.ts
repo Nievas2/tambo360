@@ -5,13 +5,13 @@ export const ROUTES = {
   REGISTER: '/register',
   RESET_PASSWORD: '/auth/reset-password',
 
-  // Rutas Privadas (Dashboard y Operaciones)
+  // Rutas Privadas
   DASHBOARD: '/dashboard',
-  PRODUCCION: '/produccion', // Registro de producción por lotes (HU1)
-  MERMAS: '/mermas', // Registro de mermas (HU2)
-  COSTOS: '/costos', // Registro de costos directos
-  REPORTES: '/reportes', // Indicadores operativos básicos
-  ALERTAS: '/alertas', // Alertas de TamboEngine (HU4)
+  PRODUCCION: '/produccion',
+  MERMAS: '/mermas',
+  COSTOS: '/costos',
+  REPORTES: '/reportes',
+  ALERTAS: '/alertas',
 } as const
 
 export const API_ENDPOINTS = {

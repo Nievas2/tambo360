@@ -24,8 +24,6 @@ const TamboEngine: React.FC = () => {
 
   return (
     <main className="flex flex-col gap-4">
-      {' '}
-      {/* Agregado padding al contenedor principal */}
       <h2 className="text-4xl font-bold">TamboEngine - IA</h2>
       <p>
         TamboEngine analiza automáticamente los datos históricos de producción,

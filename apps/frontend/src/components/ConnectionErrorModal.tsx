@@ -22,12 +22,10 @@ export const ConnectionErrorModal = ({
   return (
     <Dialog open={open} onOpenChange={onCancel}>
       <DialogContent className="max-w-sm text-center space-y-6 py-8">
-        {/* Icon */}
         <DialogTitle className="flex justify-center">
           <ErrorIcon />
         </DialogTitle>
 
-        {/* Text */}
         <div className="space-y-2 px-2">
           <h2 className="text-xl font-bold text-slate-900">
             No pudimos guardar los cambios
@@ -35,7 +33,6 @@ export const ConnectionErrorModal = ({
           <p className="text-sm text-slate-500 leading-relaxed">{message}</p>
         </div>
 
-        {/* Actions */}
         <div className="flex flex-col gap-3 px-2">
           <Button className="w-full h-12 font-semibold" onClick={onRetry}>
             Intentar de nuevo

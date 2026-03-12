@@ -66,7 +66,6 @@ const Perfil: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      {/* Cabecera del Perfil */}
       <div className="flex flex-col items-center mb-8">
         <Avatar className="h-24 w-24 mb-4 shadow-sm">
           <AvatarImage src="" />
@@ -80,11 +79,9 @@ const Perfil: React.FC = () => {
         </p>
       </div>
 
-      {/* Contenedor Principal */}
       <Card className="w-full max-w-md border-none shadow-lg">
         <CardContent className="p-2 space-y-2">
           <Accordion type="single" collapsible className="w-full space-y-2">
-            {/* Datos Personales */}
             <AccordionItem value="datos" className="border-none">
               <AccordionTrigger className="hover:no-underline py-3 px-4 bg-[#F1F1F1] hover:bg-[#BABABA] rounded-t-lg group">
                 <div className="flex items-center gap-4 text-gray-600">
@@ -116,7 +113,6 @@ const Perfil: React.FC = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Configuración del establecimiento */}
             <AccordionItem value="config" className="border-none">
               <AccordionTrigger className="hover:no-underline py-3 px-4 bg-[#F1F1F1] hover:bg-[#BABABA] group">
                 <div className="flex items-center gap-4 text-gray-600">
@@ -162,7 +158,6 @@ const Perfil: React.FC = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Ayuda y soporte */}
             <AccordionItem value="ayuda" className="border-none">
               <AccordionTrigger className="hover:no-underline py-3 px-4 bg-[#F1F1F1] hover:bg-[#BABABA] group">
                 <div className="flex items-center gap-4 text-gray-600">
@@ -181,7 +176,6 @@ const Perfil: React.FC = () => {
             </AccordionItem>
           </Accordion>
 
-          {/* Botón Cerrar Sesión (No expandible) */}
           <Button
             className="w-full flex items-center justify-between py-4 px-4 bg-alert-bg hover:bg-[#BABABA]  transition-colors rounded-b-lg group h-15"
             onClick={logout}

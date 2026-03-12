@@ -83,7 +83,6 @@ const DailyProductionLog = () => {
                     <TableCell>
                       {batch.cantidad} {batch.unidad}
                     </TableCell>
-                    {/* calcula todas las mermas y las suma */}
                     <TableCell>
                       {batch.mermas?.reduce((total, m) => {
                         const qty =

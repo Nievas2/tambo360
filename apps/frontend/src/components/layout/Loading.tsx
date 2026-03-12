@@ -2,7 +2,6 @@ const Loading = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <div className="relative w-48 h-48 flex items-center justify-center">
-        {/* Capa base: gris y transparente */}
         <img
           src="/isotipo_tambo 1.svg"
           alt=""
@@ -10,7 +9,6 @@ const Loading = () => {
           style={{ filter: 'grayscale(100%) opacity(0.15)' }}
         />
 
-        {/* Capa fill: se revela de abajo hacia arriba */}
         <img
           src="/isotipo_tambo 1.svg"
           alt="Cargando..."
