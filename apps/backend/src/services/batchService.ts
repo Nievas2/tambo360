@@ -55,7 +55,7 @@ export class LoteService {
 
         // Disparar en background el análisis de IA si se creó como completado
         if (lote.estado) {
-            TamboEngineService.analizarSiCorresponde(establecimiento.idEstablecimiento);
+            TamboEngineService.analizarSiCorresponde(establecimiento.idEstablecimiento, lote.idLote);
         }
 
         return lote;
@@ -294,7 +294,7 @@ export class LoteService {
         });
 
         // Disparar en background el análisis de IA al completarse
-        TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento);
+        TamboEngineService.analizarSiCorresponde(lote.idEstablecimiento, lote.idLote);
 
         return loteActualizado;
     }
