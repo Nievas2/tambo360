@@ -1,3 +1,4 @@
+import { Button } from '@/src/components/common/Button'
 import { Card, CardContent } from '@/src/components/common/card'
 import {
   Select,
@@ -11,16 +12,22 @@ import TamboEngineCard from '@/src/components/shared/dashboard/tambo engine/Tamb
 import { useAuth } from '@/src/context/AuthContext'
 import { useAlerts } from '@/src/hooks/alerts/useAlerts'
 import { Alert } from '@/src/types/alerts'
-import { Bot } from 'lucide-react'
-import React, { useState } from 'react'
+import { Bot, RotateCw } from 'lucide-react'
+import React, { useCallback, useState } from 'react'
 
 const TamboEngine: React.FC = () => {
   const [range, setRange] = useState<'7' | '14' | '30'>('7')
   const { user } = useAuth()
-  const { data, isPending } = useAlerts({
+  const { data, isPending, refetch, isFetching } = useAlerts({
     id: user.establecimientos[0].idEstablecimiento,
     range: range,
   })
+
+  const handleRefetch = useCallback(() => {
+    if (!isPending) {
+      refetch()
+    }
+  }, [isPending, refetch])
 
   return (
     <main className="flex flex-col gap-4">
@@ -31,7 +38,7 @@ const TamboEngine: React.FC = () => {
         Las alertas generadas son informativas y ayudan a comprender el
         comportamiento productivo sin sustituir el criterio del encargado.
       </p>
-      <div>
+      <div className="flex gap-2 items-center">
         <Select
           onValueChange={(e) => setRange(e as '7' | '14' | '30')}
           defaultValue={range}
@@ -48,6 +55,21 @@ const TamboEngine: React.FC = () => {
             <SelectItem value="30">Último mes</SelectItem>
           </SelectContent>
         </Select>
+
+        <Button
+          variant="outline"
+          onClick={handleRefetch}
+          className={`size-[50px] transition-all duration-500 bg-[#F1F5F9] ${
+            isPending || isFetching ? 'opacity-70' : ''
+          }`}
+          disabled={isPending || isFetching}
+        >
+          <RotateCw
+            className={`transition-transform duration-500 ${
+              isPending || isFetching ? 'animate-spin' : ''
+            }`}
+          />
+        </Button>
       </div>
       <div className="flex flex-col gap-4">
         {isPending ? (
