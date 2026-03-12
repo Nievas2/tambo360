@@ -129,7 +129,11 @@ const DecreaseTable = ({ batch, isPending }: DecreaseTableProps) => {
                     <TableCell className="text-center mr-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={batch?.estado}
+                          >
                             <Ellipsis />
                           </Button>
                         </DropdownMenuTrigger>
@@ -141,7 +145,7 @@ const DecreaseTable = ({ batch, isPending }: DecreaseTableProps) => {
                                 setOpen(true)
                                 setDecrease(decrease)
                               }}
-                              disabled={isPending}
+                              disabled={isPending || batch?.estado}
                             >
                               <Pencil className="size-4" /> Editar
                             </DropdownMenuItem>
@@ -155,7 +159,7 @@ const DecreaseTable = ({ batch, isPending }: DecreaseTableProps) => {
                                 setIdDelete(decrease.idMerma)
                                 setOpenDelete(true)
                               }}
-                              disabled={isPending}
+                              disabled={isPending || batch?.estado}
                             >
                               <Trash className="size-4" /> Eliminar
                             </DropdownMenuItem>
