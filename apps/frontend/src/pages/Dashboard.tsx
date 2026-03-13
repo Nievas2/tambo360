@@ -67,10 +67,14 @@ const Dashboard = () => {
           title="Mermas Totales"
           value={porcentajeMermas.toFixed(2)}
           unit="%"
-          trend={{
-            value: data?.data.variaciones.mermas,
-            isPositive: data?.data.variaciones.mermas <= 0,
-          }}
+          trend={
+            data?.data.variaciones.costos != null
+              ? {
+                  value: data?.data.variaciones.mermas,
+                  isPositive: data?.data.variaciones.mermas <= 0,
+                }
+              : null
+          }
           description={`vs ${data?.data.mesPrevio}`}
           isPending={isPending}
         />
