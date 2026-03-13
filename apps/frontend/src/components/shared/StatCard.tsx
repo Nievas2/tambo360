@@ -53,8 +53,16 @@ export const StatCard = ({
 
             <div className="flex items-center gap-1.5 mt-1">
               {trend != null ? (
-                <div className="flex items-center gap-1 text-[13px] font-bold text-slate-600">
-                  <span>{trend.isPositive ? '↑' : '↓'}</span>
+                <div
+                  className={`flex items-center gap-1 text-[13px] font-bold ${trend.isPositive || (trend.isPositive && (title == 'Mermas Totales' || title == 'Costos totales')) ? 'text-green-main' : 'text-red-main'}`}
+                >
+                  <span>
+                    {trend.isPositive ||
+                    title == 'Costos totales' ||
+                    title == 'Mermas Totales'
+                      ? '↑'
+                      : '↓'}
+                  </span>
                   <span>{trend.value?.toString().split('.')[0]}% </span>
                   <span className="text-[12px] text-slate-400 font-medium font-inter">
                     {description}
