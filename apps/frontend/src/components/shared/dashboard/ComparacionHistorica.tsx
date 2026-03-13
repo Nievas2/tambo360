@@ -97,7 +97,7 @@ const ComparacionHistorica = () => {
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <CardTitle className="text-lg font-bold text-slate-800">
-                Histórico de {params.producto}
+                Comparación histórico
               </CardTitle>
               <p className="text-muted-foreground text-xs">
                 Últimos 6 meses de {params.metrica}

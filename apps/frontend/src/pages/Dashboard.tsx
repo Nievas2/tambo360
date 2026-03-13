@@ -83,7 +83,7 @@ const Dashboard = () => {
             data?.data.variaciones.costos != null
               ? {
                   value: data.data.variaciones.costos,
-                  isPositive: data.data.variaciones.costos >= 0,
+                  isPositive: data.data.variaciones.costos <= 0,
                 }
               : null
           }
